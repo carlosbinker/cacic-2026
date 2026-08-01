@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+*.egg-info/
+
+# Pesos de modelos descargados de HuggingFace (varios GB, no se versionan)
+.hf_cache/
+models_cache/
+
+# Salidas generadas localmente (se regeneran corriendo el pipeline)
+outputs/*.tmp
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
