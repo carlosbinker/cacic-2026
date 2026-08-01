@@ -1,0 +1,33 @@
+id,comando,intent,dispositivo,ubicacion,valor,unidad
+0,Prendé la luz del living.,encender,luz,living,,
+1,Apagá la luz de la cocina.,apagar,luz,cocina,,
+2,Encendé el aire acondicionado del dormitorio.,encender,aire_acondicionado,dormitorio,,
+3,Apagá la tele del living.,apagar,tv,living,,
+4,Prendé el ventilador del garage.,encender,ventilador,garage,,
+5,Apagá la calefacción del baño.,apagar,calefaccion,bano,,
+6,Encendé el parlante de la cocina.,encender,parlante,cocina,,
+7,Cerrá la cerradura de la entrada.,apagar,cerradura,entrada,,
+8,Poné el aire del dormitorio en 22 grados.,ajustar,aire_acondicionado,dormitorio,22,°C
+9,Bajá la persiana del living al 50%.,ajustar,persiana,living,50,%
+10,Poné la luz del dormitorio al 30% de brillo.,ajustar,luz,dormitorio,30,%
+11,Configurá la calefacción de la cocina a 24 grados.,ajustar,calefaccion,cocina,24,°C
+12,Subí la cortina del patio al 100%.,ajustar,cortina,patio,100,%
+13,Poné el volumen del parlante del living en 40%.,ajustar,parlante,living,40,%
+14,Dejá la luz del baño al 10%.,ajustar,luz,bano,10,%
+15,Poné el aire del living en 19 grados.,ajustar,aire_acondicionado,living,19,°C
+16,Bajale un poco a la luz del living.,ajustar,luz,living,,
+17,"Hace un poco más de calor en el dormitorio, subí la calefacción.",ajustar,calefaccion,dormitorio,,
+18,"Está muy fuerte el aire de la cocina, bajalo.",ajustar,aire_acondicionado,cocina,,
+19,Subí un poco el volumen del parlante del dormitorio.,ajustar,parlante,dormitorio,,
+20,"La persiana del baño no cerró del todo, bajala un toque más.",ajustar,persiana,bano,,
+21,Subile más luz al living que está muy oscuro.,ajustar,luz,living,,
+22,Apagá todas las luces de la casa.,apagar,luz,todas,,
+23,Prendé todos los aires acondicionados.,encender,aire_acondicionado,todas,,
+24,Bajá todas las persianas de la casa.,ajustar,persiana,todas,0,%
+25,Apagá todo antes de dormir.,apagar,todos,todas,,
+26,¿Está prendida la luz del living?,consultar,luz,living,,
+27,¿A cuántos grados está el aire del dormitorio?,consultar,aire_acondicionado,dormitorio,,
+28,¿Quedó cerrada la cerradura de la entrada?,consultar,cerradura,entrada,,
+29,"No dejes prendida la luz de la cocina, apagala.",apagar,luz,cocina,,
+30,"Che, la tele del living quedó prendida, apagala por favor.",apagar,tv,living,,
+31,"Antes me olvidé, prendé la luz del baño.",encender,luz,bano,,

@@ -1,0 +1,58 @@
+[
+  {
+    "modelo": "SmolLM2-360M-Instruct",
+    "params_b": 0.36,
+    "load_time_s": 49.7,
+    "n": 32,
+    "json_valido_pct": 100.0,
+    "exact_match_pct": 18.8,
+    "avg_latencia_s": 15.617,
+    "acc_intent_pct": 40.6,
+    "acc_dispositivo_pct": 68.8,
+    "acc_ubicacion_pct": 71.9,
+    "acc_valor_pct": 78.1,
+    "acc_unidad_pct": 78.1
+  },
+  {
+    "modelo": "Qwen2.5-0.5B-Instruct",
+    "params_b": 0.494,
+    "load_time_s": 56.3,
+    "n": 32,
+    "json_valido_pct": 100.0,
+    "exact_match_pct": 43.8,
+    "avg_latencia_s": 14.681,
+    "acc_intent_pct": 84.4,
+    "acc_dispositivo_pct": 81.2,
+    "acc_ubicacion_pct": 81.2,
+    "acc_valor_pct": 78.1,
+    "acc_unidad_pct": 78.1
+  },
+  {
+    "modelo": "Qwen2.5-1.5B-Instruct",
+    "params_b": 1.54,
+    "load_time_s": 132.2,
+    "n": 32,
+    "json_valido_pct": 100.0,
+    "exact_match_pct": 50.0,
+    "avg_latencia_s": 43.159,
+    "acc_intent_pct": 93.8,
+    "acc_dispositivo_pct": 87.5,
+    "acc_ubicacion_pct": 90.6,
+    "acc_valor_pct": 90.6,
+    "acc_unidad_pct": 78.1
+  },
+  {
+    "modelo": "SmolLM2-1.7B-Instruct",
+    "params_b": 1.71,
+    "load_time_s": 158.4,
+    "n": 32,
+    "json_valido_pct": 100.0,
+    "exact_match_pct": 59.4,
+    "avg_latencia_s": 61.869,
+    "acc_intent_pct": 87.5,
+    "acc_dispositivo_pct": 87.5,
+    "acc_ubicacion_pct": 96.9,
+    "acc_valor_pct": 78.1,
+    "acc_unidad_pct": 75.0
+  }
+]
