@@ -66,14 +66,19 @@ def evaluar_modelo(modelo_info, dataset: pd.DataFrame) -> list[dict]:
             {"role": "system", "content": SYSTEM_PROMPT_RECONSTRUIDO},
             {"role": "user", "content": construir_prompt_usuario(comando)},
         ]
+        # return_dict=True es necesario: sin esto, algunas versiones de
+        # transformers devuelven un BatchEncoding sin atributo .shape en
+        # vez del tensor de input_ids, y model.generate() falla con
+        # AttributeError al intentar leer inputs_tensor.shape[0].
         entrada = tokenizer.apply_chat_template(
-            mensajes, add_generation_prompt=True, return_tensors="pt"
+            mensajes, add_generation_prompt=True, return_tensors="pt",
+            return_dict=True,
         )
 
         inicio = time.perf_counter()
         with torch.no_grad():
             salida = modelo.generate(
-                entrada,
+                **entrada,          # unpackea input_ids + attention_mask
                 max_new_tokens=128,
                 do_sample=False,   # decodificación determinista (greedy),
                 temperature=None,  # Sección 3.1: "sin muestreo, temperatura
@@ -83,7 +88,7 @@ def evaluar_modelo(modelo_info, dataset: pd.DataFrame) -> list[dict]:
         latencia_s = time.perf_counter() - inicio
 
         texto_generado = tokenizer.decode(
-            salida[0][entrada.shape[1]:], skip_special_tokens=True
+            salida[0][entrada["input_ids"].shape[1]:], skip_special_tokens=True
         )
 
         pred, json_valido, nota = extraer_json(texto_generado)
