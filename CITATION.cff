@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "Si usás este código, por favor citá el paper original."
+title: "SLMs para interpretación de comandos de domótica en español rioplatense"
+type: software
+authors:
+  - name: "[Nombre y Apellido del autor/a]"
+    affiliation: "[Afiliación / Institución]"
+license: MIT
+preferred-citation:
+  type: conference-paper
+  title: "Modelos de Lenguaje Pequeños para la Interpretación de Comandos de Domótica en Español: Un Estudio Comparativo"
+  authors:
+    - name: "[Nombre y Apellido del autor/a]"
+  conference:
+    name: "XXXII Congreso Argentino de Ciencias de la Computación (CACIC 2026)"
+  year: 2026
