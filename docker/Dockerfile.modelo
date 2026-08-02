@@ -1,0 +1,36 @@
+# Imagen de evaluación de UN modelo del roster 2026.
+#
+# Se construye una por modelo para que los árboles de dependencias queden
+# aislados: varios modelos del roster (Granite 4.0 hibridos, LFM2.5, Qwen3.5)
+# son releases recientes y pueden exigir versiones distintas de transformers.
+# El pin efectivo de cada uno vive en src/models_2026.py y se documenta en
+# docker/README.md (ver RF5 del TODO).
+#
+# La caché de pesos SÍ se comparte entre imágenes (un solo volumen .hf_cache):
+# aísla dependencias, no descargas.
+#
+# Credenciales (F11): esta imagen no declara ni recibe ningún token. Los dos
+# modelos gated leen $HF_TOKEN del entorno en runtime, inyectado únicamente
+# con `docker run --env-file .env` (ver docker/README.md).
+
+FROM python:3.11-slim
+
+ARG TRANSFORMERS_PIN="transformers>=4.57.0"
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY docker/requirements-base.txt .
+RUN pip install --no-cache-dir -r requirements-base.txt \
+    && pip install --no-cache-dir "${TRANSFORMERS_PIN}"
+
+COPY src/ /app/src/
+COPY data/dataset_comandos_domotica.csv /app/data/dataset_comandos_domotica.csv
+
+ENV HF_HOME=/app/.hf_cache
+ENV PYTHONUNBUFFERED=1
+
+CMD ["python", "src/run_sweep_2026.py", "--listar"]

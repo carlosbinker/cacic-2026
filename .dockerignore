@@ -1,0 +1,17 @@
+# El contexto de build no debe arrastrar pesos, PDFs ni credenciales.
+# .env y *.env son obligatorios acá (F11/RF17): el token de HuggingFace nunca
+# puede entrar en el contexto de build ni en una capa de imagen.
+.env
+*.env
+.hf_token
+.git
+.hf_cache
+.claude-scratch
+data/2026
+figures
+paper
+LaTeX2e*
+*.docx
+*.pdf
+__pycache__
+.pytest_cache
