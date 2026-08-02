@@ -551,3 +551,209 @@ Se verifica al final del ciclo (`create-test-plan` / `run-test-plan`), no dentro
 10. **Amenazas nuevas presentes.** `06_amenazas.tex` cubre explícitamente las **cuatro** amenazas de RF16.
 11. **Historial limpio.** Un commit por subtask en `feat/reescritura-experimento-2026`, y `paper_cacic_LNCS_word.docx` sigue sin trackear, y `.env` sigue sin trackear (`git ls-files` no lista `.env` ni ningún `*.env`).
 12. **Ningún secreto versionado.** `git grep -iE 'hf_[A-Za-z0-9]{20,}'` sale vacío (exit 1) en todo el árbol trackeado — el patrón es estricto a propósito: un token de HuggingFace es `hf_` + ~34 alfanuméricos, mientras que `hf_repo_id`, `.hf_cache`, `HF_TOKEN` y `HF_HOME` son identificadores legítimos del diseño y deben seguir existiendo. Además, `git grep -nE 'ARG +HF_TOKEN|ENV +HF_TOKEN|COPY +\.env' docker/` sale vacío, y `git ls-files` no lista `.env`.
+
+## 6. Tareas globales de test
+
+Insertadas por `/create-test-plan`. **No son nodos del DAG de §3**: son tareas a nivel índice que cubren dos verificaciones *cross-task* que ningún bloque `Verify` de subtask puede cubrir, porque cruzan artefactos de subtasks distintos. Se ejecutan con el resto del ciclo y las consume `TEST_PLAN.md` (Test 2 y Test 3). Cada una lleva su propio commit, igual que un subtask (RNF5).
+
+### G1 — `tests/test_credenciales_gated.py`: fallo temprano por credencial ausente
+
+**depends_on:** [01, 04] — cruza el flag `gated` de `src/models_2026.py` (subtask 01) con `validar_credenciales` de `docker/run_sweep.py` (subtask 04). Ninguno de los dos lo testea: el subtask 04 testea que `--env-file` se agregue solo a los gated, pero **no** que el barrido aborte cuando falta el token. Es el invariante de cierre del *Delta 01* y el que evita que un barrido de 5–9 h muera a mitad de camino.
+
+**Archivos:** `tests/test_credenciales_gated.py`
+
+- [ ] Escribir `tests/test_credenciales_gated.py` completo:
+
+  ```python
+  """Invariante del Delta 01 / F11: si la corrida incluye modelos gated y falta
+  el token, el barrido aborta ANTES de construir o descargar nada, con un
+  mensaje que jamás imprime el valor del token."""
+
+  import importlib.util
+  import sys
+  from pathlib import Path
+
+  import pytest
+
+  RAIZ = Path(__file__).resolve().parent.parent
+  sys.path.insert(0, str(RAIZ / "src"))
+
+  from models_2026 import MODELOS_2026, gated, por_nombre  # noqa: E402
+
+  # Valor ficticio deliberadamente sin la forma `hf_` + 20+ alfanuméricos, para
+  # que el escaneo de secretos (AC12) no lo tome por un token real.
+  TOKEN_FICTICIO = "valor-de-prueba-no-es-un-token"
+
+
+  def _cargar_run_sweep():
+      """`docker/` no es un paquete importable: se carga el módulo por ruta."""
+      ruta = RAIZ / "docker" / "run_sweep.py"
+      spec = importlib.util.spec_from_file_location("run_sweep_docker", ruta)
+      modulo = importlib.util.module_from_spec(spec)
+      spec.loader.exec_module(modulo)
+      return modulo
+
+
+  @pytest.fixture(scope="module")
+  def run_sweep():
+      return _cargar_run_sweep()
+
+
+  def test_aborta_si_no_existe_el_archivo_env(run_sweep, tmp_path):
+      with pytest.raises(ValueError) as exc:
+          run_sweep.validar_credenciales(gated(), tmp_path)
+      assert ".env" in str(exc.value)
+
+
+  def test_aborta_si_el_token_esta_vacio(run_sweep, tmp_path):
+      (tmp_path / ".env").write_text("HF_TOKEN=\n", encoding="utf-8")
+      with pytest.raises(ValueError) as exc:
+          run_sweep.validar_credenciales(gated(), tmp_path)
+      assert "HF_TOKEN" in str(exc.value)
+
+
+  def test_aborta_si_el_token_no_esta_declarado(run_sweep, tmp_path):
+      (tmp_path / ".env").write_text("OTRA_COSA=1\n", encoding="utf-8")
+      with pytest.raises(ValueError):
+          run_sweep.validar_credenciales(gated(), tmp_path)
+
+
+  @pytest.mark.parametrize("nombre", ["gemma-3-270m-it", "Llama-3.2-1B-Instruct"])
+  def test_un_solo_modelo_gated_ya_dispara_el_aborto(run_sweep, tmp_path, nombre):
+      with pytest.raises(ValueError):
+          run_sweep.validar_credenciales([por_nombre(nombre)], tmp_path)
+
+
+  def test_los_doce_no_gated_corren_sin_credenciales(run_sweep, tmp_path):
+      no_gated = [m for m in MODELOS_2026 if not m.gated]
+      assert len(no_gated) == 12
+      assert run_sweep.validar_credenciales(no_gated, tmp_path) is None
+
+
+  def test_no_aborta_con_el_token_presente(run_sweep, tmp_path):
+      (tmp_path / ".env").write_text(f"HF_TOKEN={TOKEN_FICTICIO}\n", encoding="utf-8")
+      assert run_sweep.validar_credenciales(list(MODELOS_2026), tmp_path) is None
+
+
+  def test_leer_el_token_no_lo_imprime(run_sweep, tmp_path, capsys):
+      ruta_env = tmp_path / ".env"
+      ruta_env.write_text(f"HF_TOKEN={TOKEN_FICTICIO}\n", encoding="utf-8")
+      assert run_sweep._hf_token_de_env(ruta_env) == TOKEN_FICTICIO
+      capturado = capsys.readouterr()
+      assert TOKEN_FICTICIO not in capturado.out
+      assert TOKEN_FICTICIO not in capturado.err
+
+
+  def test_el_mensaje_de_aborto_no_filtra_el_token(run_sweep, tmp_path):
+      (tmp_path / ".env").write_text(f"HF_TOKEN=   \nOTRA={TOKEN_FICTICIO}\n", encoding="utf-8")
+      with pytest.raises(ValueError) as exc:
+          run_sweep.validar_credenciales(gated(), tmp_path)
+      assert TOKEN_FICTICIO not in str(exc.value)
+  ```
+
+- [ ] Correr y confirmar **verde**: `pytest -q tests/test_credenciales_gated.py`
+- [ ] Confirmar que el valor ficticio no dispara el escaneo de secretos:
+  `git grep -iE 'hf_[A-Za-z0-9]{20,}' -- tests/test_credenciales_gated.py` → vacío (exit 1)
+- [ ] Correr la suite completa: `pytest -q`
+- [ ] `git add tests/test_credenciales_gated.py`
+- [ ] `git commit -m "test: fallo temprano del barrido si falta \$HF_TOKEN para los modelos gated"`
+
+### G2 — `tests/test_integracion_2026.py`: integridad de los artefactos del pipeline
+
+**depends_on:** [01, 05, 06, 08, 09] — verifica de una sola vez los criterios AC2, AC3 y AC4, que abarcan artefactos producidos por cuatro subtasks distintos y por eso no son atribuibles a ninguno. Los tests están guardados por `skipif` sobre la existencia de los artefactos, de modo que `pytest -q` sigue verde en cada commit desde el primero (RNF4) y el archivo se puede crear apenas termine el subtask 01.
+
+**Archivos:** `tests/test_integracion_2026.py`
+
+- [ ] Escribir `tests/test_integracion_2026.py` completo:
+
+  ```python
+  """AC2/AC3/AC4: integridad cross-task de `data/2026/`. Solo lee artefactos ya
+  producidos; nunca reejecuta el barrido ni al juez."""
+
+  import json
+  import sys
+  from pathlib import Path
+
+  import pandas as pd
+  import pytest
+
+  RAIZ = Path(__file__).resolve().parent.parent
+  sys.path.insert(0, str(RAIZ / "src"))
+
+  from models_2026 import MODELOS_2026  # noqa: E402
+  from taxonomia_2026 import (  # noqa: E402
+      CATEGORIAS_LINGUISTICAS,
+      ETIQUETAS_ERROR,
+      SEP_ETIQUETAS,
+  )
+
+  DIR_2026 = RAIZ / "data" / "2026"
+  DETALLE = DIR_2026 / "detalle_2026.csv"
+  ETIQUETAS = DIR_2026 / "etiquetas_errores.csv"
+  CATEGORIAS = DIR_2026 / "categorias_comandos.csv"
+  RESUMEN = DIR_2026 / "resumen_2026.json"
+
+  N_COMANDOS = 32
+  N_FILAS = len(MODELOS_2026) * N_COMANDOS  # 448
+
+  requiere_barrido = pytest.mark.skipif(
+      not DETALLE.exists(), reason=f"falta {DETALLE.name}: requiere el subtask 06"
+  )
+  requiere_etapa2 = pytest.mark.skipif(
+      not (ETIQUETAS.exists() and CATEGORIAS.exists()),
+      reason="faltan los CSV de la etapa 2: requiere el subtask 08",
+  )
+  requiere_resumen = pytest.mark.skipif(
+      not RESUMEN.exists(), reason=f"falta {RESUMEN.name}: requiere el subtask 09"
+  )
+
+
+  @requiere_barrido
+  def test_el_consolidado_tiene_448_filas_del_roster_completo():
+      df = pd.read_csv(DETALLE)
+      assert len(df) == N_FILAS
+      assert sorted(df["modelo"].unique()) == sorted(m.nombre for m in MODELOS_2026)
+      for nombre, grupo in df.groupby("modelo"):
+          assert sorted(grupo["idx"]) == list(range(N_COMANDOS)), f"{nombre}: idx incompletos o duplicados"
+
+
+  @requiere_barrido
+  @requiere_etapa2
+  def test_la_etapa_2_cubre_exactamente_las_respuestas_incorrectas():
+      df = pd.read_csv(DETALLE)
+      etq = pd.read_csv(ETIQUETAS)
+      incorrectas = {
+          (f.modelo, f.idx) for f in df[~df["match_exact"].astype(bool)].itertuples()
+      }
+      etiquetadas = {(f.modelo, f.idx) for f in etq.itertuples()}
+      assert incorrectas == etiquetadas
+      for texto in etq["etiquetas"]:
+          partes = [p for p in str(texto).split(SEP_ETIQUETAS) if p]
+          assert partes, "hay una fila etiquetada con el conjunto vacío"
+          assert set(partes) <= set(ETIQUETAS_ERROR), f"etiqueta fuera de vocabulario: {texto!r}"
+
+
+  @requiere_etapa2
+  def test_las_categorias_cubren_los_32_comandos_una_sola_vez():
+      cat = pd.read_csv(CATEGORIAS)
+      assert sorted(cat["idx"]) == list(range(N_COMANDOS))
+      assert set(cat["categoria"]) <= set(CATEGORIAS_LINGUISTICAS)
+
+
+  @requiere_resumen
+  def test_la_exactitud_laxa_domina_a_la_estricta_en_los_14_modelos():
+      resumen = json.loads(RESUMEN.read_text(encoding="utf-8"))
+      assert [f["modelo"] for f in resumen] == [m.nombre for m in MODELOS_2026]
+      for fila in resumen:
+          estricta, laxa = fila["exact_match_pct"], fila["exact_match_laxo_pct"]
+          assert 0 <= estricta <= 100, f"{fila['modelo']}: estricta fuera de rango"
+          assert 0 <= laxa <= 100, f"{fila['modelo']}: laxa fuera de rango"
+          assert laxa >= estricta, f"{fila['modelo']}: laxa {laxa} < estricta {estricta}"
+  ```
+
+- [ ] Correr y confirmar que **saltea** (todavía no hay artefactos): `pytest -q -rs tests/test_integracion_2026.py` → `4 skipped`, con el motivo nombrando el subtask que falta.
+- [ ] Correr la suite completa: `pytest -q`
+- [ ] `git add tests/test_integracion_2026.py`
+- [ ] `git commit -m "test: integridad cross-task de data/2026 (448 filas, cobertura de etapa 2, laxa >= estricta)"`
+- [ ] **Después del subtask 09**, reejecutar y confirmar que ya **no** saltea:
+  `pytest -q -rs tests/test_integracion_2026.py` → `4 passed`, cero `skipped`.
