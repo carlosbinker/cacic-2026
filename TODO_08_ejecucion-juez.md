@@ -31,7 +31,7 @@ j = json.load(open('data/2026/juez_seleccionado.json', encoding='utf-8'))
 print('Juez:', j['modelo'], '|', j['hf_repo_id'], '|', j['exact_match_pct'], '%')
 print('Empatados:', j['empatados'])
 "
-wc -l data/2026/detalle_2026.csv     # -> 385 (384 + encabezado)
+wc -l data/2026/detalle_2026.csv     # -> 449 (448 + encabezado)
 ```
 
 - [ ] Calcular cuántas consultas va a hacer, para dimensionar la corrida:

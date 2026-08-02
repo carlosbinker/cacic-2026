@@ -21,6 +21,8 @@ Cubre además **RF5**, el requisito explícito del usuario: toda divergencia de 
 
 Este subtask es el **único autorizado a modificar `src/models_2026.py`**, y solo los campos `transformers_pin`, `trust_remote_code` y `motivo_pin`, y solo con evidencia empírica de fallo. El `Dockerfile` legacy de la raíz queda intacto.
 
+Cubre también la mitad "Docker" de **F11**: dos de los 14 modelos (`gemma-3-270m-it`, `Llama-3.2-1B-Instruct`) son `gated`. El token de Hugging Face vive solo en `.env` en la raíz del repo (ignorado por git) y se inyecta **únicamente en tiempo de ejecución**, vía `docker run --env-file .env`, y **solo** a esas dos imágenes; las otras 12 corren sin credenciales. Prohibido en cualquier `Dockerfile` o script bajo `docker/`: `ARG HF_TOKEN`, `ENV HF_TOKEN`, `COPY .env`, pasar el token por `--build-arg`, o invocar `huggingface-cli login` / `huggingface_hub.login()`. `run_sweep.py` valida al arrancar que exista `.env` con `HF_TOKEN` no vacío si la lista a correr incluye algún `gated`, y aborta antes de construir o correr nada si falta.
+
 ## Implementation plan
 
 ### Tarea 1 — Imagen parametrizada y `.dockerignore`
@@ -113,7 +115,7 @@ RAIZ = Path(__file__).resolve().parent.parent
 
 def test_tag_por_modelo_es_unico_y_usa_el_slug():
     tags = [tag_imagen(m) for m in MODELOS_2026]
-    assert len(set(tags)) == 12
+    assert len(set(tags)) == 14
     assert tag_imagen(MODELOS_2026[0]) == f"slm-domotica-2026:{slug(MODELOS_2026[0].nombre)}"
 
 
@@ -147,13 +149,46 @@ def test_comando_run_invoca_el_harness_con_el_nombre_del_modelo():
     assert cmd[-3:] == ["src/run_sweep_2026.py", "--modelo", modelo.nombre]
 
 
-def test_no_hay_ningun_paso_de_autenticacion():
-    """La entrevista descartó los modelos gated: no debe haber tokens ni logins."""
-    for ruta in (RAIZ / "docker").glob("*"):
+def test_no_hay_credenciales_en_capas_ni_login_interactivo():
+    """F11: prohibido declarar HF_TOKEN en el Dockerfile, copiar .env, pasar el
+    token por --build-arg o hacer login interactivo. NO prohibido: --env-file
+    en el docker run de los dos modelos gated (se testea aparte)."""
+    for ruta in (RAIZ / "docker").rglob("*"):
+        if not ruta.is_file():
+            continue
+        texto = ruta.read_text(encoding="utf-8", errors="ignore")
+        assert not re.search(r"ARG\s+HF_TOKEN", texto), f"{ruta.name}: ARG HF_TOKEN"
+        assert not re.search(r"ENV\s+HF_TOKEN", texto), f"{ruta.name}: ENV HF_TOKEN"
+        assert not re.search(r"COPY\s+\.env", texto), f"{ruta.name}: COPY .env"
+        bajo = texto.lower()
+        assert "huggingface-cli login" not in bajo, f"{ruta.name}: login interactivo"
+        assert "huggingface_hub.login(" not in bajo, f"{ruta.name}: huggingface_hub.login("
+
+
+def test_docker_no_contiene_el_valor_del_token():
+    """El patrón es estricto a propósito: hf_ + ~34 alfanuméricos es un token
+    real; hf_repo_id, .hf_cache, HF_TOKEN y HF_HOME son identificadores
+    legítimos del diseño y no deben matchear."""
+    for ruta in (RAIZ / "docker").rglob("*"):
         if ruta.is_file():
-            texto = ruta.read_text(encoding="utf-8", errors="ignore").lower()
-            for prohibido in ("hf_token", "huggingface-cli login", "huggingface_hub.login"):
-                assert prohibido not in texto, f"{ruta.name} menciona {prohibido}"
+            texto = ruta.read_text(encoding="utf-8", errors="ignore")
+            assert not re.search(r"hf_[A-Za-z0-9]{20,}", texto), f"{ruta.name} versiona un token"
+
+
+def test_run_sweep_agrega_env_file_solo_a_los_gated():
+    """F11: --env-file .env solo para los dos modelos gated; los otros 12 no."""
+    gated = [m for m in MODELOS_2026 if m.gated]
+    no_gated = [m for m in MODELOS_2026 if not m.gated]
+    assert len(gated) == 2
+    assert len(no_gated) == 12
+    for m in gated:
+        cmd = comando_run(m, RAIZ)
+        assert "--env-file" in cmd
+        i = cmd.index("--env-file")
+        assert cmd[i + 1] == str(RAIZ / ".env")
+    for m in no_gated:
+        cmd = comando_run(m, RAIZ)
+        assert "--env-file" not in cmd
 
 
 def test_el_readme_documenta_la_matriz_completa():
@@ -242,12 +277,18 @@ if __name__ == "__main__":
 
 ```python
 #!/usr/bin/env python3
-"""Corre el barrido completo: las 12 imágenes, de a una, en orden de roster.
+"""Corre el barrido completo: las 14 imágenes, de a una, en orden de roster.
 
 Secuencial a propósito (RF4): dos modelos en paralelo se pelearían por los
 2 núcleos y contaminarían la tabla de latencia, que es el resultado central
 del paper. El harness es reanudable, así que reejecutar este script después
 de una interrupción retoma donde quedó.
+
+Credenciales (F11): dos de los 14 modelos son gated. Reciben el token de
+Hugging Face SOLO en tiempo de ejecución, vía `docker run --env-file .env`;
+las otras 12 imágenes corren sin credenciales. Si la lista a correr incluye
+algún gated y falta `.env` o `HF_TOKEN`, este script aborta antes de correr
+nada; nunca imprime el valor del token.
 
 Uso:
     python docker/run_sweep.py [--desde NOMBRE] [--force] [--dry-run]
@@ -269,6 +310,11 @@ def comando_run(modelo: ModeloEvaluado2026, raiz: Path, force: bool = False) -> 
     cmd = [
         "docker", "run", "--rm",
         "--memory=8g", "--cpus=2",
+    ]
+    if modelo.gated:
+        # F11: exclusivamente estos dos modelos reciben el token, y solo así.
+        cmd += ["--env-file", str(raiz / ".env")]
+    cmd += [
         "-v", f"{raiz / 'data'}:/app/data",
         "-v", f"{raiz / '.hf_cache'}:/app/.hf_cache",
         tag_imagen(modelo),
@@ -279,6 +325,32 @@ def comando_run(modelo: ModeloEvaluado2026, raiz: Path, force: bool = False) -> 
     else:
         cmd += ["src/run_sweep_2026.py", "--modelo", modelo.nombre]
     return cmd
+
+
+def _hf_token_de_env(ruta_env: Path) -> str:
+    """Lee HF_TOKEN de .env sin nunca imprimirlo. Devuelve "" si no está."""
+    for linea in ruta_env.read_text(encoding="utf-8").splitlines():
+        if linea.strip().startswith("HF_TOKEN="):
+            return linea.split("=", 1)[1].strip()
+    return ""
+
+
+def validar_credenciales(modelos: list[ModeloEvaluado2026], raiz: Path) -> None:
+    """F11: si la lista a correr incluye algún gated, aborta ANTES de construir
+    o correr nada si falta .env o HF_TOKEN. El mensaje nunca imprime el token."""
+    if not any(m.gated for m in modelos):
+        return
+    ruta_env = raiz / ".env"
+    if not ruta_env.exists():
+        raise ValueError(
+            "La lista a correr incluye modelos gated pero no existe .env en la "
+            "raíz del repo. Creá .env con HF_TOKEN=<tu token> (ver docker/README.md)."
+        )
+    if not _hf_token_de_env(ruta_env):
+        raise ValueError(
+            "La lista a correr incluye modelos gated pero HF_TOKEN está ausente "
+            "o vacío en .env. Completalo (ver docker/README.md)."
+        )
 
 
 def main() -> int:
@@ -294,6 +366,8 @@ def main() -> int:
         if args.desde not in nombres:
             raise ValueError(f"{args.desde!r} no está en el roster: {nombres}")
         modelos = modelos[nombres.index(args.desde):]
+
+    validar_credenciales(modelos, RAIZ)
 
     for i, modelo in enumerate(modelos, 1):
         cmd = comando_run(modelo, RAIZ, args.force)
@@ -323,7 +397,7 @@ if __name__ == "__main__":
 Para **cada** modelo del roster, en orden:
 
 - [ ] Construir con el pin actual: `python docker/build_all.py --modelo "<nombre>"`
-- [ ] Probar carga y una sola generación dentro del contenedor:
+- [ ] Probar carga y una sola generación dentro del contenedor. Para los 12 modelos no gated, sin credenciales:
 
 ```bash
 docker run --rm --memory=8g --cpus=2 \
@@ -339,6 +413,30 @@ m = por_nombre('<nombre>')
 tok = AutoTokenizer.from_pretrained(m.hf_repo_id, trust_remote_code=m.trust_remote_code)
 red = AutoModelForCausalLM.from_pretrained(m.hf_repo_id, device_map='cpu',
                                            trust_remote_code=m.trust_remote_code)
+e, modo = construir_entrada(tok, 'Prendé la luz del living.')
+print('OK', transformers.__version__, modo, red.generate(**e, max_new_tokens=8).shape)
+"
+```
+
+  Para los dos modelos gated (`gemma-3-270m-it`, `Llama-3.2-1B-Instruct`), la única diferencia es `--env-file .env` en el `docker run` y `token=os.environ["HF_TOKEN"]` en ambos `from_pretrained` (F11; nunca `login()`):
+
+```bash
+docker run --rm --memory=8g --cpus=2 \
+  --env-file "$(pwd)/.env" \
+  -v "$(pwd)/.hf_cache:/app/.hf_cache" \
+  slm-domotica-2026:<slug> \
+  python -c "
+import os, sys; sys.path.insert(0,'src')
+import transformers
+from transformers import AutoTokenizer, AutoModelForCausalLM
+from models_2026 import por_nombre
+from prompt_2026 import construir_entrada
+m = por_nombre('<nombre>')
+tok = AutoTokenizer.from_pretrained(m.hf_repo_id, trust_remote_code=m.trust_remote_code,
+                                    token=os.environ['HF_TOKEN'])
+red = AutoModelForCausalLM.from_pretrained(m.hf_repo_id, device_map='cpu',
+                                           trust_remote_code=m.trust_remote_code,
+                                           token=os.environ['HF_TOKEN'])
 e, modo = construir_entrada(tok, 'Prendé la luz del living.')
 print('OK', transformers.__version__, modo, red.generate(**e, max_new_tokens=8).shape)
 "
@@ -383,9 +481,9 @@ Baseline del proyecto: `transformers>=4.57.0`.
 
 ## Matriz de versiones
 
-| Modelo | `transformers_pin` | `trust_remote_code` | ¿Divergente? | Motivo |
-|---|---|---|---|---|
-| ... una fila por cada uno de los 12 modelos ... |
+| Modelo | `transformers_pin` | `trust_remote_code` | ¿Divergente? | Motivo | ¿Gated? |
+|---|---|---|---|---|---|
+| ... una fila por cada uno de los 14 modelos ... |
 
 Los modelos marcados como no divergentes heredan el baseline; su pin no es una
 decisión, es la ausencia de una. Solo las filas marcadas como divergentes
@@ -394,14 +492,38 @@ reportan en la Tabla 5 y en la Sección 6 (Amenazas a la validez) del paper:
 correr distintos modelos con distintas versiones de la librería de inferencia
 es un confusor para la comparación de latencia.
 
+> Nota informativa: Gemma 3 requiere `transformers >= 4.50.0`; cubierto por el
+> baseline `transformers>=4.57.0`. No es un pin divergente — `gemma-3-270m-it`
+> hereda el baseline igual que los demás.
+
+## Credenciales de los modelos gated
+
+Dos modelos del roster son *gated*: `google/gemma-3-270m-it` y
+`meta-llama/Llama-3.2-1B-Instruct` (columna "¿Gated?" de la tabla). El token
+de Hugging Face vive **solo** en `.env` en la raíz del repo (ignorado por
+git) y se inyecta **únicamente en tiempo de ejecución**, vía
+`docker run --env-file .env`, y **solo** a esas dos imágenes; las otras 12
+corren sin credenciales.
+
+Prohibido: declarar `ARG HF_TOKEN` o `ENV HF_TOKEN` en `Dockerfile.modelo`,
+pasar el token como `--build-arg`, hacer `COPY .env`, escribirlo en una capa
+de imagen, o invocar `huggingface-cli login` / `huggingface_hub.login()`. La
+única forma de consumirlo es leer `os.environ["HF_TOKEN"]` en runtime (ver
+`src/run_sweep_2026.py`, subtask 03).
+
+Si la lista a correr incluye algún modelo gated y `.env` no existe o
+`HF_TOKEN` está ausente o vacío, `docker/run_sweep.py` aborta con un
+`ValueError` en español antes de construir o correr nada; el mensaje nunca
+imprime el valor del token.
+
 ## Uso
 
-    python docker/build_all.py            # construye las 12 imágenes
+    python docker/build_all.py            # construye las 14 imágenes
     python docker/run_sweep.py            # corre el barrido completo, de a una
     python docker/run_sweep.py --desde "Qwen3.5-2B"   # retoma tras una interrupción
 ```
 
-- [ ] Completar la tabla con las 12 filas reales (una por modelo, con su pin, flag, "sí"/"no" y motivo o "—").
+- [ ] Completar la tabla con las 14 filas reales (una por modelo, con su pin, flag, "sí"/"no", motivo o "—" y "sí"/"no" en ¿Gated?; los dos gated son `gemma-3-270m-it` y `Llama-3.2-1B-Instruct`).
 - [ ] Correr y confirmar **verde**: `pytest -q tests/test_docker_matriz.py`
 
 ### Tarea 4 — commit
@@ -418,10 +540,11 @@ pytest -q
 
 # 2. Los comandos generados son los congelados en F11 (sin ejecutar docker)
 python docker/build_all.py --dry-run | head -40
-python docker/run_sweep.py --dry-run | grep -c "memory=8g"      # -> 12
+python docker/run_sweep.py --dry-run | grep -c "memory=8g"      # -> 14
+python docker/run_sweep.py --dry-run | grep -c -- "--env-file"  # -> 2 (solo los gated)
 
-# 3. Las 12 imágenes existen
-docker images --format '{{.Repository}}:{{.Tag}}' | grep -c '^slm-domotica-2026:'   # -> 12
+# 3. Las 14 imágenes existen
+docker images --format '{{.Repository}}:{{.Tag}}' | grep -c '^slm-domotica-2026:'   # -> 14
 
 # 4. RF5: coherencia entre el registro, el README y los motivos
 python -c "
@@ -438,9 +561,18 @@ for m in div:
 print(f'{len(div)} pines divergentes, todos documentados')
 "
 
-# 5. Cero rastros de autenticación en todo el árbol docker/
-grep -rniE "hf_token|huggingface-cli login|login\(" docker/ \
-  && echo "FALLA: hay auth" || echo "sin auth OK"
+# 5a. Prohibido: HF_TOKEN en capa de imagen, COPY .env, login interactivo
+grep -rnE "ARG +HF_TOKEN|ENV +HF_TOKEN|COPY +\.env" docker/ \
+  && echo "FALLA: credenciales en capa" || echo "sin credenciales en capa OK"
+grep -rniE "huggingface-cli login|huggingface_hub\.login\(" docker/ \
+  && echo "FALLA: login interactivo" || echo "sin login interactivo OK"
+
+# 5b. Prohibido en todo el árbol trackeado: el VALOR del token
+git grep -iE 'hf_[A-Za-z0-9]{20,}' \
+  && echo "FALLA: token versionado" || echo "sin token versionado OK"
+
+# 5c. Permitido y esperado: --env-file en el run de los dos modelos gated
+python docker/run_sweep.py --dry-run | grep -c -- "--env-file"   # -> 2
 
 # 6. El Dockerfile legacy de la raíz no fue tocado
 git diff --exit-code main -- Dockerfile requirements.txt && echo "legacy intacto"
@@ -453,11 +585,12 @@ git diff main -- src/models_2026.py | grep '^[-+]' | grep -vE '^[-+]{3}' \
 
 ## Acceptance criteria
 
-- **Dado** `docker/build_all.py --dry-run`, **entonces** emite 12 comandos `docker build`, cada uno con `-f docker/Dockerfile.modelo`, `--build-arg TRANSFORMERS_PIN=<pin del modelo>` y `-t slm-domotica-2026:<slug>` con 12 tags distintos.
-- **Dado** `docker/run_sweep.py --dry-run`, **entonces** emite 12 comandos `docker run` **secuenciales**, todos con `--rm --memory=8g --cpus=2`, montando `data` en `/app/data` y una **única** caché compartida en `/app/.hf_cache`, e invocando `src/run_sweep_2026.py --modelo "<nombre>"`.
+- **Dado** `docker/build_all.py --dry-run`, **entonces** emite 14 comandos `docker build`, cada uno con `-f docker/Dockerfile.modelo`, `--build-arg TRANSFORMERS_PIN=<pin del modelo>` y `-t slm-domotica-2026:<slug>` con 14 tags distintos.
+- **Dado** `docker/run_sweep.py --dry-run`, **entonces** emite 14 comandos `docker run` **secuenciales**, todos con `--rm --memory=8g --cpus=2`, montando `data` en `/app/data` y una **única** caché compartida en `/app/.hf_cache`, e invocando `src/run_sweep_2026.py --modelo "<nombre>"`. Exactamente **dos** de esos comandos —los de `gemma-3-270m-it` y `Llama-3.2-1B-Instruct`— incluyen además `--env-file <repo>/.env`; los otros 12 no.
 - **Dado** un fallo en el modelo N, **cuando** se relanza con `--desde "<nombre del modelo N>"`, **entonces** retoma en ese modelo y los anteriores no se rehacen (los saltea el harness del subtask 03).
-- **Dado** cada uno de los 12 modelos, **cuando** se lo carga y genera 8 tokens dentro de su imagen, **entonces** no lanza excepción; si la lanzó, su `transformers_pin` y/o `trust_remote_code` fueron ajustados y `motivo_pin` cita el error textual.
-- **Dado** el registro y `docker/README.md`, **entonces** los 12 modelos aparecen en la tabla, y para **todo** modelo con `transformers_pin != BASELINE_TRANSFORMERS` se cumple que `motivo_pin` es no vacío, y tanto el pin como el motivo figuran en el README. Lo mismo para todo modelo con `trust_remote_code=True`.
-- **Dado** cualquier archivo bajo `docker/`, **entonces** no menciona `HF_TOKEN`, `huggingface-cli login` ni ninguna forma de autenticación: los modelos gated fueron descartados en la entrevista.
+- **Dado** cada uno de los 14 modelos, **cuando** se lo carga y genera 8 tokens dentro de su imagen (con `--env-file .env` para los dos gated), **entonces** no lanza excepción; si la lanzó, su `transformers_pin` y/o `trust_remote_code` fueron ajustados y `motivo_pin` cita el error textual.
+- **Dado** el registro y `docker/README.md`, **entonces** los 14 modelos aparecen en la tabla (incluida la columna ¿Gated?), y para **todo** modelo con `transformers_pin != BASELINE_TRANSFORMERS` se cumple que `motivo_pin` es no vacío, y tanto el pin como el motivo figuran en el README. Lo mismo para todo modelo con `trust_remote_code=True`. `gemma-3-270m-it` **no** diverge: hereda el baseline, y la nota informativa sobre su mínimo de `transformers` no cuenta como divergencia.
+- **Dado** cualquier archivo bajo `docker/`, **entonces** no declara `ARG HF_TOKEN` ni `ENV HF_TOKEN`, no hace `COPY .env`, no pasa el token por `--build-arg`, y no invoca `huggingface-cli login` ni `huggingface_hub.login()`; el **valor** del token tampoco aparece en ningún archivo versionado del repo (`git grep -iE 'hf_[A-Za-z0-9]{20,}'` vacío). Los dos modelos gated sí incluyen `--env-file .env` en su invocación de `docker run`; las otras 12 no.
+- **Dado** una lista de modelos a correr que incluye algún gated, **cuando** `.env` no existe o `HF_TOKEN` está ausente/vacío en él, **entonces** `docker/run_sweep.py` aborta con `ValueError` en español antes de construir o correr nada, sin imprimir el valor del token.
 - **Dado** `git diff main -- src/models_2026.py`, **entonces** las únicas líneas cambiadas corresponden a `transformers_pin`, `trust_remote_code`, `motivo_pin` o comentarios; el roster, los nombres, repos, params y tiers quedan iguales.
 - **Dado** `Dockerfile` y `requirements.txt` de la raíz, **entonces** siguen byte-idénticos a `main`.

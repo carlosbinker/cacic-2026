@@ -518,7 +518,7 @@ git diff --exit-code main -- data/dataset_comandos_domotica.csv && echo "dataset
 - **Dado** una primera salida no parseable, **entonces** se reintenta **exactamente una** vez con el doble de `max_new_tokens`; si el reintento parsea, `juez_parse_ok` es `True`.
 - **Dado** dos salidas no parseables seguidas, **entonces** se usa la etiqueta de respaldo determinista (primer `confusion_*` cuyo campo no coincide, en orden `intent, dispositivo, ubicacion`; si los tres coinciden, `valor_numerico_incorrecto`), `juez_parse_ok` es `False`, y `juez_raw` guarda la última salida cruda.
 - **Dado** un juez que nunca produce salida válida, **entonces** **toda** fila incorrecta igualmente termina con al menos una etiqueta perteneciente a `ETIQUETAS_ERROR`: el pipeline no deja huecos.
-- **Dado** un detalle con 12 modelos, **cuando** se corre `etiquetar_categorias`, **entonces** produce una fila por **comando** (`idx` único), no por corrida, ordenadas por `idx`, y consulta al juez una sola vez por comando.
+- **Dado** un detalle con 14 modelos, **cuando** se corre `etiquetar_categorias`, **entonces** produce una fila por **comando** (`idx` único), no por corrida, ordenadas por `idx`, y consulta al juez una sola vez por comando.
 - **Dado** una respuesta del juez con dos categorías, **entonces** no parsea y se reintenta; si el reintento da una sola válida, se acepta con `juez_parse_ok=True`.
 - **Dado** `src/judge_2026.py`, **cuando** se lo importa, **entonces** no carga `torch` ni `transformers` (viven dentro de `construir_juez_real`), y el juez real usa `do_sample=False`, `temperature=None`, `top_p=None`.
 - **Dado** el commit, **entonces** `pytest -q` pasa y `data/dataset_comandos_domotica.csv` sigue intacto.

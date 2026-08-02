@@ -10,7 +10,7 @@ files:
 
 ## Spec
 
-Implementar **F7** / **RF12**: rediseñar las figuras para que soporten 12 modelos. Las actuales son barras verticales para 4 modelos; a 12, con nombres como `granite-4.0-h-350m` y `OLMo-2-0425-1B-Instruct`, se vuelven ilegibles.
+Implementar **F7** / **RF12**: rediseñar las figuras para que soporten 14 modelos. Las actuales son barras verticales para 4 modelos; a 14, con nombres como `granite-4.0-h-350m` y `OLMo-2-0425-1B-Instruct`, se vuelven ilegibles.
 
 Diseño: **barras horizontales**, agrupadas y separadas visualmente por `tier` (`sub-1B` arriba, `1-2B` abajo), con los nombres completos como etiquetas del eje Y — que es precisamente lo que la orientación horizontal permite sin rotar texto.
 
@@ -67,25 +67,25 @@ def _resumen():
 def test_ordena_sub1b_primero_y_por_params_dentro_del_tier():
     ordenado = ordenar_para_grafico(_resumen())
     tiers = [f["tier"] for f in ordenado]
-    assert tiers == ["sub-1B"] * 6 + ["1-2B"] * 6
-    sub = [f["params_b"] for f in ordenado[:6]]
-    grandes = [f["params_b"] for f in ordenado[6:]]
+    assert tiers == ["sub-1B"] * 7 + ["1-2B"] * 7
+    sub = [f["params_b"] for f in ordenado[:7]]
+    grandes = [f["params_b"] for f in ordenado[7:]]
     assert sub == sorted(sub) and grandes == sorted(grandes)
 
 
 def test_ordenar_no_pierde_ni_duplica_modelos():
     ordenado = ordenar_para_grafico(_resumen())
-    assert len(ordenado) == 12
+    assert len(ordenado) == 14
     assert {f["modelo"] for f in ordenado} == {m.nombre for m in MODELOS_2026}
 
 
 def test_hay_un_hueco_entre_los_dos_tiers():
-    tiers = ["sub-1B"] * 6 + ["1-2B"] * 6
+    tiers = ["sub-1B"] * 7 + ["1-2B"] * 7
     pos = posiciones_con_separacion(tiers)
-    assert len(pos) == 12
+    assert len(pos) == 14
     assert all(b > a for a, b in zip(pos, pos[1:]))          # monótono
     dentro = pos[1] - pos[0]
-    entre = pos[6] - pos[5]
+    entre = pos[7] - pos[6]
     assert entre > dentro, (entre, dentro)                   # hueco entre tiers
 
 
@@ -144,7 +144,7 @@ Módulo nuevo, no una edición de generate_figures.py: aquel está congelado
 para que las figuras publicadas del paper original sigan siendo reproducibles.
 Conserva su convención de CLI (--resumen / --sufijo).
 
-Rediseño: barras horizontales agrupadas por tier. Con 12 modelos y nombres
+Rediseño: barras horizontales agrupadas por tier. Con 14 modelos y nombres
 como 'OLMo-2-0425-1B-Instruct', las barras verticales del diseño original
 obligan a rotar las etiquetas hasta volverlas ilegibles; en horizontal el
 nombre completo entra en el eje Y.
@@ -303,7 +303,7 @@ if __name__ == "__main__":
 ### Tarea 2 — Generar las figuras reales y revisarlas
 
 - [ ] `python src/generate_figures_2026.py`
-- [ ] Abrir los dos PNG y confirmar visualmente: los 12 nombres se leen completos y sin recortes, los dos tiers están separados y rotulados, ninguna barra sale del área, y en fig. 1 se distingue la barra estricta de la laxa.
+- [ ] Abrir los dos PNG y confirmar visualmente: los 14 nombres se leen completos y sin recortes, los dos tiers están separados y rotulados, ninguna barra sale del área, y en fig. 1 se distingue la barra estricta de la laxa.
 - [ ] Si algún nombre queda cortado, ajustar `figsize`/`tight_layout`, no acortar los nombres (deben coincidir con los de la Tabla 1).
 
 ### Tarea 3 — commit
@@ -338,26 +338,26 @@ python src/generate_figures_2026.py --sufijo _reproducido
 ls figures/2026/ | grep _reproducido
 rm figures/2026/*_reproducido.png
 
-# 5. Los 12 modelos aparecen en el gráfico (chequeo por conteo de ticks)
+# 5. Los 14 modelos aparecen en el gráfico (chequeo por conteo de ticks)
 python -c "
 import sys, json; sys.path.insert(0,'src')
 from generate_figures_2026 import ordenar_para_grafico, posiciones_con_separacion
 r = ordenar_para_grafico(json.load(open('data/2026/resumen_2026.json', encoding='utf-8')))
-assert len(r) == 12
+assert len(r) == 14
 tiers = [f['tier'] for f in r]
-assert tiers == ['sub-1B']*6 + ['1-2B']*6, tiers
+assert tiers == ['sub-1B']*7 + ['1-2B']*7, tiers
 pos = posiciones_con_separacion(tiers)
-assert pos[6]-pos[5] > pos[1]-pos[0]
+assert pos[7]-pos[6] > pos[1]-pos[0]
 print('orden y separacion por tier OK')
 "
 ```
 
 ## Acceptance criteria
 
-- **Dado** el resumen de 12 modelos, **cuando** se llama `ordenar_para_grafico`, **entonces** devuelve los 6 `sub-1B` primero y los 6 `1-2B` después, ordenados por `params_b` creciente dentro de cada tier, sin perder ni duplicar modelos.
+- **Dado** el resumen de 14 modelos, **cuando** se llama `ordenar_para_grafico`, **entonces** devuelve los 7 `sub-1B` primero y los 7 `1-2B` después, ordenados por `params_b` creciente dentro de cada tier, sin perder ni duplicar modelos.
 - **Dado** una lista de tiers, **cuando** se llama `posiciones_con_separacion`, **entonces** las posiciones son estrictamente crecientes y el salto en el cambio de tier es mayor que el salto dentro de un tier; con un solo tier, todos los saltos valen 1.0.
 - **Dado** `python src/generate_figures_2026.py`, **entonces** escribe `figures/2026/fig1_exactitud_latencia_2026.png` y `figures/2026/fig2_exactitud_por_campo_2026.png`, ambos de más de 20 KB.
-- **Dado** la figura 1, **entonces** su panel izquierdo muestra **dos** series por modelo (exactitud estricta y laxa) con leyenda, y el derecho la latencia promedio; ambos con barras **horizontales** y los 12 nombres completos legibles en el eje Y.
+- **Dado** la figura 1, **entonces** su panel izquierdo muestra **dos** series por modelo (exactitud estricta y laxa) con leyenda, y el derecho la latencia promedio; ambos con barras **horizontales** y los 14 nombres completos legibles en el eje Y.
 - **Dado** la figura 2, **entonces** muestra los 5 campos del esquema (`intención`, `dispositivo`, `ubicación`, `valor`, `unidad`) como series agrupadas por modelo.
 - **Dado** ambas figuras, **entonces** los dos tiers están visualmente separados y rotulados (`sub-1B`, `1-2B`).
 - **Dado** `--sufijo _reproducido`, **entonces** los archivos se escriben con ese sufijo y no pisan a los oficiales.

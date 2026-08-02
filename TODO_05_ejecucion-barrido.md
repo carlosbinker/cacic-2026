@@ -1,6 +1,6 @@
 ---
 id: 05
-title: Ejecución del barrido completo (12 modelos)
+title: Ejecución del barrido completo (14 modelos)
 depends_on: [04]
 files:
   - data/2026/detalle/
@@ -9,9 +9,9 @@ files:
 
 ## Spec
 
-Ejecutar el barrido real: los 12 modelos, de a uno, cada uno en su imagen, con `--memory=8g --cpus=2`, produciendo los 12 `data/2026/detalle/<slug>.csv` de 32 filas cada uno (384 filas en total). Es la tarea de **datos** que desbloquea toda la mitad de análisis y de paper del DAG.
+Ejecutar el barrido real: los 14 modelos, de a uno, cada uno en su imagen, con `--memory=8g --cpus=2`, produciendo los 14 `data/2026/detalle/<slug>.csv` de 32 filas cada uno (448 filas en total). Los dos modelos *gated* (`gemma-3-270m-it`, `Llama-3.2-1B-Instruct`) corren con `--env-file .env` para inyectar `$HF_TOKEN`; los otros 12 corren sin credenciales (ver la nota de invocación en la Tarea 2). Es la tarea de **datos** que desbloquea toda la mitad de análisis y de paper del DAG.
 
-No se escribe código nuevo: se ejecuta el pipeline de los subtasks 03 y 04 y se commitean los resultados. Duración esperada ~4–8 h (**RNF2**); el harness es reanudable, así que una interrupción se retoma con `--desde`.
+No se escribe código nuevo: se ejecuta el pipeline de los subtasks 03 y 04 y se commitean los resultados. Duración esperada ~5–9 h (**RNF2**; rescalado de ~4–8 h para 12 modelos a 14), el harness es reanudable, así que una interrupción se retoma con `--desde`.
 
 Si un modelo falla de forma irrecuperable, **no** se lo silencia ni se lo elimina del roster por cuenta propia: se detiene, se documenta el fallo y se escala (ver "Protocolo de fallo").
 
@@ -21,8 +21,22 @@ Si un modelo falla de forma irrecuperable, **no** se lo silencia ni se lo elimin
 
 ### Tarea 1 — Preparación
 
+- [ ] **Precondición de credenciales (verificar primero, antes de cualquier otra cosa).** `.env`
+  existe en la raíz del repo, define un `HF_TOKEN` no vacío, y sigue sin trackear. **No abrir ni
+  imprimir su contenido**; usar solo chequeos que no revelen el valor:
+  ```bash
+  test -s .env && grep -q '^HF_TOKEN=.\+' .env && echo ".env con HF_TOKEN: OK"
+  git ls-files .env   # debe salir vacío (untracked)
+  ```
+  Si falta `.env` o `HF_TOKEN` está ausente/vacío, **parar**: los dos modelos *gated*
+  (`gemma-3-270m-it`, `Llama-3.2-1B-Instruct`) no van a poder descargarse y el barrido fallaría a
+  mitad de camino, no al arrancar.
+- [ ] Verificar (**solo verificar; no editar** — el subtask 01 es el único dueño de `.gitignore`)
+  que ya cubre `.env` y `*.env`:
+  `git check-ignore -v .env` → debe imprimir la regla que lo ignora. Si no imprime nada, **parar**
+  y resolverlo en el subtask 01 antes de seguir.
 - [ ] Confirmar que el DAG previo está verde: `pytest -q`
-- [ ] Confirmar las 12 imágenes: `docker images --format '{{.Repository}}:{{.Tag}}' | grep -c '^slm-domotica-2026:'` → `12`
+- [ ] Confirmar las 14 imágenes: `docker images --format '{{.Repository}}:{{.Tag}}' | grep -c '^slm-domotica-2026:'` → `14`
 - [ ] Confirmar espacio libre ≥ 60 GB en `C:` (pesos + capas de imagen):
   `df -h /c | tail -1`
 - [ ] Crear la caché compartida si no existe: `mkdir -p .hf_cache data/2026/detalle`
@@ -33,6 +47,28 @@ Si un modelo falla de forma irrecuperable, **no** se lo silencia ni se lo elimin
   la caché sin ignorar mete decenas de GB en el índice.
 
 ### Tarea 2 — Barrido
+
+> Nota (documentación, no código nuevo): `docker/run_sweep.py` corre las 14 imágenes, de a una, en
+> orden de roster. Para los 12 modelos no *gated* invoca:
+> ```
+> docker run --rm --memory=8g --cpus=2 \
+>   -v <repo>/data:/app/data \
+>   -v <repo>/.hf_cache:/app/.hf_cache \
+>   slm-domotica-2026:<slug> \
+>   python src/run_sweep_2026.py --modelo "<nombre>"
+> ```
+> Para los 2 modelos *gated* (`gemma-3-270m-it`, `Llama-3.2-1B-Instruct`) agrega **exclusivamente**
+> `--env-file <repo>/.env`:
+> ```
+> docker run --rm --memory=8g --cpus=2 \
+>   --env-file <repo>/.env \
+>   -v <repo>/data:/app/data \
+>   -v <repo>/.hf_cache:/app/.hf_cache \
+>   slm-domotica-2026:<slug> \
+>   python src/run_sweep_2026.py --modelo "<nombre>"
+> ```
+> Esta lógica ya está implementada en el subtask 04; acá solo se documenta para quien ejecute el
+> barrido. El valor de `$HF_TOKEN` no aparece en ningún log ni en este archivo.
 
 - [ ] Lanzar el barrido completo, con log persistente:
 
@@ -62,7 +98,7 @@ print('faltan:', faltan or 'ninguno')
 
 ### Tarea 3 — Validación de integridad del barrido
 
-- [ ] Correr el chequeo de invariantes sobre los 12 CSV:
+- [ ] Correr el chequeo de invariantes sobre los 14 CSV:
 
 ```bash
 python -c "
@@ -125,7 +161,7 @@ es decir la versión que efectivamente corrió dentro del contenedor:
 ```
 
 - [ ] `git add data/2026/detalle/ data/2026/log_barrido.txt docker/README.md`
-- [ ] `git commit -m "data(2026): barrido completo de los 12 modelos (384 corridas, CPU 2 nucleos)"`
+- [ ] `git commit -m "data(2026): barrido completo de los 14 modelos (448 corridas, CPU 2 nucleos)"`
 
 ### Protocolo de fallo
 
@@ -133,27 +169,27 @@ Si un modelo falla y no se recupera tras un reintento:
 
 - [ ] Guardar el error textual completo en `data/2026/log_barrido.txt`.
 - [ ] Si es un problema de versión de librería → volver al subtask 04, ajustar `transformers_pin`/`trust_remote_code` con su `motivo_pin`, rehacer la imagen, retomar con `--desde`.
-- [ ] Si es un fallo del modelo en sí (arquitectura no soportada en ninguna versión, pesos rotos) → **PARAR y escalar**. Sacar un modelo del roster cambia §2.1 del índice, la Tabla 1 del paper y el conteo de 384 filas: es una re-congelación de contrato, no una decisión de implementación.
-- [ ] Si es un error de autenticación / 401 / 403 → **PARAR inmediatamente**, no reintentar, no ejecutar ningún comando de login. Ningún modelo del roster es gated, así que un 401 significa que algo se desvió del plan.
+- [ ] Si es un fallo del modelo en sí (arquitectura no soportada en ninguna versión, pesos rotos) → **PARAR y escalar**. Sacar un modelo del roster cambia §2.1 del índice, la Tabla 1 del paper y el conteo de 448 filas: es una re-congelación de contrato, no una decisión de implementación.
+- [ ] Si es un error de autenticación / 401 / 403 → **PARAR inmediatamente**, no reintentar, no ejecutar ningún comando de login/auth/configure, y reportar `AUTH-BLOCKER` con el error textual completo. Si ocurre en uno de los 12 modelos **no** *gated*, algo se desvió gravemente del plan (ninguno de esos debería requerir credenciales). Si ocurre en uno de los dos modelos *gated* (`gemma-3-270m-it`, `Llama-3.2-1B-Instruct`) pese a haber pasado la precondición de la Tarea 1, no se reintenta ni se corre ningún comando de login: se escala igual, sin volver a tocar `.env`.
 
 ## Verify
 
 ```bash
-# 1. Hay 12 CSV, uno por modelo del roster, y ninguno de más
-ls -1 data/2026/detalle/*.csv | wc -l    # -> 12
+# 1. Hay 14 CSV, uno por modelo del roster, y ninguno de más
+ls -1 data/2026/detalle/*.csv | wc -l    # -> 14
 
-# 2. 384 filas en total, 32 por modelo, sin duplicados (modelo, idx)
+# 2. 448 filas en total, 32 por modelo, sin duplicados (modelo, idx)
 python -c "
 import sys, glob; sys.path.insert(0,'src')
 import pandas as pd
 from models_2026 import MODELOS_2026, slug
 dfs = [pd.read_csv(p) for p in sorted(glob.glob('data/2026/detalle/*.csv'))]
 todo = pd.concat(dfs, ignore_index=True)
-assert len(todo) == 384, len(todo)
+assert len(todo) == 448, len(todo)
 assert todo.groupby('modelo').size().eq(32).all()
 assert not todo.duplicated(['modelo','idx']).any()
 assert set(todo['modelo']) == {m.nombre for m in MODELOS_2026}
-print('384 filas OK, 12 modelos, sin duplicados')
+print('448 filas OK, 14 modelos, sin duplicados')
 "
 
 # 3. Los porcentajes de exactitud estricta son plausibles y no todos iguales
@@ -185,12 +221,13 @@ pytest -q
 
 ## Acceptance criteria
 
-- **Dado** `data/2026/detalle/`, **entonces** contiene exactamente 12 archivos `.csv`, cuyos nombres son los `slug` de los 12 modelos del roster, sin sobrantes ni faltantes.
+- **Dado** el inicio de la ejecución, **entonces** `.env` existe en la raíz, define `HF_TOKEN` no vacío, y sigue sin trackear (`git ls-files .env` sale vacío); y `git check-ignore -v .env` imprime la regla que lo cubre. Si falta cualquiera de estas condiciones, el barrido **no** arrancó.
+- **Dado** `data/2026/detalle/`, **entonces** contiene exactamente 14 archivos `.csv`, cuyos nombres son los `slug` de los 14 modelos del roster, sin sobrantes ni faltantes.
 - **Dado** cada CSV, **entonces** tiene exactamente 32 filas, columnas idénticas y en el orden de `COLUMNAS_DETALLE` (17), `idx` de 0 a 31 sin huecos ni repeticiones, un único valor en la columna `modelo` igual al nombre del roster, y todas las latencias estrictamente positivas.
-- **Dado** el concatenado de los 12, **entonces** tiene 384 filas y ningún par `(modelo, idx)` duplicado.
+- **Dado** el concatenado de los 14, **entonces** tiene 448 filas y ningún par `(modelo, idx)` duplicado.
 - **Dado** cada CSV, **entonces** su columna `modo_prompting` tiene un único valor, y ese valor es `raw_completion` para `LFM2.5-230M` y `LFM2.5-350M`; cualquier discrepancia con la tabla §2.1 del índice quedó **corregida en el índice**, no ocultada.
 - **Dado** cada CSV, **entonces** su columna `transformers_version` tiene un único valor, consistente con el `transformers_pin` de ese modelo, y esas versiones efectivas están tabuladas en `docker/README.md`.
 - **Dado** el conjunto de exactitudes estrictas por modelo, **entonces** están en `[0, 100]` y no son todas idénticas (todas iguales indicaría que el barrido no varió realmente de modelo).
 - **Dado** el barrido, **cuando** se interrumpió y se retomó, **entonces** los modelos ya completos no se recalcularon y el resultado final es indistinguible de una corrida sin interrupciones.
 - **Dado** el repositorio tras el commit, **entonces** los archivos de F0 siguen byte-idénticos a `main`, `pytest -q` pasa, y `data/2026/log_barrido.txt` contiene el registro de la corrida.
-- **Dado** cualquier fallo de autenticación durante el barrido, **entonces** el proceso se detuvo sin reintentar y sin ejecutar ningún comando de login.
+- **Dado** cualquier fallo de autenticación durante el barrido, **entonces** el proceso se detuvo sin reintentar y sin ejecutar ningún comando de login/auth/configure, sin importar si el modelo involucrado es uno de los dos *gated* o uno de los doce restantes, y quedó reportado como `AUTH-BLOCKER`.

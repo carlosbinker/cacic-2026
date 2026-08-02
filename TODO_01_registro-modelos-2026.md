@@ -12,9 +12,9 @@ files:
 
 ## Spec
 
-Crear los dos módulos de datos maestros de los que depende todo el resto del DAG: el registro de los 12 modelos (F3) y los vocabularios cerrados de etiquetas y categorías (F4). Ambos son puro dato + validación, sin dependencias pesadas (nada de `torch`/`transformers`), para que se puedan importar y testear en cualquier contexto, incluido dentro de los contenedores mínimos del subtask 04.
+Crear los dos módulos de datos maestros de los que depende todo el resto del DAG: el registro de los 14 modelos (F3) y los vocabularios cerrados de etiquetas y categorías (F4). Ambos son puro dato + validación, sin dependencias pesadas (nada de `torch`/`transformers`), para que se puedan importar y testear en cualquier contexto, incluido dentro de los contenedores mínimos del subtask 04.
 
-Honra los contratos **F1** (convenciones), **F3** (registro) y **F4** (vocabularios) del índice. El roster es exactamente el de §2.1: 12 modelos, sin `Qwen2.5-*`, sin `gemma-3-270m-it`, sin `Llama-3.2-1B-Instruct`. Todos arrancan con `transformers_pin = BASELINE_TRANSFORMERS`, `trust_remote_code = False`, `motivo_pin = ""`; solo el subtask 04 puede cambiarlos.
+Honra los contratos **F1** (convenciones), **F3** (registro) y **F4** (vocabularios) del índice. El roster es exactamente el de §2.1: 14 modelos, sin `Qwen2.5-*` (descartados, superados por el par Qwen3.5). `gemma-3-270m-it` y `Llama-3.2-1B-Instruct` **se mantienen**: son *gated* (requieren licencia aceptada y `$HF_TOKEN` para descargarse, ver F11), y el registro los marca con el flag `gated: bool` — sin leer ni mencionar el valor del token. Todos arrancan con `transformers_pin = BASELINE_TRANSFORMERS`, `trust_remote_code = False`, `motivo_pin = ""`; solo el subtask 04 puede cambiarlos.
 
 ## Implementation plan
 
@@ -147,7 +147,7 @@ def parsear_categoria(texto: str) -> str:
 
 - [ ] Correr y confirmar **verde**: `pytest -q tests/test_taxonomia_2026.py`
 
-### Tarea 2 — `src/models_2026.py` con el roster de 12 (TDD)
+### Tarea 2 — `src/models_2026.py` con el roster de 14 (TDD)
 
 - [ ] Escribir el test que falla, `tests/test_models_2026.py`:
 
@@ -164,36 +164,41 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 from models_2026 import (  # noqa: E402
     BASELINE_TRANSFORMERS,
     MODELOS_2026,
+    gated,
     por_nombre,
     por_tier,
     slug,
 )
 
-GATED_O_DESCARTADOS = {
-    "google/gemma-3-270m-it",
-    "meta-llama/Llama-3.2-1B-Instruct",
+DESCARTADOS = {
     "Qwen/Qwen2.5-0.5B-Instruct",
     "Qwen/Qwen2.5-1.5B-Instruct",
 }
 
 
-def test_el_roster_tiene_doce_modelos():
-    assert len(MODELOS_2026) == 12
+def test_el_roster_tiene_catorce_modelos():
+    assert len(MODELOS_2026) == 14
 
 
-def test_no_hay_modelos_gated_ni_qwen25():
+def test_no_hay_modelos_qwen25():
     repos = {m.hf_repo_id for m in MODELOS_2026}
-    assert repos & GATED_O_DESCARTADOS == set()
+    assert repos & DESCARTADOS == set()
+
+
+def test_exactamente_dos_modelos_gated():
+    gateados = {m.hf_repo_id for m in MODELOS_2026 if m.gated}
+    assert gateados == {"google/gemma-3-270m-it", "meta-llama/Llama-3.2-1B-Instruct"}
+    assert {m.hf_repo_id for m in gated()} == gateados
 
 
 def test_nombres_y_repos_son_unicos():
-    assert len({m.nombre for m in MODELOS_2026}) == 12
-    assert len({m.hf_repo_id for m in MODELOS_2026}) == 12
+    assert len({m.nombre for m in MODELOS_2026}) == 14
+    assert len({m.hf_repo_id for m in MODELOS_2026}) == 14
 
 
-def test_seis_por_tier():
-    assert len(por_tier("sub-1B")) == 6
-    assert len(por_tier("1-2B")) == 6
+def test_siete_por_tier():
+    assert len(por_tier("sub-1B")) == 7
+    assert len(por_tier("1-2B")) == 7
 
 
 def test_smollm2_aporta_los_dos_tamanos_del_paper_original():
@@ -204,7 +209,7 @@ def test_smollm2_aporta_los_dos_tamanos_del_paper_original():
 
 def test_los_slugs_son_unicos_y_aptos_para_nombre_de_archivo():
     slugs = [slug(m.nombre) for m in MODELOS_2026]
-    assert len(set(slugs)) == 12
+    assert len(set(slugs)) == 14
     for s in slugs:
         assert s and all(c.isalnum() or c == "-" for c in s)
         assert not s.startswith("-") and not s.endswith("-")
@@ -239,7 +244,14 @@ def test_por_nombre_encuentra_y_falla_bien():
 > Nota para el implementador: `test_estado_inicial_sin_divergencias` es una foto del estado inicial. El subtask 04 **debe** relajarlo a un `xfail`/eliminarlo si descubre pines necesarios; `test_invariante_motivo_pin` en cambio es permanente y nunca se relaja.
 
 - [ ] Correr y confirmar que **falla**: `pytest -q tests/test_models_2026.py`
-- [ ] Implementar `src/models_2026.py` con la dataclass de F3, `BASELINE_TRANSFORMERS = "transformers>=4.57.0"`, los 12 `ModeloEvaluado2026` en el orden de §2.1, y:
+- [ ] Implementar `src/models_2026.py` con la dataclass de F3 (incluye el campo `gated: bool`,
+  ubicado **después** de `trust_remote_code` y **antes** de `motivo_pin`),
+  `BASELINE_TRANSFORMERS = "transformers>=4.57.0"`, los 14 `ModeloEvaluado2026` en el orden
+  congelado de §2.1 (`gemma-3-270m-it` es el #7, cierra el bloque sub-1B; `Llama-3.2-1B-Instruct`
+  es el #14, cierra el bloque 1-2B). Los dos gated arrancan igual que los demás:
+  `transformers_pin = BASELINE_TRANSFORMERS`, `motivo_pin = ""`, `trust_remote_code = False` — no
+  se les inventa un pin divergente. El módulo declara el flag `gated` pero **no** lee ni imprime el
+  valor de ningún token, y no menciona `login` ni `huggingface-cli`. Además:
 
 ```python
 def slug(nombre: str) -> str:
@@ -259,29 +271,34 @@ def por_nombre(nombre: str) -> ModeloEvaluado2026:
 
 def por_tier(tier: Tier) -> list[ModeloEvaluado2026]:
     return [m for m in MODELOS_2026 if m.tier == tier]
+
+
+def gated() -> list[ModeloEvaluado2026]:
+    """Los modelos que requieren $HF_TOKEN para descargarse, en orden de roster."""
+    return [m for m in MODELOS_2026 if m.gated]
 ```
 
 - [ ] Correr y confirmar **verde**: `pytest -q tests/test_models_2026.py`
 
-### Tarea 3 — `.gitignore` de toda la rama
+### Tarea 3 — `.gitignore` de toda la rama: verificar y completar (no reescribir)
 
 > Exención de TDD: edición de configuración. Este subtask es el **único dueño de
-> `.gitignore`** en todo el DAG; ningún otro subtask debe editarlo. Se escriben acá
-> todas las entradas que el resto del trabajo va a necesitar (caché de pesos,
-> auxiliares de LaTeX, el `.docx` y la plantilla descargada), para que nadie tenga
-> que tocarlo después.
+> `.gitignore`** en todo el DAG; ningún otro subtask debe editarlo (los subtasks 05 y 13 solo
+> **verifican** que las entradas estén, y paran si faltan). El archivo **ya está commiteado**
+> (commit `8acfefd`) con las entradas de caché HF, credenciales (`.env`, `*.env`, `.hf_token`), el
+> `.docx` y la plantilla `LaTeX2e (1)/`. Esta tarea **no reescribe ni reordena** nada de lo
+> existente: primero **verifica** que esas entradas sigan presentes, y **agrega solo lo que
+> falte** — hoy, los auxiliares de compilación de LaTeX. En particular, no se tocan las entradas
+> de credenciales (`.env`, `*.env`, `.hf_token`).
 
-- [ ] Agregar al final de `.gitignore`, sin borrar lo que ya tiene:
+- [ ] Verificar que `.gitignore` ya contiene (sin modificarlas) las entradas commiteadas en
+  `8acfefd`: caché de HF (`.hf_cache/`, `models_cache/`), credenciales (`.env`, `*.env`,
+  `.hf_token`), y `paper_cacic_LNCS_word.docx` / `LaTeX2e (1)/` / `LaTeX2e (1).zip`.
+  `git show 8acfefd:.gitignore` (o `Get-Content .gitignore`) para confirmar antes de tocar nada.
+- [ ] Agregar al **final** de `.gitignore`, sin borrar ni reordenar lo que ya tiene, únicamente los
+  auxiliares de LaTeX que faltan:
 
 ```gitignore
-# Pesos descargados de HuggingFace (compartidos por todas las imágenes)
-.hf_cache/
-
-# Fuente del paper y plantilla oficial: se leen del disco, no se versionan
-paper_cacic_LNCS_word.docx
-LaTeX2e (1)/
-LaTeX2e (1).zip
-
 # Auxiliares de compilación de LaTeX
 *.aux
 *.bbl
@@ -291,9 +308,13 @@ LaTeX2e (1).zip
 *.log
 *.out
 *.synctex.gz
+*.toc
 ```
 
-- [ ] Confirmar que el `.docx` deja de aparecer como no trackeado:
+- [ ] Confirmar que las entradas de credenciales siguen intactas y en su lugar original:
+  `git diff -- .gitignore` solo debe mostrar líneas **agregadas** al final, ninguna eliminada ni
+  reordenada.
+- [ ] Confirmar que el `.docx` sigue sin aparecer como no trackeado:
   `git status --short | grep -i docx` → sin salida
 - [ ] Confirmar que no se ignoró nada que sí debe versionarse:
   `git check-ignore -v data/2026/detalle/x.csv paper/02_reescrito/main.tex` → sin coincidencias
@@ -302,7 +323,7 @@ LaTeX2e (1).zip
 
 - [ ] `pytest -q` (suite completa, incluida la legacy)
 - [ ] `git add src/models_2026.py src/taxonomia_2026.py tests/test_models_2026.py tests/test_taxonomia_2026.py .gitignore`
-- [ ] `git commit -m "feat(2026): registro de 12 modelos y vocabularios cerrados de la etapa 2"`
+- [ ] `git commit -m "feat(2026): registro de 14 modelos y vocabularios cerrados de la etapa 2"`
 
 ## Verify
 
@@ -313,13 +334,15 @@ pytest -q
 # 2. El roster es el correcto y no arrastra modelos descartados
 python -c "
 import sys; sys.path.insert(0, 'src')
-from models_2026 import MODELOS_2026, BASELINE_TRANSFORMERS, slug
-assert len(MODELOS_2026) == 12, len(MODELOS_2026)
+from models_2026 import MODELOS_2026, BASELINE_TRANSFORMERS, slug, gated
+assert len(MODELOS_2026) == 14, len(MODELOS_2026)
 repos = {m.hf_repo_id for m in MODELOS_2026}
-prohibidos = {'google/gemma-3-270m-it','meta-llama/Llama-3.2-1B-Instruct',
-              'Qwen/Qwen2.5-0.5B-Instruct','Qwen/Qwen2.5-1.5B-Instruct'}
+prohibidos = {'Qwen/Qwen2.5-0.5B-Instruct','Qwen/Qwen2.5-1.5B-Instruct'}
 assert not (repos & prohibidos), repos & prohibidos
-assert len({slug(m.nombre) for m in MODELOS_2026}) == 12
+assert len({slug(m.nombre) for m in MODELOS_2026}) == 14
+gateados = {m.hf_repo_id for m in gated()}
+assert gateados == {'google/gemma-3-270m-it','meta-llama/Llama-3.2-1B-Instruct'}, gateados
+assert all(m.transformers_pin == BASELINE_TRANSFORMERS for m in MODELOS_2026 if m.hf_repo_id in gateados)
 print('roster OK:', len(MODELOS_2026), 'modelos,', BASELINE_TRANSFORMERS)
 "
 
@@ -339,10 +362,10 @@ git diff --name-only main -- src/models.py src/prompt.py src/scoring.py src/sche
 
 ## Acceptance criteria
 
-- **Dado** el repositorio en la rama `feat/reescritura-experimento-2026`, **cuando** se importa `models_2026`, **entonces** `MODELOS_2026` tiene 12 elementos, 6 con `tier == "sub-1B"` y 6 con `tier == "1-2B"`, con `nombre` y `hf_repo_id` únicos.
-- **Dado** el roster, **cuando** se buscan los repos descartados por la entrevista (`gemma-3-270m-it`, `Llama-3.2-1B-Instruct`, ambos `Qwen2.5-*`), **entonces** ninguno está presente, y ningún módulo menciona `HF_TOKEN`, `login` ni autenticación.
-- **Dado** cualquier modelo del roster, **cuando** `transformers_pin == BASELINE_TRANSFORMERS`, **entonces** `motivo_pin == ""`; y cuando difiere, `motivo_pin` es no vacío. El test lo verifica para los 12.
-- **Dado** `slug`, **cuando** se aplica a los 12 nombres, **entonces** produce 12 cadenas distintas, no vacías, compuestas solo de `[a-z0-9-]`, sin guiones en los extremos (`"Qwen3.5-0.8B" -> "qwen3-5-0-8b"`).
+- **Dado** el repositorio en la rama `feat/reescritura-experimento-2026`, **cuando** se importa `models_2026`, **entonces** `MODELOS_2026` tiene 14 elementos, 7 con `tier == "sub-1B"` y 7 con `tier == "1-2B"`, con `nombre` y `hf_repo_id` únicos.
+- **Dado** el roster, **cuando** se buscan los repos de `Qwen2.5-*` descartados por la entrevista, **entonces** ninguno está presente; y **cuando** se filtran los `gated = True`, **entonces** son exactamente `google/gemma-3-270m-it` y `meta-llama/Llama-3.2-1B-Instruct`. `src/models_2026.py` declara el flag `gated` pero **no** lee ni imprime el valor de ningún token, y no menciona `login` ni `huggingface-cli`.
+- **Dado** cualquier modelo del roster, **cuando** `transformers_pin == BASELINE_TRANSFORMERS`, **entonces** `motivo_pin == ""`; y cuando difiere, `motivo_pin` es no vacío. El test lo verifica para los 14, incluidos los dos `gated`.
+- **Dado** `slug`, **cuando** se aplica a los 14 nombres, **entonces** produce 14 cadenas distintas, no vacías, compuestas solo de `[a-z0-9-]`, sin guiones en los extremos (`"Qwen3.5-0.8B" -> "qwen3-5-0-8b"`).
 - **Dado** `parsear_etiquetas`, **cuando** recibe `"confusion_intencion;uso_de_sinonimos"`, **entonces** devuelve esa lista de 2; **cuando** recibe una cadena vacía o una etiqueta desconocida, **entonces** lanza `ValueError` cuyo mensaje incluye el valor ofensor.
 - **Dado** `parsear_categoria`, **cuando** recibe exactamente una categoría válida (con espacios o mayúsculas), **entonces** la devuelve normalizada; **cuando** recibe cero o dos, **entonces** lanza `ValueError`.
 - **Dado** `ETIQUETAS_ERROR`, **cuando** se toman sus 5 primeros elementos, **entonces** coinciden con las 5 categorías publicadas de la Tabla 4, con `alucinacion_valor_unidad` y `valor_numerico_incorrecto` **separadas** (a diferencia del legacy que las fusiona).

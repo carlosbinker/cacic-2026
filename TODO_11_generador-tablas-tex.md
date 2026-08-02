@@ -177,13 +177,13 @@ def _es_bloque_table(tex: str) -> bool:
             and r"\documentclass" not in tex and tex.count(r"\begin{tabular}") == 1)
 
 
-def test_tabla1_lista_los_doce_modelos_con_su_label():
+def test_tabla1_lista_los_catorce_modelos_con_su_label():
     tex = tabla1_modelos()
     assert _es_bloque_table(tex)
     assert r"\label{tab:modelos}" in tex
     for m in MODELOS_2026:
         assert _escapar(m.nombre) in tex
-    assert tex.count(r"\\") >= 12
+    assert tex.count(r"\\") >= 14
 
 
 def test_tabla2_trae_estricta_y_laxa():
@@ -286,7 +286,7 @@ EOF
   && echo "las 5 tablas compilan" || echo "FALLA de compilacion"
 ```
 
-- [ ] Si alguna tabla se sale del ancho de página, envolverla en `\resizebox{\textwidth}{!}{...}` dentro de `_tabla` (las de 12 columnas — Tablas 3 y 4 — son las candidatas) y recompilar.
+- [ ] Si alguna tabla se sale del ancho de página, envolverla en `\resizebox{\textwidth}{!}{...}` dentro de `_tabla` (las de 14 columnas — Tablas 3 y 4 — son las candidatas) y recompilar.
 
 ### Tarea 4 — commit
 
@@ -349,11 +349,11 @@ print('tabla 5 refleja los pines divergentes')
 
 - **Dado** `_escapar`, **entonces** convierte `_ % & # $ { } ~ ^ \` a sus formas LaTeX seguras y deja intacto el texto limpio (`granite-4.0-h-1b`).
 - **Dado** cualquiera de los cinco fragmentos, **entonces** empieza con `\begin{table}`, termina con `\end{table}`, contiene exactamente un `tabular`, no contiene `\documentclass` ni preámbulo, y declara su `\label{tab:...}` congelado en F8.
-- **Dado** la Tabla 1, **entonces** lista los 12 modelos con parámetros, tier, familia y modo de prompting.
+- **Dado** la Tabla 1, **entonces** lista los 14 modelos con parámetros, tier, familia y modo de prompting.
 - **Dado** la Tabla 2, **entonces** tiene columnas para JSON válido, exactitud **estricta**, exactitud **laxa** y latencia, y sus valores coinciden dígito a dígito con `data/2026/resumen_2026.json`.
 - **Dado** la Tabla 3, **entonces** tiene una fila por categoría lingüística presente, con el nombre legible de `CATEGORIAS_DISPLAY` y el `n` entre paréntesis, y una columna por modelo.
 - **Dado** la Tabla 4, **entonces** tiene una fila `Total de respuestas incorrectas` y **siete** filas de etiquetas con sus nombres legibles, incluyendo `Alucinación de valor/unidad` y `Valor numérico incorrecto` como filas **separadas**.
-- **Dado** la Tabla 5, **entonces** lista los 12 modelos con su `transformers_pin`, su `trust_remote_code` y su motivo (`—` cuando hereda el baseline), y una nota al pie que declara cuál es el baseline.
+- **Dado** la Tabla 5, **entonces** lista los 14 modelos con su `transformers_pin`, su `trust_remote_code` y su motivo (`—` cuando hereda el baseline), y una nota al pie que declara cuál es el baseline.
 - **Dado** cualquier fragmento, **entonces** no contiene ningún `_` sin escapar (todos precedidos por `\`).
 - **Dado** un documento LNCS mínimo que hace `\input` de los cinco fragmentos, **entonces** `latexmk -pdf -halt-on-error` compila con código 0.
 - **Dado** que se regenera sin cambiar los datos, **entonces** `git diff -- paper/02_reescrito/tablas/` sale vacío.

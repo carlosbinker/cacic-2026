@@ -13,6 +13,8 @@ Implementar el harness que corre **un solo modelo por invocación** y escribe `d
 
 Cubre **RF3** (reanudable: si el CSV del modelo ya existe y está completo, se saltea salvo `--force`), **RF6** (etapa 1 = coincidencia textual, reutilizando `scoring.py` sin tocarlo) y **RNF3** (decodificación greedy determinista, idéntica al harness legacy).
 
+Cubre además la mitad "harness" de **F11**: dos de los 14 modelos son `gated`. Antes de tocar la red, el harness verifica que exista `$HF_TOKEN`; si el modelo es `gated` y falta, aborta con un `ValueError` en español (sin imprimir el valor del token) en vez de fallar a mitad de una descarga. Para los `gated`, el token se pasa a `from_pretrained` por el parámetro `token=os.environ["HF_TOKEN"]` — nunca `huggingface_hub.login()`.
+
 Diferencias respecto de `src/run_evaluation.py` (que queda congelado por F0): un modelo por corrida en vez de los cuatro, salida por modelo en vez de un CSV único, entrada construida por `prompt_2026.construir_entrada` en vez de `apply_chat_template` directo, y dos columnas nuevas (`modo_prompting`, `transformers_version`).
 
 La lógica pura (armado de fila, decisión de saltear) se separa de la inferencia para poder testearla sin `torch` ni descargas.
@@ -31,6 +33,8 @@ de filas y la decisión de reanudación, que es lo que puede romperse en
 silencio durante un barrido de varias horas.
 """
 
+import os
+import re
 import sys
 from pathlib import Path
 
@@ -46,6 +50,7 @@ from run_sweep_2026 import (  # noqa: E402
     armar_fila,
     debe_saltear,
     ruta_detalle,
+    verificar_credencial_gated,
 )
 
 
@@ -71,6 +76,24 @@ def test_ruta_detalle_usa_el_slug():
     ruta = ruta_detalle("Qwen3.5-0.8B")
     assert ruta.name == "qwen3-5-0-8b.csv"
     assert ruta.parent.name == "detalle" and ruta.parent.parent.name == "2026"
+
+
+def test_verificar_credencial_gated_lanza_valueerror_sin_token(monkeypatch):
+    """F11: falla temprano y en español si falta $HF_TOKEN para un modelo gated."""
+    monkeypatch.delenv("HF_TOKEN", raising=False)
+    modelo = por_nombre("gemma-3-270m-it")
+    with pytest.raises(ValueError) as exc:
+        verificar_credencial_gated(modelo)
+    mensaje = str(exc.value)
+    assert modelo.nombre in mensaje
+    assert ".env" in mensaje
+    assert not re.search(r"hf_[A-Za-z0-9]{20,}", mensaje), "no debe imprimir el valor del token"
+
+
+def test_verificar_credencial_gated_no_hace_nada_para_no_gated(monkeypatch):
+    monkeypatch.delenv("HF_TOKEN", raising=False)
+    modelo = por_nombre("SmolLM2-360M-Instruct")
+    verificar_credencial_gated(modelo)  # no debe lanzar: este modelo no es gated
 
 
 def _csv_completo(tmp_path: Path, n: int) -> Path:
@@ -189,6 +212,7 @@ Uso:
 
 import argparse
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -234,6 +258,18 @@ def debe_saltear(ruta: Path, force: bool) -> bool:
     return len(df) == N_COMANDOS_ESPERADO
 
 
+def verificar_credencial_gated(modelo: ModeloEvaluado2026) -> None:
+    """Falla temprano (F11): antes de tocar la red, si el modelo es `gated` y
+    falta `$HF_TOKEN`, aborta en vez de fallar a mitad de una descarga. El
+    mensaje nunca imprime el valor del token."""
+    if modelo.gated and not os.environ.get("HF_TOKEN"):
+        raise ValueError(
+            f"{modelo.nombre} es un modelo gated: requiere licencia aceptada y "
+            f"un token de Hugging Face para descargarse. Definí HF_TOKEN en el "
+            f"archivo .env de la raíz del repo (ver docker/README.md)."
+        )
+
+
 def armar_fila(*, modelo: ModeloEvaluado2026, idx: int, comando: str, gt: dict,
                texto_generado: str, latencia_s: float, modo: str,
                transformers_version: str) -> dict:
@@ -271,6 +307,8 @@ def armar_fila(*, modelo: ModeloEvaluado2026, idx: int, comando: str, gt: dict,
 
 ```python
 def evaluar_modelo(modelo: ModeloEvaluado2026, dataset: pd.DataFrame) -> list[dict]:
+    verificar_credencial_gated(modelo)  # F11: antes de descargar/cargar pesos
+
     import torch  # import local: los tests de lógica pura no necesitan torch
     import transformers
     from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -278,14 +316,19 @@ def evaluar_modelo(modelo: ModeloEvaluado2026, dataset: pd.DataFrame) -> list[di
     version = transformers.__version__
     print(f"=== {modelo.nombre} ({modelo.hf_repo_id}) | transformers {version} ===")
 
+    # F11: solo los dos modelos gated reciben el token, y solo por este
+    # parámetro. Nunca huggingface_hub.login().
+    credencial = {"token": os.environ["HF_TOKEN"]} if modelo.gated else {}
+
     tokenizer = AutoTokenizer.from_pretrained(
-        modelo.hf_repo_id, trust_remote_code=modelo.trust_remote_code
+        modelo.hf_repo_id, trust_remote_code=modelo.trust_remote_code, **credencial
     )
     red = AutoModelForCausalLM.from_pretrained(
         modelo.hf_repo_id,
         torch_dtype=torch.bfloat16,
         device_map="cpu",
         trust_remote_code=modelo.trust_remote_code,
+        **credencial,
     )
     red.eval()
 
@@ -379,7 +422,7 @@ if __name__ == "__main__":
 pytest -q
 
 # 2. El roster se lista sin tocar la red
-python src/run_sweep_2026.py --listar | wc -l    # -> 12
+python src/run_sweep_2026.py --listar | wc -l    # -> 14
 
 # 3. Las 15 primeras columnas coinciden exactamente con el CSV legacy
 python -c "
@@ -422,6 +465,8 @@ git diff --exit-code main -- src/scoring.py src/run_evaluation.py \
 - **Dado** una respuesta que usa `"tele"` donde el ground truth dice `"tv"`, **cuando** se llama `armar_fila`, **entonces** `json_valido` es `True` pero `match_dispositivo` y `match_exact` son `False` — la etapa 1 penaliza el sinónimo, tal como exige el protocolo taxativo.
 - **Dado** una respuesta no parseable, **entonces** `json_valido=False`, `pred_json=""`, `parse_note="no_parseable_como_json"` y todos los `match_*` en `False`.
 - **Dado** un `modo` fuera de `{"chat_template", "raw_completion"}`, **entonces** `armar_fila` lanza `ValueError` mencionando `modo_prompting`.
+- **Dado** un modelo con `gated = True` y `$HF_TOKEN` ausente o vacío, **cuando** se llama `verificar_credencial_gated` (o se corre el harness sobre ese modelo), **entonces** lanza `ValueError` en español que nombra al modelo y a `.env`, y cuyo mensaje no contiene el valor de ningún token. Para un modelo no gated, la misma función no lanza nada aunque falte `$HF_TOKEN`.
+- **Dado** un modelo `gated`, **cuando** se ejecuta `evaluar_modelo`, **entonces** el token se pasa a `AutoTokenizer.from_pretrained` y `AutoModelForCausalLM.from_pretrained` por el parámetro `token=os.environ["HF_TOKEN"]`; para un modelo no gated, no se pasa `token`; en ningún caso se invoca `huggingface_hub.login()`.
 - **Dado** `python src/run_sweep_2026.py --modelo "SmolLM2-360M-Instruct"`, **entonces** produce `data/2026/detalle/smollm2-360m-instruct.csv` con 32 filas, `idx` de 0 a 31 sin huecos, y una segunda invocación imprime que se saltea.
 - **Dado** el módulo, **cuando** se importa desde los tests, **entonces** no requiere `torch` ni `transformers` (los imports pesados son locales a `evaluar_modelo`).
 - **Dado** `git diff main`, **entonces** ningún archivo de F0 aparece modificado.

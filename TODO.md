@@ -1,6 +1,6 @@
 # Reejecución del experimento con roster 2026, verificación automática en dos etapas y reescritura del paper en LaTeX
 
-**Goal:** Rehacer el estudio comparativo de SLMs para interpretación de comandos de domótica con un roster de 12 modelos nuevos, reemplazar la clasificación manual de errores por un pipeline automático de dos etapas (coincidencia textual + juez LLM con categorías cerradas), aislar cada modelo en su propia imagen Docker, y reescribir el paper como un conjunto de archivos `.tex` LNCS listos para envío ciego a CACIC 2026.
+**Goal:** Rehacer el estudio comparativo de SLMs para interpretación de comandos de domótica con un roster de 14 modelos nuevos, reemplazar la clasificación manual de errores por un pipeline automático de dos etapas (coincidencia textual + juez LLM con categorías cerradas), aislar cada modelo en su propia imagen Docker, y reescribir el paper como un conjunto de archivos `.tex` LNCS listos para envío ciego a CACIC 2026.
 
 **Architecture:** Todo el código nuevo vive en módulos `*_2026.py` paralelos a los existentes; los módulos legacy (`models.py`, `prompt.py`, `metrics.py`, `run_evaluation.py`, `generate_figures.py`), los resultados publicados (`data/resultados_experimento_*`) y `tests/test_metricas.py` quedan **congelados y verdes**. El barrido corre un modelo por contenedor, secuencialmente, escribiendo un CSV por modelo bajo `data/2026/detalle/` para que sea reanudable. Consolidado el barrido, se elige el juez de forma determinista (mejor exactitud estricta, desempate por tamaño) y ese mismo modelo etiqueta (a) cada respuesta incorrecta con una taxonomía cerrada de 7 etiquetas y (b) cada uno de los 32 comandos con una de 6 categorías lingüísticas. De ahí salen dos métricas titulares —exactitud estricta y laxa— cuya brecha es en sí misma un resultado. El paper se genera con tablas `.tex` emitidas por script desde los JSON de resultados.
 
@@ -48,26 +48,84 @@ Tareas:
 - Haz las preguntas lo antes posible.
 ```
 
+### Delta 2026-08-02
+
+# Delta 01 — los modelos gated vuelven al roster
+
+## Qué cambia
+
+`02-interview.md` §A1 dice: *"DROP `google/gemma-3-270m-it` and `meta-llama/Llama-3.2-1B-Instruct`
+— no `HF_TOKEN` is available"*. **Eso queda anulado.** El usuario creó un token de HuggingFace y
+ambos modelos **vuelven al roster**.
+
+Verificado por root, no asumido:
+
+```
+200  google/gemma-3-270m-it
+200  meta-llama/Llama-3.2-1B-Instruct
+200  whoami-v2
+```
+
+Es decir: el token es válido **y** las licencias (Gemma Terms of Use, Llama 3.2 Community License)
+ya están aceptadas en la cuenta. No hay paso manual pendiente ni riesgo de 401 a mitad del barrido.
+
+La instrucción que root le dio al agente de Phase 1 — *"no auth step should appear anywhere in the
+plan"* — también queda anulada: ahora **sí** hace falta plomería de credenciales, acotada a lo de
+abajo.
+
+## Consecuencias concretas para el plan
+
+1. **Roster**: +2 modelos. El barrido, la matriz de imágenes Docker, las figuras y las tablas se
+   dimensionan con el roster ampliado. Todo lo demás de §A1 sigue vigente: los Qwen2.5 siguen
+   afuera, y los LFM2.5 base siguen adentro con ruta de raw-completion.
+2. **Gemma 3 necesita `transformers >= 4.50.0`** (único mínimo confirmado por la investigación de
+   Phase 1). Es exactamente el caso que motiva §A6: entra en la matriz de versiones documentada,
+   con su motivo.
+3. **Plomería del token** — el token vive en `.env` en la raíz del repo, ya creado y verificado
+   como ignorado por git:
+   - `.gitignore` ahora cubre `.env`, `*.env`, `.hf_token`.
+   - El barrido lo pasa a los contenedores por entorno: `docker run --env-file .env ...` o
+     `-e HF_TOKEN`. **Nunca** como `ARG`/`ENV` en un `Dockerfile` ni como capa de imagen.
+   - Solo lo reciben las dos imágenes que lo necesitan; los demás modelos corren sin credenciales.
+   - Si falta `HF_TOKEN`, el barrido debe fallar temprano con un mensaje claro, no a mitad de la
+     descarga.
+4. **Prohibición dura**: el token **no puede aparecer** en ningún archivo versionado — ni en los
+   `TODO_<NN>_*.md`, ni en el README, ni en la matriz de versiones, ni en logs commiteados, ni en
+   `data/2026/`. Los archivos del plan lo referencian **solo** como `$HF_TOKEN`. Esto es criterio
+   de aceptación verificable (`git grep -i 'hf_[A-Za-z]'` debe dar vacío).
+5. **Reproducibilidad / paper**: dos de los modelos requieren aceptar una licencia y un token para
+   descargarse. Eso limita la reproducibilidad de terceros y **debe decirse** en la sección de
+   reproducibilidad y en §6 Amenazas a la Validez, junto con la divergencia de versiones de §A6.
+   Redactarlo sin datos identificatorios (submission ciega, §A8).
+
+## Nota de seguridad para el usuario (no es tarea del plan)
+
+El token se pegó en texto plano en el chat. Funciona y no bloquea nada, pero conviene **rotarlo en
+huggingface.co/settings/tokens cuando termine el barrido**, y darle scope de solo lectura si el
+actual es de escritura. Sustituir el valor en `.env` alcanza; ningún archivo versionado lo contiene.
+
 ## 2. Formalized specification
 
-### 2.1 Roster de modelos (12)
+### 2.1 Roster de modelos (14)
 
-`Qwen2.5-0.5B-Instruct` y `Qwen2.5-1.5B-Instruct` se **eliminan** (superados por el par Qwen3.5). `google/gemma-3-270m-it` y `meta-llama/Llama-3.2-1B-Instruct` se **eliminan** por ser *gated* y no haber `HF_TOKEN` disponible; **ningún paso de autenticación debe aparecer en el plan**. `SmolLM2` aporta los "2 tamaños" del modelo del paper original (360M y 1.7B). Roster final:
+`Qwen2.5-0.5B-Instruct` y `Qwen2.5-1.5B-Instruct` se **eliminan** (superados por el par Qwen3.5). `google/gemma-3-270m-it` y `meta-llama/Llama-3.2-1B-Instruct` **se mantienen**: son *gated*, pero hay un `$HF_TOKEN` válido y ambas licencias ya están aceptadas en la cuenta, así que se descargan sin intervención manual (ver §4, F11 para la plomería del token). `SmolLM2` aporta los "2 tamaños" del modelo del paper original (360M y 1.7B). Roster final:
 
-| # | `nombre` | `hf_repo_id` | `params_b` | `tier` | prompting |
-|---|----------|--------------|-----------|--------|-----------|
-| 1 | `LFM2.5-230M` | `LiquidAI/LFM2.5-230M` | 0.23 | sub-1B | raw_completion (base) |
-| 2 | `LFM2.5-350M` | `LiquidAI/LFM2.5-350M` | 0.35 | sub-1B | raw_completion (base) |
-| 3 | `granite-4.0-350m` | `ibm-granite/granite-4.0-350m` | 0.35 | sub-1B | chat_template |
-| 4 | `granite-4.0-h-350m` | `ibm-granite/granite-4.0-h-350m` | 0.34 | sub-1B | chat_template |
-| 5 | `Qwen3.5-0.8B` | `Qwen/Qwen3.5-0.8B` | 0.8 | sub-1B | chat_template |
-| 6 | `SmolLM2-360M-Instruct` | `HuggingFaceTB/SmolLM2-360M-Instruct` | 0.36 | sub-1B | chat_template |
-| 7 | `LFM2.5-1.2B-Instruct` | `LiquidAI/LFM2.5-1.2B-Instruct` | 1.2 | 1-2B | chat_template |
-| 8 | `granite-4.0-1b` | `ibm-granite/granite-4.0-1b` | 1.6 | 1-2B | chat_template |
-| 9 | `granite-4.0-h-1b` | `ibm-granite/granite-4.0-h-1b` | 1.5 | 1-2B | chat_template |
-| 10 | `Qwen3.5-2B` | `Qwen/Qwen3.5-2B` | 2.0 | 1-2B | chat_template |
-| 11 | `OLMo-2-0425-1B-Instruct` | `allenai/OLMo-2-0425-1B-Instruct` | 1.0 | 1-2B | chat_template |
-| 12 | `SmolLM2-1.7B-Instruct` | `HuggingFaceTB/SmolLM2-1.7B-Instruct` | 1.71 | 1-2B | chat_template |
+| # | `nombre` | `hf_repo_id` | `params_b` | `tier` | prompting | `gated` |
+|---|----------|--------------|-----------|--------|-----------|---------|
+| 1 | `LFM2.5-230M` | `LiquidAI/LFM2.5-230M` | 0.23 | sub-1B | raw_completion (base) | no |
+| 2 | `LFM2.5-350M` | `LiquidAI/LFM2.5-350M` | 0.35 | sub-1B | raw_completion (base) | no |
+| 3 | `granite-4.0-350m` | `ibm-granite/granite-4.0-350m` | 0.35 | sub-1B | chat_template | no |
+| 4 | `granite-4.0-h-350m` | `ibm-granite/granite-4.0-h-350m` | 0.34 | sub-1B | chat_template | no |
+| 5 | `Qwen3.5-0.8B` | `Qwen/Qwen3.5-0.8B` | 0.8 | sub-1B | chat_template | no |
+| 6 | `SmolLM2-360M-Instruct` | `HuggingFaceTB/SmolLM2-360M-Instruct` | 0.36 | sub-1B | chat_template | no |
+| 7 | `gemma-3-270m-it` | `google/gemma-3-270m-it` | 0.27 | sub-1B | chat_template | sí |
+| 8 | `LFM2.5-1.2B-Instruct` | `LiquidAI/LFM2.5-1.2B-Instruct` | 1.2 | 1-2B | chat_template | no |
+| 9 | `granite-4.0-1b` | `ibm-granite/granite-4.0-1b` | 1.6 | 1-2B | chat_template | no |
+| 10 | `granite-4.0-h-1b` | `ibm-granite/granite-4.0-h-1b` | 1.5 | 1-2B | chat_template | no |
+| 11 | `Qwen3.5-2B` | `Qwen/Qwen3.5-2B` | 2.0 | 1-2B | chat_template | no |
+| 12 | `OLMo-2-0425-1B-Instruct` | `allenai/OLMo-2-0425-1B-Instruct` | 1.0 | 1-2B | chat_template | no |
+| 13 | `SmolLM2-1.7B-Instruct` | `HuggingFaceTB/SmolLM2-1.7B-Instruct` | 1.71 | 1-2B | chat_template | no |
+| 14 | `Llama-3.2-1B-Instruct` | `meta-llama/Llama-3.2-1B-Instruct` | 1.0 | 1-2B | chat_template | sí |
 
 El `modo_prompting` de la última columna es la **expectativa**; el código lo decide en runtime por capacidad (`tokenizer.chat_template is None`), nunca por ID hardcodeado. Si la detección discrepa de la tabla, gana la detección y se corrige la tabla del paper.
 
@@ -76,7 +134,7 @@ El `modo_prompting` de la última columna es la **expectativa**; el código lo d
 - **RF1** — Prompt de sistema 2026: el prompt del paper más una cláusula **taxativa** que declare que los valores entre paréntesis son los únicos outputs aceptados textualmente y que usar sinónimos es una violación de formato (texto exacto congelado en §4, F2).
 - **RF2** — Ruta de prompting por *raw completion* para tokenizers sin `chat_template`, detectada por capacidad.
 - **RF3** — Barrido **reanudable por modelo**: un CSV por modelo; reejecutar salta los modelos ya completos salvo `--force`.
-- **RF4** — **Una imagen Docker por modelo**, con su `transformers` fijado, compartiendo un único volumen de caché HF. Ejecución secuencial, `--memory=8g --cpus=2`, CPU-only.
+- **RF4** — **Una imagen Docker por modelo** (14), con su `transformers` fijado, compartiendo un único volumen de caché HF. Ejecución secuencial, `--memory=8g --cpus=2`, CPU-only. Las dos imágenes de modelos *gated* reciben `$HF_TOKEN` por entorno en runtime (§4, F11); las otras 12 corren sin credenciales.
 - **RF5** — Toda divergencia de versión respecto del baseline debe quedar documentada (qué modelo la forzó, qué error evita) en `docker/README.md`, en el sitio del pin, y en el texto de metodología y de amenazas del paper. Lo mismo para cualquier uso de `trust_remote_code`.
 - **RF6** — Etapa 1 (automática): coincidencia textual exacta campo a campo, como hoy.
 - **RF7** — Selección determinista del juez: mayor `exact_match_pct` de la etapa 1; empate → mayor `params_b`; empate persistente → orden del roster. Decodificación greedy/temperatura 0 en etapa 1 y etapa 2.
@@ -84,11 +142,13 @@ El `modo_prompting` de la última columna es la **expectativa**; el código lo d
 - **RF9** — Etapa 2, trabajo B: el juez clasifica cada uno de los 32 comandos en **exactamente una** de las 6 categorías lingüísticas cerradas (§4, F4). Reemplaza el etiquetado manual de la Tabla 3; **no** se agrega columna al dataset.
 - **RF10** — Dos métricas titulares: **exactitud estricta** (`match_exact`) y **exactitud laxa** (`match_exact` o etiqueta en `{sin_error_semantico, uso_de_sinonimos}`). Ambas en la Tabla 2; la brecha se discute como resultado.
 - **RF11** — Tabla 4 con las **5 categorías publicadas** (se separa `alucinacion_valor_unidad` de `valor_numerico_incorrecto`; el legacy las fusionaba) más las 2 etiquetas nuevas.
-- **RF12** — Figuras rediseñadas: **barras horizontales agrupadas por tier**, nombres largos legibles, sin apiñamiento a 12 modelos.
+- **RF12** — Figuras rediseñadas: **barras horizontales agrupadas por tier**, nombres largos legibles, sin apiñamiento a 14 modelos.
 - **RF13** — Tablas 1–5 del paper generadas por script desde los JSON de resultados hacia fragmentos `.tex` que `main.tex` hace `\input`.
 - **RF14** — Dos árboles LaTeX: `paper/01_original/` (transcripción fiel del `.docx`) y `paper/02_reescrito/`, cada uno con `main.tex`, un `.tex` por sección y `refs.bib`, autocontenidos (`llncs.cls` y `splncs03.bst` copiados), y ambos compilando a PDF.
 - **RF15** — **Envío ciego**: cero datos identificatorios en `paper/02_reescrito/` ni en su PDF (sin autores, afiliaciones, agradecimientos, financiamiento, URL del repositorio, ORCID, ni metadatos identificatorios). Verificado por script, no por inspección.
-- **RF16** — El paper reescrito debe incorporar tres amenazas a la validez **nuevas**: sesgo de auto-favorecimiento del juez, incomparabilidad de los dos modelos base prompteados por raw completion, y versiones divergentes de librería como confusor de la latencia.
+- **RF16** — El paper reescrito debe incorporar cuatro amenazas a la validez **nuevas**: sesgo de auto-favorecimiento del juez, incomparabilidad de los dos modelos base prompteados por raw completion, versiones divergentes de librería como confusor de la latencia, y reproducibilidad limitada por los dos modelos *gated*, que exigen aceptar una licencia y disponer de un token para descargarse.
+- **RF17** — **Credenciales**: el token de HuggingFace vive solo en `.env` (ignorado por git) y se pasa a los dos contenedores *gated* con `docker run --env-file .env`. Nunca como `ARG`/`ENV` de Dockerfile, `--build-arg`, `COPY`, capa de imagen ni `login` interactivo. Su **valor** no puede aparecer en ningún archivo versionado. Si falta, el barrido falla **temprano** con un mensaje claro en español que no imprime el token.
+- **RF18** — **Reproducibilidad declarada**: el paper reescrito debe decir, en la sección de metodología/reproducibilidad y en §6 Amenazas a la Validez, que 2 de los 14 modelos son *gated* y que reproducir el barrido completo exige aceptar sus licencias y usar un token propio de HuggingFace. Redactado sin datos identificatorios (envío ciego, RF15).
 
 ### 2.3 Requisitos no funcionales
 
@@ -100,7 +160,7 @@ El `modo_prompting` de la última columna es la **expectativa**; el código lo d
 
 ### 2.4 Fuera de alcance (out of scope)
 
-- Cualquier paso de login / token / autenticación, y los modelos *gated* que lo requerirían (`gemma-3-270m-it`, `Llama-3.2-1B-Instruct`).
+- Cualquier flujo de login interactivo (`huggingface-cli login`, `huggingface_hub.login()`) o gestión de credenciales más allá de leer `$HF_TOKEN` del entorno. Rotar, emitir o almacenar tokens tampoco es parte del plan.
 - Los modelos `Qwen2.5-*` del paper original.
 - Modificar `data/resultados_experimento_detalle.csv`, `data/resultados_experimento_resumen.json`, `tests/test_metricas.py`, `data/dataset_comandos_domotica.csv` o los módulos legacy de `src/`.
 - Abstract en inglés (el paper es solo en español).
@@ -118,7 +178,7 @@ El `modo_prompting` de la última columna es la **expectativa**; el código lo d
 | 02 | Prompt taxativo 2026 y ruta de raw completion | [01] | `TODO_02_prompt-y-raw-completion.md` |
 | 03 | Harness de barrido reanudable por modelo | [01, 02] | `TODO_03_harness-barrido-reanudable.md` |
 | 04 | Imágenes Docker por modelo y matriz de versiones | [01, 03] | `TODO_04_docker-por-modelo.md` |
-| 05 | Ejecución del barrido completo (12 modelos) | [04] | `TODO_05_ejecucion-barrido.md` |
+| 05 | Ejecución del barrido completo (14 modelos) | [04] | `TODO_05_ejecucion-barrido.md` |
 | 06 | Consolidación de etapa 1 y selección del juez | [05] | `TODO_06_consolidacion-y-juez.md` |
 | 07 | Juez LLM: taxonomía de errores y categorías lingüísticas | [06] | `TODO_07_juez-llm.md` |
 | 08 | Ejecución de la etapa 2 | [07] | `TODO_08_ejecucion-juez.md` |
@@ -164,7 +224,7 @@ Corolario: **todo el código nuevo va en módulos nuevos**, no en ediciones de l
 - **Escritura de artefactos.** Siempre `Path(...).parent.mkdir(parents=True, exist_ok=True)` antes de escribir; JSON con `indent=2, ensure_ascii=False`; CSV con `index=False`.
 - **Idioma.** Docstrings, comentarios, mensajes de error y prosa del paper en español. Identificadores de código y claves de datos en español sin tildes ni ñ (igual que `schema.py`).
 - **Logging.** `print()` a stdout, igual que los scripts existentes; sin librería de logging.
-- **Dueño único de `.gitignore`.** El subtask **01** es el único autorizado a editar `.gitignore`, y escribe de una sola vez todas las entradas que el DAG necesita (`.hf_cache/`, el `.docx`, `LaTeX2e (1)/`, los auxiliares de LaTeX). Ningún otro subtask lo toca: los subtasks 05 y 13 solo **verifican** que las entradas estén, y paran si faltan.
+- **Dueño único de `.gitignore`.** El subtask **01** es el único autorizado a editar `.gitignore`. El archivo **ya está commiteado** (en `8acfefd`) con las entradas de caché HF, credenciales (`.env`, `*.env`, `.hf_token`), el `.docx` y la plantilla `LaTeX2e (1)/`. El subtask 01 por lo tanto **verifica y completa, nunca reescribe ni reordena**: comprueba que esas entradas estén y agrega **únicamente lo que falte** (hoy: los auxiliares de LaTeX `*.aux`, `*.log`, `*.out`, `*.bbl`, `*.blg`, `*.synctex.gz`, `*.fls`, `*.fdb_latexmk`, `*.toc`). Ningún otro subtask lo toca: los subtasks 05 y 13 solo **verifican** que las entradas estén, y paran si faltan.
 - **`git add` acotado.** Cada subtask agrega solo las rutas que declara en su frontmatter, nunca `git add -A` ni `git add .`, para que ningún artefacto pesado o no versionable entre por accidente.
 
 ### F2 — Prompting: `src/prompt_2026.py`
@@ -226,16 +286,20 @@ class ModeloEvaluado2026:
     tier: Tier
     transformers_pin: str      # spec pip exacto usado en la imagen de ese modelo
     trust_remote_code: bool
+    gated: bool                # requiere licencia aceptada + $HF_TOKEN para descargarse
     motivo_pin: str            # "" si transformers_pin == BASELINE_TRANSFORMERS; si no, el porqué
 
-MODELOS_2026: list[ModeloEvaluado2026]   # los 12 de §2.1, en ese orden
+MODELOS_2026: list[ModeloEvaluado2026]   # los 14 de §2.1, en ese orden
 
 def slug(nombre: str) -> str: ...        # minúsculas; [^a-z0-9]+ -> "-"; sin guiones al borde
 def por_nombre(nombre: str) -> ModeloEvaluado2026: ...   # ValueError si no existe
 def por_tier(tier: Tier) -> list[ModeloEvaluado2026]: ...
+def gated() -> list[ModeloEvaluado2026]: ...   # los que requieren $HF_TOKEN, en orden de roster
 ```
 
-**Invariante congelado, verificado por test:** `motivo_pin != ""` si y solo si `transformers_pin != BASELINE_TRANSFORMERS`. Valor inicial de los 12: `transformers_pin = BASELINE_TRANSFORMERS`, `trust_remote_code = False`, `motivo_pin = ""`. El subtask 04 es el único autorizado a cambiarlos, y solo con evidencia empírica de fallo.
+`src/models_2026.py` declara el **flag** `gated`; **no** lee el token ni menciona su valor.
+
+**Invariantes congelados, verificados por test:** (a) `motivo_pin != ""` si y solo si `transformers_pin != BASELINE_TRANSFORMERS`; (b) exactamente **dos** modelos tienen `gated = True`, y son `google/gemma-3-270m-it` y `meta-llama/Llama-3.2-1B-Instruct`. Valor inicial de los 14: `transformers_pin = BASELINE_TRANSFORMERS`, `trust_remote_code = False`, `motivo_pin = ""`. El subtask 04 es el único autorizado a cambiar los pines, y solo con evidencia empírica de fallo.
 
 ### F4 — Vocabularios cerrados: `src/taxonomia_2026.py`
 
@@ -441,11 +505,13 @@ docker/
   Dockerfile.modelo        # parametrizado por ARG TRANSFORMERS_PIN
   requirements-base.txt    # todo menos transformers
   build_all.py             # construye una imagen por modelo del roster
-  run_sweep.py             # corre las 12 imágenes, de a una, en orden de roster
+  run_sweep.py             # corre las 14 imágenes, de a una, en orden de roster
   README.md                # matriz de versiones + motivos (RF5)
 ```
 
-Nombre de imagen congelado: `slm-domotica-2026:<slug>`. Invocación congelada por modelo:
+Nombre de imagen congelado: `slm-domotica-2026:<slug>`. Invocación congelada por modelo, según `gated`:
+
+Modelos **no gated** (12) — sin credenciales, idéntico a hoy:
 ```
 docker run --rm --memory=8g --cpus=2 \
   -v <repo>/data:/app/data \
@@ -453,14 +519,28 @@ docker run --rm --memory=8g --cpus=2 \
   slm-domotica-2026:<slug> \
   python src/run_sweep_2026.py --modelo "<nombre>"
 ```
+
+Modelos **gated** (2) — se agrega **exclusivamente** `--env-file <repo>/.env`:
+```
+docker run --rm --memory=8g --cpus=2 \
+  --env-file <repo>/.env \
+  -v <repo>/data:/app/data \
+  -v <repo>/.hf_cache:/app/.hf_cache \
+  slm-domotica-2026:<slug> \
+  python src/run_sweep_2026.py --modelo "<nombre>"
+```
 Un único volumen de caché HF compartido por todas las imágenes; los árboles de dependencias quedan aislados. `docker/README.md` debe contener una tabla `modelo | transformers_pin | trust_remote_code | ¿necesario? | motivo` que sea la **misma información** que la Tabla 5 del paper.
+
+**Credenciales (congelado).** El token de HuggingFace vive **solo** en `.env` en la raíz del repo, ignorado por git. Se inyecta **únicamente en tiempo de ejecución** vía `docker run --env-file .env`, y **solo** a las dos imágenes con `gated = True`; las otras 12 corren sin credenciales. Está **prohibido**: declarar `ARG HF_TOKEN` o `ENV HF_TOKEN` en cualquier `Dockerfile`, pasar el token como `--build-arg`, hacer `COPY .env`, escribirlo en una capa de imagen, o invocar `huggingface-cli login` / `huggingface_hub.login()`. La única forma de consumirlo es leer `os.environ["HF_TOKEN"]` en runtime. Los archivos del plan y del repo lo referencian **solo** como `$HF_TOKEN`; su valor no aparece en ningún archivo versionado.
+
+**Fallo temprano (congelado).** Antes de construir o correr nada, si la lista de modelos a ejecutar incluye algún `gated` y `.env` no existe o `HF_TOKEN` está ausente/vacío, se aborta con `ValueError` en español que nombre el modelo y el archivo faltante — **nunca** a mitad de la descarga. El mensaje de error **no** imprime el valor del token.
 
 ## 5. Cross-task acceptance
 
 Se verifica al final del ciclo (`create-test-plan` / `run-test-plan`), no dentro de ningún subtask:
 
 1. **Regresión legacy intacta.** `pytest -q` verde y `git diff main --stat` no muestra cambios en ninguno de los archivos de F0.
-2. **Barrido completo y consistente.** `data/2026/detalle_2026.csv` tiene exactamente 384 filas (12 modelos × 32 comandos), los 12 valores de `modelo` coinciden con `MODELOS_2026`, y no hay `idx` faltantes ni duplicados por modelo.
+2. **Barrido completo y consistente.** `data/2026/detalle_2026.csv` tiene exactamente **448** filas (14 modelos × 32 comandos), los 14 valores de `modelo` coinciden con `MODELOS_2026`, y no hay `idx` faltantes ni duplicados por modelo.
 3. **Cobertura de la etapa 2.** Toda fila con `match_exact == False` en `detalle_2026.csv` tiene una fila correspondiente en `etiquetas_errores.csv` con al menos una etiqueta válida, y `categorias_comandos.csv` cubre los 32 `idx` exactamente una vez.
 4. **Coherencia estricta/laxa.** Para cada modelo de `resumen_2026.json`, `exact_match_laxo_pct >= exact_match_pct`, y ambos en `[0, 100]`.
 5. **Determinismo del juez.** Reejecutar la etapa 2 sobre el mismo `detalle_2026.csv` reproduce `etiquetas_errores.csv` y `categorias_comandos.csv` byte a byte.
@@ -468,5 +548,6 @@ Se verifica al final del ciclo (`create-test-plan` / `run-test-plan`), no dentro
 7. **Los dos papers compilan.** `latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex` termina con código 0 en `paper/01_original/` y en `paper/02_reescrito/`, produciendo `main.pdf` en ambas.
 8. **Envío ciego.** `python scripts/check_anonimato.py paper/02_reescrito` sale con código 0, incluyendo la revisión de metadatos del `main.pdf` ya construido.
 9. **Números del paper == números de los datos.** Cada valor de las Tablas 2/3/4 del PDF reescrito proviene de los fragmentos generados por `src/generate_tex_tables.py`; regenerar los fragmentos no produce diff.
-10. **Amenazas nuevas presentes.** `06_amenazas.tex` cubre explícitamente las tres amenazas de RF16.
-11. **Historial limpio.** Un commit por subtask en `feat/reescritura-experimento-2026`, y `paper_cacic_LNCS_word.docx` sigue sin trackear.
+10. **Amenazas nuevas presentes.** `06_amenazas.tex` cubre explícitamente las **cuatro** amenazas de RF16.
+11. **Historial limpio.** Un commit por subtask en `feat/reescritura-experimento-2026`, y `paper_cacic_LNCS_word.docx` sigue sin trackear, y `.env` sigue sin trackear (`git ls-files` no lista `.env` ni ningún `*.env`).
+12. **Ningún secreto versionado.** `git grep -iE 'hf_[A-Za-z0-9]{20,}'` sale vacío (exit 1) en todo el árbol trackeado — el patrón es estricto a propósito: un token de HuggingFace es `hf_` + ~34 alfanuméricos, mientras que `hf_repo_id`, `.hf_cache`, `HF_TOKEN` y `HF_HOME` son identificadores legítimos del diseño y deben seguir existiendo. Además, `git grep -nE 'ARG +HF_TOKEN|ENV +HF_TOKEN|COPY +\.env' docker/` sale vacío, y `git ls-files` no lista `.env`.

@@ -418,7 +418,7 @@ import sys, json; sys.path.insert(0,'src')
 from metrics_2026 import CLAVES_RESUMEN
 from models_2026 import MODELOS_2026
 r = json.load(open('data/2026/resumen_2026.json', encoding='utf-8'))
-assert len(r) == 12, len(r)
+assert len(r) == 14, len(r)
 assert [f['modelo'] for f in r] == [m.nombre for m in MODELOS_2026]
 for f in r:
     assert list(f.keys()) == CLAVES_RESUMEN, f['modelo']
@@ -438,7 +438,7 @@ t = pd.read_csv('data/2026/taxonomia_2026.csv')
 assert list(t.columns) == ['modelo','total_incorrectas'] + ETIQUETAS_ERROR
 assert 'alucinacion_valor_unidad' in t.columns and 'valor_numerico_incorrecto' in t.columns
 assert 'confusion_valor_o_unidad' not in t.columns
-assert len(t) == 12
+assert len(t) == 14
 print(t.to_string(index=False))
 "
 

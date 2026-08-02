@@ -24,7 +24,7 @@ files:
 
 Primera mitad del paper reescrito (**RF14**): el andamiaje LNCS anónimo más las secciones que **no** dependen de los resultados numéricos — abstract, introducción, trabajos relacionados y metodología.
 
-La metodología es la sección que más cambia respecto del original, porque cambió el experimento: 12 modelos en vez de 4 (Tabla 1 generada), prompt con cláusula taxativa (**RF1**), ruta de raw completion para los dos modelos base (**RF2**), aislamiento por contenedor y matriz de versiones (**RF4**, **RF5**, Tabla 5), y sobre todo el **pipeline automático de dos etapas** que reemplaza el etiquetado manual (**RF6**–**RF9**), con sus dos métricas (**RF10**).
+La metodología es la sección que más cambia respecto del original, porque cambió el experimento: 14 modelos en vez de 4 (Tabla 1 generada), prompt con cláusula taxativa (**RF1**), ruta de raw completion para los dos modelos base (**RF2**), aislamiento por contenedor y matriz de versiones (**RF4**, **RF5**, Tabla 5), y sobre todo el **pipeline automático de dos etapas** que reemplaza el etiquetado manual (**RF6**–**RF9**), con sus dos métricas (**RF10**). También se documenta, para envío ciego (**RF18**), que dos de los catorce modelos son *gated* y qué implica eso para la reproducibilidad por terceros.
 
 Restricción dura desde el primer commit: **envío ciego** (**RF15**). El bloque de autor se escribe anonimizado y el verificador del subtask 12 debe salir en 0 ya en este subtask, no recién en el 15.
 
@@ -63,7 +63,7 @@ cp figures/2026/fig2_exactitud_por_campo_2026.png paper/02_reescrito/figuras/
 \begin{document}
 
 \title{Modelos de Lenguaje Pequeños para la Interpretación de Comandos de
-Domótica en Español: Evaluación Automática de Doce Modelos Sub-2B}
+Domótica en Español: Evaluación Automática de Catorce Modelos Sub-2B}
 \author{Anonimizado por revisión ciega}
 \institute{Anonimizado por revisión ciega}
 \maketitle
@@ -97,15 +97,15 @@ done
 
 ### Tarea 2 — Abstract, introducción y trabajos relacionados
 
-- [ ] `00_abstract.tex` — `\begin{abstract}...\end{abstract}` + `\keywords{...}`, **solo en español** (A8: no va abstract en inglés). Debe declarar, con estas cuatro piezas: (a) que se evalúan **12** SLM abiertos de menos de 2B en interpretación de comandos de domótica en español rioplatense; (b) que la verificación es **totalmente automática** en dos etapas, coincidencia textual más un juez LLM con categorías cerradas, sin etiquetado manual; (c) que se reportan **dos** métricas, exactitud estricta y laxa, y que la brecha entre ambas cuantifica cuánto penaliza la coincidencia exacta a respuestas semánticamente correctas; (d) que todo corre en CPU con 2 núcleos y 8 GB, un contenedor por modelo. Sin números concretos: los resultados van en §4.
-- [ ] `01_introduccion.tex` — mantener la motivación del original (SLM locales para domótica, privacidad, hardware modesto) y agregar el aporte nuevo: el original clasificó a mano sus 73 respuestas incorrectas, lo que no escala a 12 modelos ni es reproducible; este trabajo automatiza ese juicio. Cerrar con las contribuciones enumeradas: roster de 12 modelos 2026, pipeline de verificación automática en dos etapas, doble métrica estricta/laxa, y protocolo reproducible con aislamiento por contenedor.
+- [ ] `00_abstract.tex` — `\begin{abstract}...\end{abstract}` + `\keywords{...}`, **solo en español** (A8: no va abstract en inglés). Debe declarar, con estas cuatro piezas: (a) que se evalúan **14** SLM abiertos de menos de 2B en interpretación de comandos de domótica en español rioplatense; (b) que la verificación es **totalmente automática** en dos etapas, coincidencia textual más un juez LLM con categorías cerradas, sin etiquetado manual; (c) que se reportan **dos** métricas, exactitud estricta y laxa, y que la brecha entre ambas cuantifica cuánto penaliza la coincidencia exacta a respuestas semánticamente correctas; (d) que todo corre en CPU con 2 núcleos y 8 GB, un contenedor por modelo. Sin números concretos: los resultados van en §4.
+- [ ] `01_introduccion.tex` — mantener la motivación del original (SLM locales para domótica, privacidad, hardware modesto) y agregar el aporte nuevo: el original clasificó a mano sus 73 respuestas incorrectas, lo que no escala a 14 modelos ni es reproducible; este trabajo automatiza ese juicio. Cerrar con las contribuciones enumeradas: roster de 14 modelos 2026, pipeline de verificación automática en dos etapas, doble métrica estricta/laxa, y protocolo reproducible con aislamiento por contenedor.
 - [ ] `02_trabajos_relacionados.tex` — reutilizar el texto del original (las 9 referencias siguen siendo válidas) y **agregar un párrafo nuevo sobre LLM-as-judge**, que es la técnica central que se incorpora: mencionar que la evaluación con modelos como jueces se usa cuando la coincidencia exacta subestima el desempeño, y que su limitación conocida es el sesgo de auto-favorecimiento — lo que enlaza con §6. Agregar a `refs.bib` **al menos una** referencia de LLM-as-judge y una de los modelos nuevos que se evalúan (familias LFM2.5 / Granite 4.0 / Qwen3.5 / OLMo-2). Las referencias nuevas **no deben deanonimizar**: nada de autocitas.
 
 ### Tarea 3 — Metodología (la sección que más cambia)
 
 - [ ] `03_metodologia.tex` con `\section{Metodología}` y estas subsecciones:
 
-**3.1 Modelos evaluados** — `\input{tablas/tabla1_modelos}`. Explicar el criterio de selección: modelos abiertos y **no gated** de dos tiers (sub-1B y 1–2B); indicar explícitamente que se excluyeron los modelos con licencia restringida por acceso, y que `SmolLM2` aparece en sus dos tamaños como continuidad con el estudio anterior. Declarar que **dos** de los doce (`LFM2.5-230M` y `LFM2.5-350M`) son modelos **base**, sin plantilla de chat.
+**3.1 Modelos evaluados** — `\input{tablas/tabla1_modelos}`. Explicar el criterio de selección: modelos abiertos de dos tiers (sub-1B y 1–2B); indicar explícitamente que dos de los catorce son *gated* —requieren aceptar una licencia de uso y disponer de un token propio para descargarse— y que se incluyeron porque no representan una barrera insalvable para este trabajo, a diferencia de otros modelos descartados por estar superados por alternativas más recientes de la misma familia; remitir a 3.6 para la nota de reproducibilidad sobre los modelos *gated*. Señalar también que `SmolLM2` aparece en sus dos tamaños como continuidad con el estudio anterior. Declarar que **dos** de los catorce (`LFM2.5-230M` y `LFM2.5-350M`) son modelos **base**, sin plantilla de chat.
 
 **3.2 Dataset de comandos** — sin cambios de fondo respecto del original: los mismos 32 comandos, el mismo esquema de 5 campos. Aclarar explícitamente que el dataset **no se modificó** para este estudio y que las categorías lingüísticas de §4.3 ya **no** se asignan a mano (ver 3.5).
 
@@ -126,6 +126,7 @@ Cerrar señalando que el juez evalúa también sus propias salidas y que eso se 
 **3.6 Entorno de ejecución y reproducibilidad** — **RF4** y **RF5**. Hardware: CPU, 2 núcleos, 8 GB, sin GPU, igual que el estudio original para que las latencias sean comparables. Aislamiento: una imagen de contenedor por modelo, ejecutadas de a una, compartiendo la caché de pesos. Y el punto que el usuario pidió explícitamente: `\input{tablas/tabla5_versiones}` con la matriz de versiones, más un párrafo que explique **por qué** difieren (arquitecturas recientes que exigen versiones distintas de la librería de inferencia), **qué modelo forzó cada divergencia**, y que esto es un confusor conocido para la comparación de latencia que se retoma en §6.
 
 - [ ] Si en el subtask 04 **ningún** pin resultó divergente, decirlo explícitamente ("todos los modelos corrieron con la misma versión de la librería de inferencia") en vez de omitir la subsección: la ausencia de divergencia también es información de reproducibilidad.
+- [ ] Cerrar 3.6 con el párrafo de **RF18** (reproducibilidad y modelos *gated*, redactado para envío ciego, sin datos identificatorios y sin mencionar el token concreto): dos de los catorce modelos (`gemma-3-270m-it` y `Llama-3.2-1B-Instruct`) son *gated*; descargarlos exige aceptar su licencia respectiva (Gemma Terms of Use y Llama 3.2 Community License) y disponer de un token propio de HuggingFace (`$HF_TOKEN`, nunca su valor concreto). Esto limita la reproducibilidad del barrido completo por parte de terceros que no dispongan de cuenta propia con esas licencias aceptadas, a diferencia de los otros doce modelos, que se descargan sin restricciones.
 
 ### Tarea 4 — Compilar, verificar anonimato y commitear
 
@@ -163,10 +164,10 @@ python -c "
 from pathlib import Path
 t = Path('paper/02_reescrito/secciones/03_metodologia.tex').read_text(encoding='utf-8').lower()
 faltan = [k for k in ('taxativ','sinónimo','raw completion','estricta','laxa',
-                      'greedy','contenedor','transformers','juez','categor')
+                      'greedy','contenedor','transformers','juez','categor','gated')
           if k not in t]
 assert not faltan, faltan
-print('metodologia cubre: prompt taxativo, raw completion, doble metrica, juez, docker, versiones')
+print('metodologia cubre: prompt taxativo, raw completion, doble metrica, juez, docker, versiones, gated')
 "
 
 # 6. Abstract solo en español
@@ -188,8 +189,8 @@ git diff --name-only main | grep -v '^paper/02_reescrito/' \
 - **Dado** `main.tex`, **entonces** usa el preámbulo congelado, hace `\input` de las nueve secciones en orden, y su bloque de autor e institución está **anonimizado**, con `\hypersetup` forzando `pdfauthor`, `pdfsubject` y `pdfkeywords` vacíos.
 - **Dado** `latexmk -pdf -halt-on-error main.tex`, **entonces** termina con código 0 y produce `main.pdf`, aun con las cinco secciones que todavía son stubs.
 - **Dado** `python scripts/check_anonimato.py paper/02_reescrito`, **entonces** sale con **código 0**, revisando tanto los `.tex` como el texto y los metadatos del `main.pdf` construido.
-- **Dado** el abstract, **entonces** está solo en español, en un único bloque `abstract`, y menciona los 12 modelos, la verificación automática en dos etapas y las dos métricas, sin dar cifras de resultados.
+- **Dado** el abstract, **entonces** está solo en español, en un único bloque `abstract`, y menciona los 14 modelos, la verificación automática en dos etapas y las dos métricas, sin dar cifras de resultados.
 - **Dado** `02_trabajos_relacionados.tex`, **entonces** incluye un párrafo sobre LLM-as-judge con al menos una referencia nueva en `refs.bib`, y ninguna referencia nueva deanonimiza a los autores.
 - **Dado** `03_metodologia.tex`, **entonces** hace `\input` de `tablas/tabla1_modelos` y `tablas/tabla5_versiones` (ningún número escrito a mano) y cubre explícitamente: la cláusula taxativa transcripta y su consecuencia sobre la comparabilidad con el estudio anterior; el prompting por raw completion de los dos modelos base decidido por capacidad; la definición precisa de exactitud estricta y laxa; el pipeline de dos etapas con la regla de selección del juez y la decodificación greedy; las siete etiquetas y las seis categorías cerradas con su política de reintento y respaldo; y el entorno de 2 núcleos / 8 GB con un contenedor por modelo.
-- **Dado** §3.6, **entonces** declara qué modelo forzó cada divergencia de versión y por qué, o bien afirma explícitamente que no hubo ninguna divergencia.
+- **Dado** §3.6, **entonces** declara qué modelo forzó cada divergencia de versión y por qué, o bien afirma explícitamente que no hubo ninguna divergencia; y declara, sin datos identificatorios ni mención del valor del token, que dos de los catorce modelos son *gated* (nombrando la licencia de cada uno) y que esto limita la reproducibilidad del barrido por terceros.
 - **Dado** `git diff --name-only main`, **entonces** los únicos cambios están bajo `paper/02_reescrito/`.

@@ -12,7 +12,7 @@ files:
 
 ## Spec
 
-Cerrar la etapa 1: consolidar los 12 CSV por modelo en `data/2026/detalle_2026.csv`, calcular el resumen de etapa 1 y **elegir el juez de forma determinista** según **RF7** — mayor `exact_match_pct`; empate → mayor `params_b`; empate persistente → orden del roster.
+Cerrar la etapa 1: consolidar los 14 CSV por modelo en `data/2026/detalle_2026.csv`, calcular el resumen de etapa 1 y **elegir el juez de forma determinista** según **RF7** — mayor `exact_match_pct`; empate → mayor `params_b`; empate persistente → orden del roster.
 
 Produce los tres artefactos de **F5**: `detalle_2026.csv`, `resumen_etapa1.json` y `juez_seleccionado.json`. Este último es el contrato de entrada del subtask 07: el juez no se elige a mano ni se hardcodea en ningún lado.
 
@@ -306,14 +306,14 @@ if __name__ == "__main__":
 # 1. Suite verde
 pytest -q
 
-# 2. El consolidado tiene las 384 filas, en orden de roster
+# 2. El consolidado tiene las 448 filas, en orden de roster
 python -c "
 import sys, json; sys.path.insert(0,'src')
 import pandas as pd
 from models_2026 import MODELOS_2026
 from run_sweep_2026 import COLUMNAS_DETALLE
 df = pd.read_csv('data/2026/detalle_2026.csv')
-assert len(df) == 384, len(df)
+assert len(df) == 448, len(df)
 assert list(df.columns) == COLUMNAS_DETALLE
 assert df['modelo'].drop_duplicates().tolist() == [m.nombre for m in MODELOS_2026]
 assert not df.duplicated(['modelo','idx']).any()
@@ -347,7 +347,7 @@ git diff --exit-code main -- data/resultados_experimento_detalle.csv \
 
 ## Acceptance criteria
 
-- **Dado** los 12 CSV de detalle, **cuando** se corre `src/stage1_2026.py`, **entonces** `data/2026/detalle_2026.csv` tiene 384 filas, las 17 columnas de F5 en orden, los modelos en orden de roster, cada bloque con `idx` de 0 a 31, y sin pares `(modelo, idx)` duplicados.
+- **Dado** los 14 CSV de detalle, **cuando** se corre `src/stage1_2026.py`, **entonces** `data/2026/detalle_2026.csv` tiene 448 filas, las 17 columnas de F5 en orden, los modelos en orden de roster, cada bloque con `idx` de 0 a 31, y sin pares `(modelo, idx)` duplicados.
 - **Dado** un directorio de detalle al que le falta algún modelo del roster, **entonces** `consolidar_detalle` lanza `ValueError` nombrando los faltantes, en vez de producir un consolidado incompleto.
 - **Dado** un CSV con esquema distinto o con distinto número de filas, **entonces** `consolidar_detalle` lanza `ValueError` señalando el archivo.
 - **Dado** un resumen con un único máximo de `exact_match_pct`, **entonces** `elegir_juez` devuelve ese modelo y `empatados` contiene solo a él.
