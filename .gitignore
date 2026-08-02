@@ -12,6 +12,21 @@ models_cache/
 # Salidas generadas localmente (se regeneran corriendo el pipeline)
 outputs/*.tmp
 
+# Credenciales (token de HuggingFace para los modelos gated). Nunca se versionan.
+.env
+*.env
+.hf_token
+
 # Archivos de sistema
 .DS_Store
 Thumbs.db
+
+# Fuente .docx del paper original (se lee localmente, no se versiona)
+paper_cacic_LNCS_word.docx
+
+# Plantilla LNCS descargada del sitio oficial (los archivos que hacen falta
+# se copian dentro de paper/*/ para que el build sea autocontenido)
+LaTeX2e (1)/
+LaTeX2e (1).zip
+
+.claude-scratch/
