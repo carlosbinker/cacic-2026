@@ -1,0 +1,5 @@
+# Herramientas de autoría y verificación, no necesarias para correr el
+# experimento. El requirements.txt de produccion se mantiene minimo porque
+# se instala dentro de cada imagen de modelo.
+-r requirements.txt
+pypdf>=5.0.0
