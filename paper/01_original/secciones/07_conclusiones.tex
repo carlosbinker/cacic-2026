@@ -1,0 +1,21 @@
+\section{Conclusiones y trabajo futuro}
+
+Este trabajo presentó una comparación empírica de cuatro Small Language
+Models open-source (0,36B a 1,7B parámetros) en la tarea de interpretar
+comandos de domótica en español rioplatense, usando un dataset propio de
+32 comandos anotados. Los resultados muestran que la coincidencia exacta
+mejora de forma consistente con el tamaño del modelo (18,8\% a 59,4\%),
+pero con una latencia que crece más rápido que la exactitud, y que los
+cuatro modelos comparten una debilidad sistemática en la interpretación de
+comandos con ajustes relativos o cualitativos sin valor numérico explícito,
+tendiendo a alucinar valores y unidades inexistentes en el comando
+original — un patrón que no se corrige con más escala dentro del rango
+evaluado.
+
+Como trabajo futuro se plantea: (1) ampliar el dataset con más comandos por
+categoría y con voz real transcripta por ASR; (2) evaluar el efecto de la
+cuantización agresiva (4-bit, 8-bit) sobre el trade-off exactitud/latencia
+en el mismo hardware; (3) evaluar estrategias de mitigación del sesgo de
+alucinación de valor/unidad, como post-procesamiento basado en reglas o
+fine-tuning de dominio con ejemplos negativos explícitos; y (4) extender la
+evaluación a comandos multi-turno con contexto de diálogo.

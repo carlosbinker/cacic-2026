@@ -1,0 +1,34 @@
+\section{Introducción}
+
+El crecimiento de los asistentes de voz y los sistemas domóticos ha
+popularizado el uso de modelos de lenguaje para interpretar comandos en
+lenguaje natural (``prendé la luz del living'', ``bajá el aire a 20
+grados''). La mayoría de las soluciones comerciales dependen de modelos de
+gran escala alojados en la nube, lo que introduce tres problemas recurrentes
+en el contexto de un hogar: latencia de red, costo recurrente por uso de
+API, y dependencia de conectividad — un comando tan simple como apagar una
+luz no debería fallar por una caída de internet.
+
+Una alternativa creciente es el uso de Small Language Models (SLMs) —
+modelos de lenguaje de entre unos cientos de millones y pocos miles de
+millones de parámetros — ejecutados localmente en el propio hub domótico
+(una Raspberry Pi, un mini-PC o un microcontrolador de gama alta). Trabajos
+recientes muestran que estos modelos pueden alcanzar, en tareas acotadas, un
+desempeño competitivo frente a modelos mucho más grandes \cite{gupta2025slms}.
+Sin embargo, la mayor parte de la literatura sobre SLMs y asistentes
+domóticos evalúa el inglés, y no está claro cómo se comportan estos modelos
+frente a estructuras propias del español rioplatense (voseo, diminutivos,
+expresiones relativas como ``bajale un toque'') ni cuál es el costo real en
+latencia de ejecutarlos en hardware modesto.
+
+Este trabajo aborda esa brecha mediante un estudio comparativo controlado.
+Las contribuciones de este paper son: (1) un dataset de 32 comandos de
+domótica en español rioplatense, organizados en seis categorías
+lingüísticas, con una estructura de referencia (ground truth) de cinco
+campos; (2) una evaluación empírica de cuatro SLMs open-source —
+SmolLM2-360M-Instruct, Qwen2.5-0.5B-Instruct, Qwen2.5-1.5B-Instruct y
+SmolLM2-1.7B-Instruct — ejecutados en CPU, midiendo coincidencia exacta,
+exactitud por campo, validez del formato de salida y latencia; y (3) un
+análisis cualitativo de los patrones de error que identifica una debilidad
+sistemática, independiente del tamaño del modelo, en la interpretación de
+comandos relativos o cualitativos sin valor numérico explícito.

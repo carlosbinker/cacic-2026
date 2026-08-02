@@ -1,0 +1,25 @@
+\begin{abstract}
+Los asistentes de domótica basados en modelos de lenguaje suelen depender de
+servicios en la nube, lo que introduce alta latencia, costos recurrentes y
+dependencia de conectividad. Los Small Language Models (SLMs) ejecutados
+localmente son una alternativa atractiva para hubs domóticos de bajo costo,
+pero su capacidad real para interpretar comandos de voz en español
+rioplatense no ha sido evaluada en profundidad. Este trabajo presenta un
+dataset de 32 comandos de domótica en español, con anotaciones de referencia
+(intención, dispositivo, ubicación, valor y unidad), y una evaluación
+empírica de cuatro SLMs open-source (SmolLM2-360M-Instruct,
+Qwen2.5-0.5B-Instruct, Qwen2.5-1.5B-Instruct y SmolLM2-1.7B-Instruct)
+ejecutados en CPU con decodificación determinista. Los resultados muestran
+una mejora consistente de la coincidencia exacta con el tamaño del modelo
+(18,8\% a 59,4\%), a costa de un crecimiento de casi 4x en la latencia de
+inferencia (15,6s a 61,9s por comando). La exactitud por campo revela que la
+interpretación de valores y unidades numéricas se estanca entre 75\% y 90\%
+independientemente del tamaño, y que los cuatro modelos fallan
+sistemáticamente (0\%-17\% de exactitud) al interpretar comandos con ajustes
+relativos o cualitativos sin un valor explícito, tendiendo a alucinar un
+valor o unidad inexistente en el comando original.
+
+\keywords{modelos de lenguaje pequeños, domótica, procesamiento del lenguaje
+natural, interpretación de intención, computación en el borde, español
+rioplatense.}
+\end{abstract}

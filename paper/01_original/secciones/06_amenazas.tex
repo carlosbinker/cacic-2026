@@ -1,0 +1,32 @@
+\section{Amenazas a la Validez}
+
+\textbf{Validez de constructo.} La métrica principal (coincidencia exacta)
+exige coincidencia textual estricta con el ground truth, lo que penaliza
+por igual un error semántico real (confundir ``luz'' con
+``aire\_acondicionado'') y una variación de vocabulario correcta (predecir
+``tele'' en lugar de ``tv''), como se discutió en la Sección 4.4. La
+exactitud reportada es una cota inferior de la capacidad semántica real:
+una evaluación con normalización de sinónimos probablemente arrojaría
+porcentajes más altos, sin cambiar el ordenamiento entre modelos ni el
+hallazgo central sobre alucinación de valor/unidad.
+
+\textbf{Validez interna.} La decodificación determinista (greedy) elimina
+la variabilidad de muestreo, pero no garantiza resultados representativos
+de un despliegue con temperatura mayor a cero. La latencia se midió en una
+única VM compartida (2 núcleos, 7,8 GB de RAM); variaciones de carga del
+sistema pudieron introducir ruido en los tiempos, aunque no en las métricas
+de exactitud.
+
+\textbf{Validez externa.} El dataset de 32 comandos es acotado (entre 3 y 8
+por categoría), lo que limita la significancia estadística de las
+comparaciones por categoría. Se usó un único prompt sin optimización por
+modelo ni cuantización agresiva (4-bit/8-bit). La entrada fue siempre texto
+limpio, sin ruido de reconocimiento de voz (ASR), y no se cubrieron
+variantes dialectales más allá del rioplatense.
+
+\textbf{Validez de conclusión.} Con 3 a 8 observaciones por categoría, las
+diferencias porcentuales entre modelos (Tabla 3) son indicativas, no
+estadísticamente significativas en sentido formal. El hallazgo más sólido —
+la dificultad sistemática con ajustes relativos sin valor explícito — se
+apoya en que el patrón se repite en los cuatro modelos, lo que reduce el
+riesgo de que sea un artefacto muestral.

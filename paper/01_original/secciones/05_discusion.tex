@@ -1,0 +1,32 @@
+\section{Discusión}
+
+Los resultados sugieren dos conclusiones prácticas para el diseño de
+asistentes domóticos locales. En primer lugar, el tamaño del modelo mejora
+de forma clara la interpretación de qué dispositivo, qué acción y en qué
+ubicación (intent, dispositivo, ubicación), pero el costo en latencia crece
+más rápido que la ganancia en exactitud: pasar de Qwen2.5-0.5B a
+SmolLM2-1.7B multiplica la latencia por algo más de 4 (14,7s → 61,9s) a
+cambio de una mejora de 15,6 puntos porcentuales en coincidencia exacta
+(43,8\% → 59,4\%). Para un hub domótico real, donde la experiencia de
+usuario depende de una respuesta rápida, Qwen2.5-1.5B-Instruct ofrece el
+mejor compromiso observado en este estudio: una coincidencia exacta similar
+a la del modelo más grande (50,0\% vs. 59,4\%) con una latencia bastante
+menor (43,2s vs. 61,9s), y la mejor exactitud de campo ``valor'' (90,6\%) de
+los cuatro modelos.
+
+En segundo lugar, y quizás más relevante, el estancamiento en los campos
+valor/unidad y el desempeño uniformemente bajo en la categoría de ajustes
+relativos indican que escalar el modelo dentro del rango evaluado (0,36B a
+1,7B) no alcanza para resolver esta clase de comando. Esto tiene una
+implicancia de diseño concreta: un sistema domótico real podría
+beneficiarse de una capa de post-procesamiento basada en reglas (por
+ejemplo, detectar la ausencia de un número en el comando original y forzar
+valor=null y unidad=null en la salida del modelo) en lugar de depender de
+que el modelo aprenda esta restricción únicamente a partir de mayor escala.
+
+El resultado llamativo de que SmolLM2-360M-Instruct obtuvo la mayor
+exactitud en la categoría de consulta de estado (66,7\% vs. 33,3\% en los
+otros tres) es probablemente ruido estadístico dado el tamaño reducido de
+esa categoría (n=3) y no debería interpretarse como que el modelo más chico
+interpreta mejor las consultas; un dataset más amplio por categoría es
+necesario para confirmar o descartar este patrón.

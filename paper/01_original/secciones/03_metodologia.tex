@@ -1,0 +1,89 @@
+\section{Metodología}
+
+\subsection{Modelos evaluados}
+
+Se seleccionaron cuatro modelos open-source, sin restricciones de licencia
+para descarga (no gated), cubriendo un rango de tamaño de 0,36 a 1,71 mil
+millones de parámetros (Tabla 1).
+
+\begin{table}[htbp]
+\centering
+\caption{Modelos evaluados en este estudio.}
+\label{tab:orig-modelos}
+\begin{tabular}{lll}
+\toprule
+Modelo & Parámetros & Familia / origen \\
+\midrule
+SmolLM2-360M-Instruct & 0.36 B & HuggingFaceTB \\
+Qwen2.5-0.5B-Instruct  & 0.49 B & Alibaba (Qwen) \\
+Qwen2.5-1.5B-Instruct  & 1.54 B & Alibaba (Qwen) \\
+SmolLM2-1.7B-Instruct  & 1.71 B & HuggingFaceTB \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Todos los modelos se ejecutaron con la librería transformers, en precisión
+bfloat16 y sin cuantización adicional, sobre una máquina virtual con 2
+núcleos de CPU y 7,8 GB de RAM, sin aceleración por GPU. La decodificación
+fue determinista (greedy, sin muestreo, temperatura no aplicada) para
+aislar la variable de tamaño del modelo del efecto de la aleatoriedad y
+garantizar reproducibilidad.
+
+\subsection{Dataset de comandos}
+
+Se diseñó manualmente un conjunto de 32 comandos de domótica en español
+rioplatense (voseo), organizado en seis categorías que capturan distintos
+desafíos lingüísticos: encendido/apagado simple, ajuste con valor numérico
+explícito (grados o porcentaje), ajuste relativo o cualitativo sin valor
+numérico (``bajale un poco''), comandos sobre múltiples dispositivos
+(``todas las luces''), consultas de estado, y comandos con contexto
+conversacional o negación. Cada comando cuenta con una anotación de
+referencia (ground truth) de cinco campos: intent (encender / apagar /
+ajustar / consultar), dispositivo, ubicación, valor y unidad.
+
+\subsection{Protocolo de prompting y esquema de salida}
+
+Se utilizó un único prompt de sistema, idéntico para los cuatro modelos, que
+especifica el esquema JSON de salida, el vocabulario de dispositivos y
+ubicaciones esperado, y dos ejemplos few-shot (no incluidos en el conjunto
+de evaluación). Se instruyó a los modelos a responder únicamente con el
+objeto JSON, sin texto adicional. El uso de un prompt idéntico para todos
+los modelos privilegia la comparabilidad por sobre el desempeño máximo de
+cada modelo individual: es posible que un prompt afinado por modelo mejore
+los resultados de cada uno, pero a costa de introducir una variable de
+confusión en la comparación.
+
+\subsection{Métricas}
+
+Se reportan cinco métricas: (1) tasa de JSON válido (respuesta parseable
+como objeto JSON); (2) coincidencia exacta (los cinco campos coinciden con
+el ground truth); (3) exactitud por campo (intent, dispositivo, ubicación,
+valor, unidad evaluados individualmente); (4) latencia promedio de
+inferencia por comando, en segundos, en el entorno de CPU descripto; y (5)
+exactitud por categoría lingüística del comando.
+
+\subsection{Prompt utilizado}
+
+Para favorecer la reproducibilidad del estudio, se reproduce a continuación
+una versión condensada del prompt de sistema (idéntico en su versión
+completa para los cuatro modelos), que en la implementación real incluía
+además un segundo ejemplo few-shot omitido aquí por espacio:
+
+\begin{quote}
+Sos un módulo de interpretación de comandos de voz para un sistema domótico
+en español rioplatense. Convertí el comando del usuario en UN objeto JSON
+con estos campos: ``intent'' (encender/apagar/ajustar/consultar),
+``dispositivo'' (luz, aire\_acondicionado, calefaccion, persiana, cortina,
+tv, parlante, cerradura, ventilador, todos), ``ubicacion'' (living, cocina,
+dormitorio, bano, garage, patio, entrada, todas), ``valor'' (número si el
+comando lo da, si no null), ``unidad'' (``\%'' o ``$^{\circ}$C'' si
+corresponde, si no null). Reglas: respondé SOLO el JSON, sin texto
+adicional; si el comando ajusta sin dar un número, ``valor'' y ``unidad''
+deben ser null. Ejemplo: Comando: ``Poné el aire de la cocina en 20
+grados.'' \{"intent": "ajustar", "dispositivo": "aire\_acondicionado",
+"ubicacion": "cocina", "valor": 20, "unidad": "$^{\circ}$C"\}
+\end{quote}
+
+Cada comando de evaluación se envió como un turno de usuario adicional
+(Comando: ``...'') inmediatamente después de este prompt de sistema, sin
+turnos previos de conversación.
