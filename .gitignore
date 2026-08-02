@@ -30,3 +30,14 @@ LaTeX2e (1)/
 LaTeX2e (1).zip
 
 .claude-scratch/
+
+# Auxiliares de compilación de LaTeX
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
