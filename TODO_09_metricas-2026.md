@@ -43,11 +43,11 @@ from metrics_2026 import (  # noqa: E402
     calcular_resumen_2026,
     calcular_taxonomia_errores_2026,
 )
-from models_2026 import MODELOS_2026  # noqa: E402
+from models_2026 import roster_activo  # noqa: E402
 from run_sweep_2026 import COLUMNAS_DETALLE  # noqa: E402
 from taxonomia_2026 import ETIQUETAS_ERROR  # noqa: E402
 
-M1, M2 = MODELOS_2026[0].nombre, MODELOS_2026[1].nombre
+M1, M2 = roster_activo()[0].nombre, roster_activo()[1].nombre
 
 
 def _det(modelo, patron, latencia=1.0, modo="chat_template"):
@@ -120,9 +120,9 @@ def test_sin_etiquetas_de_equivalencia_ambas_metricas_coinciden():
 def test_el_resumen_trae_metadatos_del_registro():
     det = _det(M1, [True], modo="raw_completion")
     fila = calcular_resumen_2026(det, _eti([]))[0]
-    assert fila["hf_repo_id"] == MODELOS_2026[0].hf_repo_id
-    assert fila["tier"] == MODELOS_2026[0].tier
-    assert fila["transformers_pin"] == MODELOS_2026[0].transformers_pin
+    assert fila["hf_repo_id"] == roster_activo()[0].hf_repo_id
+    assert fila["tier"] == roster_activo()[0].tier
+    assert fila["transformers_pin"] == roster_activo()[0].transformers_pin
     assert fila["modo_prompting"] == "raw_completion"
 
 
@@ -157,7 +157,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from models_2026 import MODELOS_2026
+from models_2026 import roster_activo
 from taxonomia_2026 import (
     CATEGORIAS_LINGUISTICAS,
     ETIQUETAS_EQUIVALENTES,
@@ -198,7 +198,7 @@ def calcular_resumen_2026(df_detalle: pd.DataFrame,
     """Resumen por modelo con exactitud estricta y laxa (RF10)."""
     equivalentes = _mapa_equivalentes(df_etiquetas)
     filas = []
-    for modelo in MODELOS_2026:
+    for modelo in roster_activo():
         df_m = df_detalle[df_detalle["modelo"] == modelo.nombre]
         if df_m.empty:
             continue
@@ -318,7 +318,7 @@ def calcular_taxonomia_errores_2026(df_detalle: pd.DataFrame,
                                     df_etiquetas: pd.DataFrame) -> pd.DataFrame:
     """Tabla 4 con las 7 etiquetas, no excluyentes (RF11)."""
     filas = []
-    for modelo in MODELOS_2026:
+    for modelo in roster_activo():
         df_m = df_detalle[df_detalle["modelo"] == modelo.nombre]
         if df_m.empty:
             continue
@@ -347,7 +347,7 @@ def calcular_exactitud_por_categoria(df_detalle: pd.DataFrame,
     df["categoria"] = df["idx"].astype(int).map(categoria_por_idx)
 
     presentes = [c for c in CATEGORIAS_LINGUISTICAS if c in set(df["categoria"])]
-    modelos = [m.nombre for m in MODELOS_2026 if m.nombre in set(df["modelo"])]
+    modelos = [m.nombre for m in roster_activo() if m.nombre in set(df["modelo"])]
 
     filas = []
     for categoria in presentes:
@@ -416,10 +416,10 @@ git diff --exit-code main -- src/metrics.py tests/test_metricas.py && echo "lega
 python -c "
 import sys, json; sys.path.insert(0,'src')
 from metrics_2026 import CLAVES_RESUMEN
-from models_2026 import MODELOS_2026
+from models_2026 import roster_activo
 r = json.load(open('data/2026/resumen_2026.json', encoding='utf-8'))
-assert len(r) == 14, len(r)
-assert [f['modelo'] for f in r] == [m.nombre for m in MODELOS_2026]
+assert len(r) == 12, len(r)
+assert [f['modelo'] for f in r] == [m.nombre for m in roster_activo()]
 for f in r:
     assert list(f.keys()) == CLAVES_RESUMEN, f['modelo']
     assert f['n'] == 32
@@ -438,7 +438,7 @@ t = pd.read_csv('data/2026/taxonomia_2026.csv')
 assert list(t.columns) == ['modelo','total_incorrectas'] + ETIQUETAS_ERROR
 assert 'alucinacion_valor_unidad' in t.columns and 'valor_numerico_incorrecto' in t.columns
 assert 'confusion_valor_o_unidad' not in t.columns
-assert len(t) == 14
+assert len(t) == 12
 print(t.to_string(index=False))
 "
 
@@ -462,7 +462,7 @@ python src/metrics_2026.py >/dev/null && md5sum -c /tmp/m_antes.txt && echo "ide
 
 ## Acceptance criteria
 
-- **Dado** `calcular_resumen_2026`, **entonces** devuelve una fila por modelo del roster presente en el detalle, en orden de roster, con exactamente las 16 claves de `CLAVES_RESUMEN` en ese orden.
+- **Dado** `calcular_resumen_2026`, **entonces** devuelve una fila por modelo del **roster activo** (`roster_activo()`, 12) presente en el detalle, en orden de roster, con exactamente las 16 claves de `CLAVES_RESUMEN` en ese orden; los dos modelos excluidos (`gemma-3-270m-it`, `Llama-3.2-1B-Instruct`) nunca aparecen, porque no forman parte del roster activo.
 - **Dado** una fila incorrecta etiquetada `uso_de_sinonimos` o `sin_error_semantico` (sola o combinada con otras), **entonces** cuenta como acierto en la métrica laxa y **no** en la estricta.
 - **Dado** cualquier modelo, **entonces** `exact_match_laxo_pct >= exact_match_pct` y ambas están en `[0, 100]`; si no hay ninguna etiqueta de equivalencia, las dos métricas coinciden exactamente.
 - **Dado** el resumen, **entonces** cada fila trae `hf_repo_id`, `tier` y `transformers_pin` tomados del registro `models_2026`, y `modo_prompting` tomado del detalle (`"mixto"` si un modelo tuviera más de uno).

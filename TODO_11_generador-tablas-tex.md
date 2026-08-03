@@ -43,7 +43,12 @@ from generate_tex_tables import (  # noqa: E402
     tabla4_taxonomia,
     tabla5_versiones,
 )
-from models_2026 import MODELOS_2026  # noqa: E402
+from models_2026 import (  # noqa: E402
+    BASELINE_TRANSFORMERS,
+    MODELOS_2026,
+    TRANSFORMERS_5X,
+    roster_activo,
+)
 from taxonomia_2026 import ETIQUETAS_ERROR  # noqa: E402
 
 
@@ -97,12 +102,19 @@ from pathlib import Path
 
 import pandas as pd
 
-from models_2026 import BASELINE_TRANSFORMERS, MODELOS_2026
+from models_2026 import BASELINE_TRANSFORMERS, TRANSFORMERS_5X, roster_activo
 from taxonomia_2026 import (
     CATEGORIAS_DISPLAY,
     ETIQUETAS_ERROR,
     ETIQUETAS_ERROR_DISPLAY,
 )
+
+# Versiones efectivamente resueltas por pip para cada grupo (F3): no se re-sondean
+# acá, se citan como constantes documentadas junto con el pin en el indice/README.
+_VERSION_RESUELTA = {
+    BASELINE_TRANSFORMERS: "4.57.6",
+    TRANSFORMERS_5X: "5.14.1",
+}
 
 RAIZ = Path(__file__).resolve().parent.parent
 DIR_2026 = RAIZ / "data" / "2026"
@@ -169,7 +181,7 @@ def _resumen():
         "avg_latencia_s": 10.0 + i, "acc_intent_pct": 80.0,
         "acc_dispositivo_pct": 70.0, "acc_ubicacion_pct": 75.0,
         "acc_valor_pct": 85.0, "acc_unidad_pct": 90.0,
-    } for i, m in enumerate(MODELOS_2026)]
+    } for i, m in enumerate(roster_activo())]
 
 
 def _es_bloque_table(tex: str) -> bool:
@@ -177,13 +189,21 @@ def _es_bloque_table(tex: str) -> bool:
             and r"\documentclass" not in tex and tex.count(r"\begin{tabular}") == 1)
 
 
-def test_tabla1_lista_los_catorce_modelos_con_su_label():
+def test_tabla1_lista_los_doce_modelos_del_roster_activo_con_su_label():
     tex = tabla1_modelos()
     assert _es_bloque_table(tex)
     assert r"\label{tab:modelos}" in tex
-    for m in MODELOS_2026:
+    for m in roster_activo():
         assert _escapar(m.nombre) in tex
-    assert tex.count(r"\\") >= 14
+    assert tex.count(r"\\") >= 12
+
+
+def test_tabla1_no_lista_los_modelos_excluidos():
+    tex = tabla1_modelos()
+    excluidos = [m for m in MODELOS_2026 if not m.activo]
+    assert len(excluidos) == 2
+    for m in excluidos:
+        assert _escapar(m.nombre) not in tex
 
 
 def test_tabla2_trae_estricta_y_laxa():
@@ -197,9 +217,9 @@ def test_tabla2_trae_estricta_y_laxa():
 def test_tabla3_una_fila_por_categoria():
     df = pd.DataFrame([
         {"categoria": "encendido_apagado_simple", "n": 8,
-         MODELOS_2026[0].nombre: 50.0, MODELOS_2026[1].nombre: 62.5},
+         roster_activo()[0].nombre: 50.0, roster_activo()[1].nombre: 62.5},
         {"categoria": "consulta_de_estado", "n": 3,
-         MODELOS_2026[0].nombre: 33.3, MODELOS_2026[1].nombre: 66.7},
+         roster_activo()[0].nombre: 33.3, roster_activo()[1].nombre: 66.7},
     ])
     tex = tabla3_por_categoria(df)
     assert _es_bloque_table(tex)
@@ -211,7 +231,7 @@ def test_tabla3_una_fila_por_categoria():
 
 def test_tabla4_tiene_las_siete_etiquetas_con_nombre_legible():
     df = pd.DataFrame([
-        {"modelo": MODELOS_2026[0].nombre, "total_incorrectas": 10,
+        {"modelo": roster_activo()[0].nombre, "total_incorrectas": 10,
          **{e: i for i, e in enumerate(ETIQUETAS_ERROR)}},
     ])
     tex = tabla4_taxonomia(df)
@@ -223,20 +243,29 @@ def test_tabla4_tiene_las_siete_etiquetas_con_nombre_legible():
     assert "Valor numérico incorrecto" in tex
 
 
-def test_tabla5_marca_cuales_pines_divergen():
+def test_tabla5_marca_cuales_pines_son_necesarios():
     tex = tabla5_versiones()
     assert _es_bloque_table(tex)
     assert r"\label{tab:versiones}" in tex
-    for m in MODELOS_2026:
+    for m in roster_activo():
         assert _escapar(m.nombre) in tex
     assert _escapar(BASELINE_TRANSFORMERS) in tex
+    assert _escapar(TRANSFORMERS_5X) in tex
+    assert "necesario" in tex.lower()
+
+
+def test_tabla5_no_lista_los_modelos_excluidos():
+    tex = tabla5_versiones()
+    excluidos = [m for m in MODELOS_2026 if not m.activo]
+    for m in excluidos:
+        assert _escapar(m.nombre) not in tex
 
 
 def test_ninguna_tabla_deja_guiones_bajos_sin_escapar():
-    df_tax = pd.DataFrame([{"modelo": MODELOS_2026[0].nombre, "total_incorrectas": 1,
+    df_tax = pd.DataFrame([{"modelo": roster_activo()[0].nombre, "total_incorrectas": 1,
                             **{e: 0 for e in ETIQUETAS_ERROR}}])
     df_cat = pd.DataFrame([{"categoria": "encendido_apagado_simple", "n": 8,
-                            MODELOS_2026[0].nombre: 50.0}])
+                            roster_activo()[0].nombre: 50.0}])
     for tex in (tabla1_modelos(), tabla2_resultados(_resumen()),
                 tabla3_por_categoria(df_cat), tabla4_taxonomia(df_tax),
                 tabla5_versiones()):
@@ -246,12 +275,12 @@ def test_ninguna_tabla_deja_guiones_bajos_sin_escapar():
 ```
 
 - [ ] Correr y confirmar que **falla**: `pytest -q tests/test_generate_tex_tables.py`
-- [ ] Implementar las cinco funciones. Firmas: `tabla1_modelos() -> str`, `tabla2_resultados(resumen: list[dict]) -> str`, `tabla3_por_categoria(df: pd.DataFrame) -> str`, `tabla4_taxonomia(df: pd.DataFrame) -> str`, `tabla5_versiones() -> str`. Puntos obligatorios:
+- [ ] Implementar las cinco funciones. Firmas: `tabla1_modelos() -> str`, `tabla2_resultados(resumen: list[dict]) -> str`, `tabla3_por_categoria(df: pd.DataFrame) -> str`, `tabla4_taxonomia(df: pd.DataFrame) -> str`, `tabla5_versiones() -> str`. Las tablas 1 y 5 se generan desde `models_2026.roster_activo()` (12 filas), **no** desde `MODELOS_2026` (14): los dos modelos excluidos no aparecen en ninguna tabla. Puntos obligatorios:
   - Tabla 1: columnas `Modelo | Parámetros | Tier | Familia | Prompting`; la familia sale del prefijo del `hf_repo_id` (`LiquidAI`, `ibm-granite`, `Qwen`, `HuggingFaceTB`, `allenai`); el prompting se toma de la tabla §2.1 del índice.
   - Tabla 2: `Modelo | Par. | JSON válido | Estricta | Laxa | Latencia (s)`, con los porcentajes con un decimal y la latencia con dos.
   - Tabla 3: primera columna `Categoría (n)` usando `CATEGORIAS_DISPLAY[cat]` y el `n` entre paréntesis; una columna por modelo.
   - Tabla 4: primera columna `Categoría de error` con `ETIQUETAS_ERROR_DISPLAY`; una fila `Total de respuestas incorrectas` primero y luego una fila por etiqueta; una columna por modelo (transpuesta respecto del CSV, igual que la Tabla 4 del paper original).
-  - Tabla 5: `Modelo | transformers | trust\_remote\_code | Motivo`, con `—` en el motivo cuando el pin no diverge, y una nota al pie indicando cuál es el baseline.
+  - Tabla 5 (re-congelada, F8): `Modelo | transformers_pin | Versión resuelta | ¿Necesario? | Motivo`, generada desde `roster_activo()`. `¿Necesario?` es "Sí" si `motivo_pin` no está vacío, "Heredado" si sí; `Motivo` es `motivo_pin` o `—` si está vacío. "Versión resuelta" es `4.57.6` para el grupo A y `5.14.1` para el grupo B (constantes de módulo, no re-sondeadas). Nota al pie indicando cuáles son los dos grupos y sus constantes (`BASELINE_TRANSFORMERS`, `TRANSFORMERS_5X`). Debe ser la **misma información** que la matriz de `docker/README.md` (mismo conjunto de modelos, mismo pin, mismo motivo).
 - [ ] Implementar el `main` que escribe los cinco archivos en `--salida-dir` y los lista por stdout.
 - [ ] Correr y confirmar **verde**: `pytest -q tests/test_generate_tex_tables.py`
 
@@ -286,7 +315,7 @@ EOF
   && echo "las 5 tablas compilan" || echo "FALLA de compilacion"
 ```
 
-- [ ] Si alguna tabla se sale del ancho de página, envolverla en `\resizebox{\textwidth}{!}{...}` dentro de `_tabla` (las de 14 columnas — Tablas 3 y 4 — son las candidatas) y recompilar.
+- [ ] Si alguna tabla se sale del ancho de página, envolverla en `\resizebox{\textwidth}{!}{...}` dentro de `_tabla` (las de 12 columnas — Tablas 3 y 4 — son las candidatas) y recompilar.
 
 ### Tarea 4 — commit
 
@@ -332,16 +361,20 @@ git diff --exit-code -- paper/02_reescrito/tablas/ && echo "regeneracion idempot
 
 # 5. Compilación de las 5 tablas (ver Tarea 3)
 
-# 6. RF5: los pines divergentes aparecen en la tabla 5
+# 6. RF5: los pines necesarios aparecen en la tabla 5, y los excluidos no aparecen
 python -c "
 import sys; sys.path.insert(0,'src')
 from pathlib import Path
-from models_2026 import MODELOS_2026, BASELINE_TRANSFORMERS
+from models_2026 import MODELOS_2026, TRANSFORMERS_5X, roster_activo
 t = Path('paper/02_reescrito/tablas/tabla5_versiones.tex').read_text(encoding='utf-8')
+for m in roster_activo():
+    assert m.nombre.replace('.', chr(92)+'.') in t or m.nombre in t, m.nombre
+    if m.motivo_pin:
+        assert m.transformers_pin in t, f'{m.nombre}: falta su pin en la tabla 5'
 for m in MODELOS_2026:
-    if m.transformers_pin != BASELINE_TRANSFORMERS:
-        assert m.motivo_pin[:20].replace('_', chr(92)+'_') in t or m.transformers_pin in t, m.nombre
-print('tabla 5 refleja los pines divergentes')
+    if not m.activo:
+        assert m.nombre not in t, f'{m.nombre}: excluido pero aparece en la tabla 5'
+print('tabla 5 refleja los pines necesarios y omite los excluidos')
 "
 ```
 
@@ -349,11 +382,11 @@ print('tabla 5 refleja los pines divergentes')
 
 - **Dado** `_escapar`, **entonces** convierte `_ % & # $ { } ~ ^ \` a sus formas LaTeX seguras y deja intacto el texto limpio (`granite-4.0-h-1b`).
 - **Dado** cualquiera de los cinco fragmentos, **entonces** empieza con `\begin{table}`, termina con `\end{table}`, contiene exactamente un `tabular`, no contiene `\documentclass` ni preámbulo, y declara su `\label{tab:...}` congelado en F8.
-- **Dado** la Tabla 1, **entonces** lista los 14 modelos con parámetros, tier, familia y modo de prompting.
+- **Dado** la Tabla 1, **entonces** lista los 12 modelos del roster activo (`roster_activo()`) con parámetros, tier, familia y modo de prompting; los dos modelos excluidos no aparecen.
 - **Dado** la Tabla 2, **entonces** tiene columnas para JSON válido, exactitud **estricta**, exactitud **laxa** y latencia, y sus valores coinciden dígito a dígito con `data/2026/resumen_2026.json`.
 - **Dado** la Tabla 3, **entonces** tiene una fila por categoría lingüística presente, con el nombre legible de `CATEGORIAS_DISPLAY` y el `n` entre paréntesis, y una columna por modelo.
 - **Dado** la Tabla 4, **entonces** tiene una fila `Total de respuestas incorrectas` y **siete** filas de etiquetas con sus nombres legibles, incluyendo `Alucinación de valor/unidad` y `Valor numérico incorrecto` como filas **separadas**.
-- **Dado** la Tabla 5, **entonces** lista los 14 modelos con su `transformers_pin`, su `trust_remote_code` y su motivo (`—` cuando hereda el baseline), y una nota al pie que declara cuál es el baseline.
+- **Dado** la Tabla 5, **entonces** lista los 12 modelos del roster activo con su `transformers_pin`, su versión resuelta (`4.57.6` grupo A / `5.14.1` grupo B), si el pin es **necesario** o **heredado**, y su motivo (`—` cuando es heredado), con una nota al pie que declara los dos grupos; es la misma información que la matriz de `docker/README.md`.
 - **Dado** cualquier fragmento, **entonces** no contiene ningún `_` sin escapar (todos precedidos por `\`).
 - **Dado** un documento LNCS mínimo que hace `\input` de los cinco fragmentos, **entonces** `latexmk -pdf -halt-on-error` compila con código 0.
 - **Dado** que se regenera sin cambiar los datos, **entonces** `git diff -- paper/02_reescrito/tablas/` sale vacío.

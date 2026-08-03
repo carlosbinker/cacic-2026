@@ -20,7 +20,7 @@ Aquí se materializan tres cosas que el índice exige y que no pueden faltar:
 
 - **RF10** — la brecha entre exactitud estricta y laxa se reporta y se **discute** como resultado, porque es la respuesta directa a la amenaza de validez de constructo que el estudio original dejó planteada.
 - **RF11** — §4.4 pasa de "se clasificó manualmente cada una de las 73 respuestas incorrectas… en una o más de cuatro categorías" a una clasificación automática con **siete** etiquetas; la mención a "cuatro categorías" del original debe desaparecer.
-- **RF16** — §6 incorpora **cuatro amenazas nuevas**: sesgo de auto-favorecimiento del juez, incomparabilidad de los dos modelos base prompteados por raw completion, versiones divergentes de librería como confusor de la latencia, y reproducibilidad limitada por los dos modelos *gated* del roster.
+- **RF16** — §6 incorpora **tres amenazas nuevas**: (1) sesgo de auto-favorecimiento del juez; (2) versiones divergentes de la librería de inferencia entre modelos (dos grupos de versión mutuamente excluyentes sobre el roster) como confusor de la latencia; (3) exclusión de 2 de los 14 modelos del diseño original por acceso restringido no otorgado. **Se elimina** la amenaza de incomparabilidad de los dos modelos base prompteados por raw completion: no aplica, porque los 12 del roster activo usan `chat_template`.
 
 Todos los números vienen de los fragmentos generados en el subtask 11; ninguno se escribe a mano.
 
@@ -84,27 +84,29 @@ grep -niE "manualmente|a mano|cuatro categor" paper/02_reescrito/secciones/04_re
   1. **Qué significa la brecha estricta/laxa.** Es la medida directa de cuánto penaliza la coincidencia exacta a respuestas semánticamente correctas — exactamente la duda que el estudio original no podía cuantificar porque su verificación era manual y su métrica única.
   2. **Endurecer el prompt no elimina el problema.** El protocolo declara los sinónimos violación de formato y aun así aparecen; discutir qué dice eso sobre la capacidad de estos modelos de respetar vocabularios cerrados.
   3. **Tamaño vs. desempeño vs. latencia**, con los dos tiers, y si algún sub-1B compite con los 1–2B.
-  4. **Los dos modelos base.** Su desempeño bajo raw completion, con la advertencia de que no es comparable de forma directa.
-  5. **Viabilidad práctica**: ¿alguno de los 14 sirve para domótica local en CPU con 2 núcleos? Responder con las latencias medidas.
+  4. **Viabilidad práctica**: ¿alguno de los 12 sirve para domótica local en CPU con 2 núcleos? Responder con las latencias medidas.
 
-### Tarea 3 — §6 Amenazas a la validez, con las cuatro nuevas (RF16)
+  No incluir un eje sobre "los dos modelos base prompteados por raw completion": esa amenaza ya no
+  aplica, porque los 12 modelos evaluados resuelven a `chat_template` (ver 3.3 y 4.4). No es una
+  omisión, es una simplificación real del panorama de comparabilidad.
 
-- [ ] Escribir `06_amenazas.tex` conservando los cuatro subtítulos del original (validez de constructo, interna, externa, de conclusión) e incorporando las cuatro amenazas nuevas, cada una nombrada explícitamente:
+### Tarea 3 — §6 Amenazas a la validez, con las tres nuevas (RF16)
+
+- [ ] Escribir `06_amenazas.tex` conservando los cuatro subtítulos del original (validez de constructo, interna, externa, de conclusión) e incorporando las **tres** amenazas nuevas, cada una nombrada explícitamente:
 
 **(a) Sesgo de auto-favorecimiento del juez** — en validez interna. El juez es uno de los modelos evaluados y **también juzga sus propias salidas**; puede favorecerse. Declarar además que es un modelo de menos de 2B juzgando equivalencia semántica, con la capacidad limitada que eso implica, y respaldar con el número de fallos de parseo de §4.4. Decir qué mitigaría esto en trabajo futuro (juez externo más grande, o validación humana sobre una muestra).
 
-**(b) Incomparabilidad de los modelos base** — en validez de constructo. `LFM2.5-230M` y `LFM2.5-350M` se prompearon por raw completion porque no tienen plantilla de chat; sus números **no son estrictamente comparables** con los de los diez modelos chat-templated.
+**(b) Versiones divergentes de la librería de inferencia** — en validez interna, y es el punto que el usuario pidió explícitamente que llegue al paper. Los 12 modelos evaluados corren bajo **dos grupos de versión de `transformers`, mutuamente excluyentes** (grupo A resuelve 4.57.6, grupo B resuelve 5.14.1 — ver Tabla~\ref{tab:versiones}), lo cual es un confusor para la comparación de **latencia**: parte de la diferencia observada puede deberse a la versión y no al modelo. Nombrar los modelos que forzaron cada grupo: `granite-4.0-350m` necesita el grupo A (falla bajo 5.14.1); `LFM2.5-230M`, `LFM2.5-350M`, `Qwen3.5-0.8B` y `Qwen3.5-2B` necesitan el grupo B (fallan bajo 4.57.6). Señalar la evidencia más nítida: el grupo B resuelve exactamente a la versión que rompe al modelo del grupo A, de modo que ninguna versión mayor única cubre el roster. **No** repetir la premisa superada de que una única versión elimina este confusor.
 
-**(c) Versiones divergentes de la librería de inferencia** — en validez interna, y es el punto que el usuario pidió explícitamente que llegue al paper. Distintos modelos corrieron con distintas versiones de `transformers` (ver Tabla~\ref{tab:versiones}), lo cual es un confusor para la comparación de **latencia**: parte de la diferencia observada puede deberse a la versión y no al modelo. Nombrar qué modelos divergieron y por qué. Si no hubo divergencias, decirlo explícitamente y señalar que en ese caso la amenaza no aplica.
+**(c) Exclusión de modelos por acceso restringido no otorgado** — en validez externa. El diseño original consideraba 14 modelos; **2** (`gemma-3-270m-it`, `Llama-3.2-1B-Instruct`) quedaron fuera del roster evaluado porque el acceso de descarga no fue otorgado —repositorios `gated` con aprobación manual pendiente—, **no por una decisión metodológica**. Esto acota el alcance de la comparación a los 12 modelos que sí se pudieron evaluar; no se puede afirmar nada sobre el desempeño relativo de los dos excluidos. Redactar sin datos identificatorios ni mención de ningún token concreto (envío ciego).
 
-**(d) Reproducibilidad limitada por los modelos *gated*** — en validez externa, y es **distinta** de la amenaza (c): mientras (c) es un confusor de la medición de latencia, esta es sobre si un tercero puede repetir el barrido. Dos de los catorce modelos evaluados son *gated*: descargarlos exige aceptar una licencia de uso propia de cada modelo y disponer de un token propio de HuggingFace (`$HF_TOKEN`, sin mencionar su valor). Un tercero sin cuenta propia con esas licencias aceptadas no puede reproducir el barrido completo, aunque sí los doce modelos restantes. Redactar sin datos identificatorios (envío ciego).
-
+- [ ] **No** incluir una amenaza de "incomparabilidad de los dos modelos base prompteados por raw completion": queda **eliminada** porque no aplica (los 12 modelos evaluados usan `chat_template`). Confirmar que no sobrevive ninguna mención a que `LFM2.5-230M` o `LFM2.5-350M` se hayan prompteado por raw completion.
 - [ ] Conservar del original las amenazas que siguen vigentes: dataset chico y desbalanceado (32 comandos, 3–8 por categoría), prompt único no optimizado, texto limpio sin ruido de ASR, una sola variante dialectal, sin significancia estadística formal, y VM compartida para medir latencia.
 - [ ] **Actualizar** la amenaza de validez de constructo del original: la penalización por sinónimos ya no es solo una advertencia, ahora está **cuantificada** por la métrica laxa. Debe quedar redactada como resuelta-parcialmente, no como pendiente.
 
 ### Tarea 4 — §7 Conclusiones y declaración sobre uso de IA
 
-- [ ] Escribir `07_conclusiones.tex`: qué se aprendió sobre los 14 modelos, qué aporta el pipeline de verificación automática (reproducible y escalable a rosters grandes, a diferencia del etiquetado manual), y trabajo futuro — juez externo, dataset más grande y balanceado, ruido de ASR, más variantes dialectales.
+- [ ] Escribir `07_conclusiones.tex`: qué se aprendió sobre los 12 modelos evaluados, qué aporta el pipeline de verificación automática (reproducible y escalable a rosters grandes, a diferencia del etiquetado manual), y trabajo futuro — juez externo, dataset más grande y balanceado, ruido de ASR, más variantes dialectales, y reintentar la evaluación de los 2 modelos excluidos si su acceso se otorga.
 - [ ] Escribir `08_declaracion_ia.tex` adaptando la del original: mantener la declaración de uso de IA en diseño, código, redacción y figuras, y **agregar** que en este trabajo un modelo de lenguaje cumple además un rol **metodológico** como juez automático, descripto en §3.5. Redactarla **sin datos identificatorios** ("los autores" en impersonal, nunca nombres).
 
 ### Tarea 5 — Build final, anonimato y documentación
@@ -134,7 +136,7 @@ grep -iE "undefined (reference|citation)|LaTeX Warning: Reference" paper/02_rees
 ```
 
 - [ ] **Puerta de envío ciego**: `python scripts/check_anonimato.py paper/02_reescrito` → código 0. Si falla, corregir el `.tex` señalado y **volver a compilar antes de reintentar** (los metadatos viven en el PDF, no en el fuente).
-- [ ] Actualizar `README.md` con una sección nueva sobre el estudio 2026: roster de 14 modelos, pipeline de dos etapas, cómo correr el barrido (`python docker/build_all.py`, `python docker/run_sweep.py`), cómo regenerar métricas, figuras y tablas, y cómo compilar los dos papers. **Sin datos identificatorios que puedan filtrarse al paper**; el README sí puede tener la URL del repo, el paper no.
+- [ ] Actualizar `README.md` con una sección nueva sobre el estudio 2026: roster activo de 12 modelos (de un registro de 14, con 2 excluidos por acceso no otorgado), pipeline de dos etapas, cómo correr el barrido (`python docker/build_all.py`, `python docker/run_sweep.py`, ambos por defecto sobre el roster activo), cómo regenerar métricas, figuras y tablas, y cómo compilar los dos papers. **Sin datos identificatorios que puedan filtrarse al paper**; el README sí puede tener la URL del repo, el paper no.
 - [ ] `pytest -q`
 - [ ] `git add paper/02_reescrito/ README.md`
 - [ ] `git commit -m "docs(paper): secciones 4-7, amenazas nuevas y build ciego del paper reescrito"`
@@ -162,21 +164,22 @@ for p in sorted(Path('paper/02_reescrito/secciones').glob('*.tex')):
     print(f'{p.name:32s} {n:5d} palabras')
 "
 
-# 4. RF16: las cuatro amenazas nuevas están presentes
+# 4. RF16: las TRES amenazas nuevas están presentes, y la de raw completion NO sobrevive
 python -c "
+import re
 from pathlib import Path
 t = Path('paper/02_reescrito/secciones/06_amenazas.tex').read_text(encoding='utf-8').lower()
 faltan = []
 if not any(k in t for k in ('auto-favorec','autofavorec','sus propias salidas','juzga sus propias')):
     faltan.append('sesgo del juez')
-if not any(k in t for k in ('raw completion','completado en crudo','sin plantilla de chat')):
-    faltan.append('modelos base no comparables')
-if not any(k in t for k in ('versiones', 'transformers')):
-    faltan.append('versiones divergentes de libreria')
-if not any(k in t for k in ('gated', 'licencia')):
-    faltan.append('reproducibilidad limitada por modelos gated')
+if not any(k in t for k in ('versiones', 'transformers')) or not any(k in t for k in ('4.57', '5.14')):
+    faltan.append('versiones divergentes de libreria (dos grupos)')
+if not any(k in t for k in ('acceso restringido', 'gated')) or 'metodologica' not in t:
+    faltan.append('exclusion por acceso restringido no otorgado')
 assert not faltan, faltan
-print('las 4 amenazas nuevas (RF16) estan presentes')
+prohibido = re.search(r'(lfm2\.5-230m|lfm2\.5-350m|modelos base)[^.]{0,80}raw completion', t)
+assert not prohibido, 'sobrevive la amenaza eliminada: incomparabilidad por raw completion'
+print('las 3 amenazas nuevas (RF16) estan presentes, ninguna de raw completion')
 "
 
 # 5. §4.4 es automática: no quedó lenguaje de etiquetado manual
@@ -205,8 +208,10 @@ git diff --exit-code main -- src/models.py src/prompt.py src/scoring.py src/sche
   data/dataset_comandos_domotica.csv && echo "F0 intacto"
 git ls-files | grep -i docx && echo "FALLA: docx trackeado" || echo "docx sin trackear OK"
 
-# 9. Un commit por subtask
-git log --oneline main..HEAD | wc -l    # -> 15
+# 9. Al menos un commit por nodo del DAG (16, tras el Delta 02) mas G1 y G2 (18 nodos en total).
+# No es un numero exacto: subtasks de alcance amplio (04, 16) abarcan varios commits, igual que
+# ya ocurrio historicamente en 04 (99c13aa, dfb8315, d6c7581).
+git rev-list --count main..HEAD   # -> >= 18
 ```
 
 ## Acceptance criteria
@@ -218,7 +223,7 @@ git log --oneline main..HEAD | wc -l    # -> 15
 - **Dado** §4.3, **entonces** declara que las categorías lingüísticas las asignó el juez automáticamente y compara la distribución obtenida contra la referencia 8/8/6/4/3/3 del estudio anterior.
 - **Dado** §4.4, **entonces** incorpora la Tabla 4 con **siete** etiquetas, nombra al juez seleccionado y su exactitud de etapa 1, reporta la cantidad de respuestas con `juez_parse_ok = False`, cuantifica cuántas rescató la métrica laxa, y **no contiene** las expresiones "manualmente", "clasificó a mano" ni "cuatro categorías".
 - **Dado** §4, **entonces** no contiene ningún `\begin{tabular}` propio: las Tablas 2, 3 y 4 entran exclusivamente por `\input{tablas/...}`.
-- **Dado** §6, **entonces** contiene las cuatro amenazas de RF16 —sesgo de auto-favorecimiento del juez (incluido que juzga sus propias salidas), incomparabilidad de los dos modelos base por raw completion, versiones divergentes de librería como confusor de la latencia con referencia a `tab:versiones`, y reproducibilidad limitada por los dos modelos *gated* (distinta de la anterior, sin datos identificatorios ni el valor del token)— y conserva las amenazas vigentes del original, con la de validez de constructo **actualizada** a "cuantificada por la métrica laxa".
+- **Dado** §6, **entonces** contiene las **tres** amenazas de RF16 —sesgo de auto-favorecimiento del juez (incluido que juzga sus propias salidas), versiones divergentes de librería como confusor de la latencia (dos grupos mutuamente excluyentes, con referencia a `tab:versiones` y a los modelos que forzaron cada grupo), y exclusión de 2 de los 14 modelos del diseño original por acceso restringido no otorgado (sin datos identificatorios ni mención de ningún token concreto)— **sin** ninguna mención a que `LFM2.5-230M`/`LFM2.5-350M` se hayan prompteado por raw completion, y conserva las amenazas vigentes del original, con la de validez de constructo **actualizada** a "cuantificada por la métrica laxa".
 - **Dado** §8, **entonces** declara el uso de IA incluyendo su rol **metodológico** como juez automático, redactada en impersonal y sin datos identificatorios.
 - **Dado** que se regeneran las tablas sin cambiar los datos, **entonces** `git diff -- paper/02_reescrito/tablas/` sale vacío: el paper y los datos están sincronizados.
-- **Dado** el repositorio al final, **entonces** `pytest -q` pasa, los dos papers compilan, todos los archivos de F0 siguen byte-idénticos a `main`, `paper_cacic_LNCS_word.docx` sigue sin trackear, y `git log --oneline main..HEAD` muestra 15 commits, uno por subtask.
+- **Dado** el repositorio al final, **entonces** `pytest -q` pasa, los dos papers compilan, todos los archivos de F0 siguen byte-idénticos a `main`, `paper_cacic_LNCS_word.docx` sigue sin trackear, y `git rev-list --count main..HEAD` es al menos 18 (16 nodos del DAG + G1 + G2, con subtasks de alcance amplio como 04 y 16 aportando varios commits).
