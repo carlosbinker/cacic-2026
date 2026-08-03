@@ -1,6 +1,7 @@
 """Tests de la orquestación Docker y del contrato de documentación de pines."""
 
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -66,6 +67,29 @@ def test_no_hay_credenciales_en_capas_ni_login_interactivo():
         bajo = texto.lower()
         assert "huggingface-cli login" not in bajo, f"{ruta.name}: login interactivo"
         assert "huggingface_hub.login(" not in bajo, f"{ruta.name}: huggingface_hub.login("
+
+
+def test_ningun_dockerfile_trackeado_tiene_credenciales_ni_login():
+    """F11 sobre TODO el árbol trackeado, no solo docker/: un Dockerfile puede
+    aparecer en cualquier ubicación (hay uno legacy en la raíz). Cierra el
+    hueco de cobertura que deja el Check C4 de TEST_PLAN.md, que está acotado
+    a docker/, src/ y scripts/ para no autofallarse contra su propia
+    documentación (*.md, tests/)."""
+    salida = subprocess.run(
+        ["git", "ls-files", "*Dockerfile*"],
+        cwd=RAIZ, capture_output=True, text=True, check=True,
+    ).stdout
+    rutas = [RAIZ / linea for linea in salida.splitlines() if linea]
+    assert rutas, "no se encontró ningún Dockerfile trackeado"
+    for ruta in rutas:
+        texto = ruta.read_text(encoding="utf-8", errors="ignore")
+        assert not re.search(r"ARG\s+HF_TOKEN", texto), f"{ruta}: ARG HF_TOKEN"
+        assert not re.search(r"ENV\s+HF_TOKEN", texto), f"{ruta}: ENV HF_TOKEN"
+        assert not re.search(r"COPY\s+\.env", texto), f"{ruta}: COPY .env"
+        assert not re.search(r"--build-arg[= ]*HF_TOKEN", texto), f"{ruta}: --build-arg HF_TOKEN"
+        bajo = texto.lower()
+        assert "huggingface-cli login" not in bajo, f"{ruta}: login interactivo"
+        assert "huggingface_hub.login(" not in bajo, f"{ruta}: huggingface_hub.login("
 
 
 def test_docker_no_contiene_el_valor_del_token():

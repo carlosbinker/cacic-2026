@@ -150,8 +150,8 @@ class ContextoInferencia:
 
 def _credencial_hf(modelo: ModeloEvaluado2026) -> dict[str, str]:
     """F11/RF17: solo los modelos gated reciben el token, y solo como
-    parámetro `token=` de `from_pretrained`. Nunca `huggingface_hub.login()`,
-    nunca escrito en disco, nunca impreso."""
+    parámetro `token=` de `from_pretrained`. Nunca se hace login interactivo
+    de huggingface_hub, nunca se escribe en disco, nunca se imprime."""
     return {"token": os.environ["HF_TOKEN"]} if modelo.gated else {}
 
 

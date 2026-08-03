@@ -131,15 +131,21 @@ git rev-list --count main..HEAD
 **On failure indicates:** el valor del token se filtró a un archivo trackeado — probablemente un log commiteado del barrido (`data/2026/log_barrido.txt`), el `docker/README.md`, o un `TODO_<NN>_*.md`. Es un incidente de seguridad: hay que rotar el token, no solo borrar la línea.
 
 ### Check C4 — El token nunca entra en una capa de imagen
-**Covers AC:** AC12 (segunda mitad) y F11 (*prohibido `ARG`/`ENV HF_TOKEN`, `COPY .env`, `--build-arg`, login interactivo*). El subtask 04 testea esto sobre `docker/`; acá se extiende a **todo el árbol trackeado**, porque un `Dockerfile` puede aparecer fuera de `docker/` (hay uno en la raíz, legacy).
+**Covers AC:** AC12 (segunda mitad) y F11 (*prohibido `ARG`/`ENV HF_TOKEN`, `COPY .env`, `--build-arg`, login interactivo*). El subtask 04 testea esto sobre `docker/`; acá se extiende a **las rutas que realmente pueden terminar en una capa de imagen** — Dockerfiles en cualquier ubicación (hay uno en la raíz, legacy) y el código que esos Dockerfiles copian (`docker/`, `src/`, `scripts/`).
 **Cost:** `cheap`
 **Run:**
 ```bash
-git grep -nE 'ARG +HF_TOKEN|ENV +HF_TOKEN|COPY +\.env|--build-arg[= ]*HF_TOKEN' ; test $? -eq 1 && echo "sin credenciales en capas OK"
-git grep -niE 'huggingface-cli login|huggingface_hub\.login\(' ; test $? -eq 1 && echo "sin login interactivo OK"
+# Alcance acotado a rutas que pueden terminar en una capa de imagen: Dockerfiles
+# en cualquier lado + el código que copian. NO se incluye *.md ni tests/: ambos
+# necesariamente CITAN los patrones prohibidos para documentarlos/testearlos,
+# y ese texto nunca entra en una capa de imagen. Ampliar el alcance de vuelta
+# al árbol completo hace que el check se autofalle contra su propia documentación.
+git grep -nE 'ARG +HF_TOKEN|ENV +HF_TOKEN|COPY +\.env|--build-arg[= ]*HF_TOKEN' -- '*Dockerfile*' 'docker/**' 'src/**' 'scripts/**' ; test $? -eq 1 && echo "sin credenciales en capas OK"
+git grep -niE 'huggingface-cli login|huggingface_hub\.login\(' -- '*Dockerfile*' 'docker/**' 'src/**' 'scripts/**' ; test $? -eq 1 && echo "sin login interactivo OK"
 ```
 **Expected:** imprime `sin credenciales en capas OK` y `sin login interactivo OK`, sin ninguna línea de coincidencia.
 **On failure indicates:** el token quedaría horneado en una capa de imagen (recuperable por cualquiera que tenga la imagen) o el pipeline dejó de ser no interactivo — ambas cosas están explícitamente prohibidas por F11 y por §2.4.
+**Cobertura complementaria (no cheap, ya cubierta por pytest):** este check manual solo mira el estado actual del árbol; la garantía de que **ningún** `Dockerfile` trackeado (en cualquier ubicación) declara/copia el token, hoy y en cualquier commit futuro, la asegura `tests/test_docker_matriz.py::test_ningun_dockerfile_trackeado_tiene_credenciales_ni_login`, que itera `git ls-files '*Dockerfile*'` — no solo `docker/`.
 
 ### Check C5 — Credenciales y `.docx` sin trackear
 **Covers AC:** AC11 (*`.env` sigue sin trackear, `git ls-files` no lista `.env` ni ningún `*.env`; `paper_cacic_LNCS_word.docx` sigue sin trackear*).
@@ -391,9 +397,13 @@ PY
 **Measurement / threshold:**
 ```bash
 python docker/run_sweep.py --dry-run | grep -cE 'gpus|--device|nvidia' ; test $? -eq 1 && echo "sin GPU OK"
-python docker/build_all.py --dry-run | grep -c 'slm-domotica-2026:'
+# build_all.py --dry-run imprime cada tag DOS veces (el header "=== build <tag> | <pin> ==="
+# y la linea del comando "docker build ... -t <tag> ..."), asi que contar lineas que
+# mencionan el tag da 24, no 12. Se cuentan tags DISTINTOS para que el numero refleje
+# imagenes de verdad, no apariciones de texto.
+python docker/build_all.py --dry-run | grep -oE 'slm-domotica-2026:[A-Za-z0-9._-]+' | sort -u | wc -l
 ```
-**Expected:** `sin GPU OK` (cero menciones de GPU en las invocaciones) y `12` imágenes en el plan de build (roster activo). Combinado con C6 (`12` × `--memory=8g`, `12` × `--cpus=2`), esto fija el envelope de las 12 corridas.
+**Expected:** `sin GPU OK` (cero menciones de GPU en las invocaciones) y `12` imágenes **distintas** en el plan de build (roster activo). Combinado con C6 (`12` × `--memory=8g`, `12` × `--cpus=2`), esto fija el envelope de las 12 corridas.
 **On failure indicates:** una corrida con recursos distintos hace que su latencia no sea comparable ni con las otras 11 ni con el paper original — rompe el eje derecho de fig1 y la columna de latencia de la Tabla 2.
 
 ### NF2 — Reanudabilidad del barrido completo
@@ -444,7 +454,7 @@ Ninguno de estos comandos arranca un contenedor de modelo, descarga pesos ni hac
 | 1 | `pytest -q` | exit 0, cero `failed` / `error` | `cheap` |
 | 2 | C1 + C2 (inmutabilidad de F0, árbol e historial) | ambas salidas vacías | `cheap` |
 | 3 | C3 + C4 + C5 (secretos, capas, untracked) | los cuatro mensajes `... OK` | `cheap` |
-| 4 | C6 + NF1 (plomería del token y envelope de recursos, vía `--dry-run`) | `2`, `12`, `12`, `0`, `sin GPU OK`, `12` (dos gated en el registro, doce activos, doce invocaciones, cero `--env-file`) | `cheap` |
+| 4 | C6 + NF1 (plomería del token y envelope de recursos, vía `--dry-run`) | `2`, `12`, `12`, `0`, `sin GPU OK`, `12` (dos gated en el registro, doce activos, doce invocaciones, cero `--env-file`, doce imágenes **distintas** en el plan de build) | `cheap` |
 | 5 | NF3 (decodificación determinista) | `sin muestreo estocastico OK` | `cheap` |
 | 6 | C7 (trazabilidad de versiones) | `... OK` | `cheap` |
 | 7 | C8 (regeneración idempotente de tablas `.tex`) | `regeneracion idempotente OK` | `cheap` |
