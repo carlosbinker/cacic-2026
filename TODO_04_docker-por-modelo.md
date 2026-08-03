@@ -477,7 +477,7 @@ Cada modelo del roster 2026 corre en su propia imagen, construida desde
 comparten un único volumen de caché de pesos (`.hf_cache`): se aíslan los
 árboles de dependencias, no las descargas.
 
-Baseline del proyecto: `transformers>=4.57.0`.
+Baseline del proyecto: `transformers>=4.57.0,<5.0.0`.
 
 ## Matriz de versiones
 
@@ -493,7 +493,7 @@ correr distintos modelos con distintas versiones de la librería de inferencia
 es un confusor para la comparación de latencia.
 
 > Nota informativa: Gemma 3 requiere `transformers >= 4.50.0`; cubierto por el
-> baseline `transformers>=4.57.0`. No es un pin divergente — `gemma-3-270m-it`
+> baseline `transformers>=4.57.0,<5.0.0`. No es un pin divergente — `gemma-3-270m-it`
 > hereda el baseline igual que los demás.
 
 ## Credenciales de los modelos gated

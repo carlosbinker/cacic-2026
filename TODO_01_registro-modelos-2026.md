@@ -246,7 +246,7 @@ def test_por_nombre_encuentra_y_falla_bien():
 - [ ] Correr y confirmar que **falla**: `pytest -q tests/test_models_2026.py`
 - [ ] Implementar `src/models_2026.py` con la dataclass de F3 (incluye el campo `gated: bool`,
   ubicado **después** de `trust_remote_code` y **antes** de `motivo_pin`),
-  `BASELINE_TRANSFORMERS = "transformers>=4.57.0"`, los 14 `ModeloEvaluado2026` en el orden
+  `BASELINE_TRANSFORMERS = "transformers>=4.57.0,<5.0.0"`, los 14 `ModeloEvaluado2026` en el orden
   congelado de §2.1 (`gemma-3-270m-it` es el #7, cierra el bloque sub-1B; `Llama-3.2-1B-Instruct`
   es el #14, cierra el bloque 1-2B). Los dos gated arrancan igual que los demás:
   `transformers_pin = BASELINE_TRANSFORMERS`, `motivo_pin = ""`, `trust_remote_code = False` — no

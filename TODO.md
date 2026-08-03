@@ -276,7 +276,7 @@ from typing import Literal
 
 Tier = Literal["sub-1B", "1-2B"]
 
-BASELINE_TRANSFORMERS: str = "transformers>=4.57.0"
+BASELINE_TRANSFORMERS: str = "transformers>=4.57.0,<5.0.0"
 
 @dataclass(frozen=True)
 class ModeloEvaluado2026:
@@ -300,6 +300,25 @@ def gated() -> list[ModeloEvaluado2026]: ...   # los que requieren $HF_TOKEN, en
 `src/models_2026.py` declara el **flag** `gated`; **no** lee el token ni menciona su valor.
 
 **Invariantes congelados, verificados por test:** (a) `motivo_pin != ""` si y solo si `transformers_pin != BASELINE_TRANSFORMERS`; (b) exactamente **dos** modelos tienen `gated = True`, y son `google/gemma-3-270m-it` y `meta-llama/Llama-3.2-1B-Instruct`. Valor inicial de los 14: `transformers_pin = BASELINE_TRANSFORMERS`, `trust_remote_code = False`, `motivo_pin = ""`. El subtask 04 es el único autorizado a cambiar los pines, y solo con evidencia empírica de fallo.
+
+**Re-congelamiento del baseline (2026-08-02).** Durante la corrida real del barrido,
+`BASELINE_TRANSFORMERS` sin cota superior (`"transformers>=4.57.0"`) resolvió, en pip, a
+`transformers 5.14.1`. Bajo esa versión, `ibm-granite/granite-4.0-350m` falla en su primer
+`generate()`, dentro de `_prefill`, con:
+
+```
+ValueError: `has_previous_state` can only be called on LinearAttention layers, and the current Cache seem to only contain Attention layers.
+```
+
+El error es 100% reproducible (no intermitente) y es una regresión de `transformers` 5.x en el
+manejo de cache híbrida/linear-attention que afecta la arquitectura Granite 4. Reconstruyendo la
+misma imagen con la cota `transformers>=4.57.0,<5.0.0`, pip resuelve a `transformers 4.57.6`, y
+bajo esa versión el mismo modelo genera con normalidad (verificado empíricamente). Por eso
+`BASELINE_TRANSFORMERS` queda acotado a `<5.0.0` para **las 14** filas del roster, no solo para
+los modelos Granite: así las 14 imágenes comparten una única versión mayor de la librería, lo que
+**elimina** —en vez de introducir— el confusor "versiones de librería divergentes entre modelos"
+nombrado en RF16, en lugar de tratar el caso Granite como un pin divergente aislado. Los
+invariantes (a) y (b) de F3 siguen intactos y siguen siendo verdaderos.
 
 ### F4 — Vocabularios cerrados: `src/taxonomia_2026.py`
 

@@ -12,7 +12,14 @@ from typing import Literal
 
 Tier = Literal["sub-1B", "1-2B"]
 
-BASELINE_TRANSFORMERS: str = "transformers>=4.57.0"
+# Cota superior <5.0.0 (re-congelado 2026-08-02): transformers 5.14.1 rompe a
+# ibm-granite/granite-4.0-350m en el primer generate() ("has_previous_state can
+# only be called on LinearAttention layers..."), regresion de transformers 5.x
+# en el manejo de cache hibrida/linear-attention para la arquitectura Granite 4.
+# transformers 4.57.6 (resuelto con la cota) genera sin problemas. Se acota para
+# las 14 filas del roster, no solo Granite, para que las 14 imagenes compartan
+# una unica version mayor de la libreria.
+BASELINE_TRANSFORMERS: str = "transformers>=4.57.0,<5.0.0"
 
 
 @dataclass(frozen=True)
