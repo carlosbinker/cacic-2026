@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Corre el barrido completo: las 14 imágenes, de a una, en orden de roster.
+"""Corre el barrido: las 12 imágenes del roster activo, de a una, en orden de registro.
 
 Secuencial a propósito (RF4): dos modelos en paralelo se pelearían por los
 2 núcleos y contaminarían la tabla de latencia, que es el resultado central
@@ -8,11 +8,16 @@ de una interrupción retoma donde quedó: los modelos con su CSV de detalle ya
 completo los saltea `src/run_sweep_2026.py` (RF3), y `--desde` permite además
 arrancar directamente en el modelo que falló.
 
-Credenciales (F11): dos de los 14 modelos son gated. Reciben el token de
-Hugging Face SOLO en tiempo de ejecución, vía `docker run --env-file .env`;
-las otras 12 imágenes corren sin credenciales. Si la lista a correr incluye
-algún gated y falta `.env` o `HF_TOKEN`, este script aborta antes de correr
-nada; nunca imprime el valor del token.
+Selecciona por defecto `roster_activo()` (12), no el registro completo (14):
+los dos modelos gated quedan fuera porque el acceso de descarga no fue
+otorgado. Retomar explícitamente desde uno de esos dos con `--desde` falla
+con `ValueError`.
+
+Credenciales (F11): el roster activo no tiene ningún modelo gated, así que
+corre sin credenciales. La invocación con `--env-file .env` se conserva tal
+cual para los dos modelos gated del registro, por si alguno se reactiva; si
+la lista a correr incluyera algún gated y faltara `.env` o `HF_TOKEN`, este
+script aborta antes de correr nada; nunca imprime el valor del token.
 
 Uso:
     python docker/run_sweep.py [--desde NOMBRE] [--force] [--dry-run]
@@ -32,7 +37,7 @@ sys.path.insert(0, str(RAIZ / "src"))
 sys.path.insert(0, str(AQUI))
 
 from build_all import tag_imagen  # noqa: E402
-from models_2026 import MODELOS_2026, ModeloEvaluado2026  # noqa: E402
+from models_2026 import ModeloEvaluado2026, por_nombre, roster_activo  # noqa: E402
 
 CLAVE_TOKEN = "HF_TOKEN"
 
@@ -109,13 +114,17 @@ def validar_credenciales(modelos: list[ModeloEvaluado2026], raiz: Path) -> None:
 # --------------------------------------------------------------------------
 
 def seleccionar_modelos(desde: str | None) -> list[ModeloEvaluado2026]:
-    """El roster desde el modelo indicado en adelante (RF3: retomar un corte)."""
-    modelos = list(MODELOS_2026)
+    """El roster ACTIVO (12) desde el modelo indicado en adelante (RF3)."""
+    modelos = roster_activo()
     if not desde:
         return modelos
+    modelo_desde = por_nombre(desde)
+    if not modelo_desde.activo:
+        raise ValueError(
+            f"{desde!r} esta excluido del roster activo: {modelo_desde.motivo_exclusion} "
+            f"No se puede retomar un barrido desde un modelo que no corre."
+        )
     nombres = [m.nombre for m in modelos]
-    if desde not in nombres:
-        raise ValueError(f"{desde!r} no está en el roster: {nombres}")
     return modelos[nombres.index(desde):]
 
 
@@ -150,7 +159,7 @@ def ejecutar_barrido(modelos: list[ModeloEvaluado2026],
 
 def _parsear_argumentos() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Barrido 2026 completo: las 14 imágenes, de a una"
+        description="Barrido 2026: las 12 imágenes del roster activo, de a una"
     )
     parser.add_argument("--desde", default=None,
                         help="retomar desde este nombre de modelo")

@@ -11,7 +11,7 @@ import pytest
 RAIZ = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RAIZ / "src"))
 
-from models_2026 import MODELOS_2026, gated, por_nombre  # noqa: E402
+from models_2026 import MODELOS_2026, gated, por_nombre, roster_activo  # noqa: E402
 
 # Valor ficticio deliberadamente sin la forma `hf_` + 20+ alfanuméricos, para
 # que el escaneo de secretos (AC12) no lo tome por un token real.
@@ -82,3 +82,13 @@ def test_el_mensaje_de_aborto_no_filtra_el_token(run_sweep, tmp_path):
     with pytest.raises(ValueError) as exc:
         run_sweep.validar_credenciales(gated(), tmp_path)
     assert TOKEN_FICTICIO not in str(exc.value)
+
+
+def test_el_roster_activo_no_tiene_ningun_modelo_gated():
+    assert len(roster_activo()) == 12
+    assert all(not m.gated for m in roster_activo())
+
+
+def test_el_roster_activo_corre_sin_credenciales_aunque_falte_env(run_sweep, tmp_path):
+    # tmp_path no tiene .env: si roster_activo() necesitara alguna credencial, esto abortaria.
+    assert run_sweep.validar_credenciales(roster_activo(), tmp_path) is None

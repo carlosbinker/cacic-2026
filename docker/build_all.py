@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
-"""Construye una imagen por modelo del roster, con su pin de transformers.
+"""Construye una imagen por modelo del roster ACTIVO, con su pin de transformers.
 
 Una imagen por modelo (RF4): los árboles de dependencias quedan aislados,
 pero la caché de pesos es un único volumen compartido en runtime.
 
 Este script nunca recibe ni declara credenciales: el único `--build-arg` es
 `TRANSFORMERS_PIN`, que es una spec de versión, no un secreto (F11).
+
+Selecciona por defecto `roster_activo()` (12), no el registro completo (14):
+los dos modelos gated quedan fuera porque el acceso de descarga no fue
+otorgado (ver `motivo_exclusion` en `src/models_2026.py`). Pedir uno de esos
+dos explícitamente con `--modelo` falla con `ValueError`.
 
 Uso:
     python docker/build_all.py [--modelo NOMBRE] [--dry-run]
@@ -19,7 +24,7 @@ from pathlib import Path
 RAIZ = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RAIZ / "src"))
 
-from models_2026 import MODELOS_2026, ModeloEvaluado2026, por_nombre, slug  # noqa: E402
+from models_2026 import ModeloEvaluado2026, por_nombre, roster_activo, slug  # noqa: E402
 
 DOCKERFILE = RAIZ / "docker" / "Dockerfile.modelo"
 
@@ -41,8 +46,16 @@ def comando_build(modelo: ModeloEvaluado2026, raiz: Path) -> list[str]:
 
 
 def seleccionar_modelos(nombre: str | None) -> list[ModeloEvaluado2026]:
-    """El roster entero, o solo el modelo pedido."""
-    return [por_nombre(nombre)] if nombre else list(MODELOS_2026)
+    """El roster ACTIVO (12), o solo el modelo pedido si esta activo."""
+    if nombre is None:
+        return roster_activo()
+    modelo = por_nombre(nombre)
+    if not modelo.activo:
+        raise ValueError(
+            f"{nombre!r} esta excluido del roster activo: {modelo.motivo_exclusion} "
+            f"Reactivarlo requiere poner activo=True en src/models_2026.py."
+        )
+    return [modelo]
 
 
 def construir(modelo: ModeloEvaluado2026, dry_run: bool) -> int:
@@ -67,7 +80,7 @@ def construir_todas(modelos: list[ModeloEvaluado2026], dry_run: bool) -> int:
 
 def _parsear_argumentos() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Construye una imagen Docker por modelo del roster 2026"
+        description="Construye una imagen Docker por modelo del roster ACTIVO (12) del 2026"
     )
     parser.add_argument("--modelo", default=None,
                         help="construir solo esta imagen (ver src/models_2026.py)")

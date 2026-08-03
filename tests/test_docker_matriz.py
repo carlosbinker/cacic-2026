@@ -4,11 +4,13 @@ import re
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "docker"))
 
 from build_all import comando_build, tag_imagen  # noqa: E402
-from models_2026 import BASELINE_TRANSFORMERS, MODELOS_2026, slug  # noqa: E402
+from models_2026 import BASELINE_TRANSFORMERS, MODELOS_2026, roster_activo, slug  # noqa: E402
 from run_sweep import comando_run  # noqa: E402
 
 RAIZ = Path(__file__).resolve().parent.parent
@@ -110,3 +112,57 @@ def test_todo_pin_divergente_esta_justificado_en_el_readme():
         if m.trust_remote_code:
             assert re.search(rf"{re.escape(m.nombre)}.*trust_remote_code", readme, re.S | re.I), \
                 f"{m.nombre} usa trust_remote_code sin documentarlo"
+
+
+def test_build_all_selecciona_el_roster_activo_por_defecto():
+    from build_all import seleccionar_modelos as seleccionar_build
+    seleccionados = seleccionar_build(None)
+    assert seleccionados == roster_activo()
+    assert len(seleccionados) == 12
+
+
+def test_run_sweep_selecciona_el_roster_activo_por_defecto():
+    from run_sweep import seleccionar_modelos as seleccionar_run
+    seleccionados = seleccionar_run(None)
+    assert seleccionados == roster_activo()
+    assert len(seleccionados) == 12
+
+
+def test_build_all_pedir_un_modelo_excluido_falla_con_el_motivo():
+    from build_all import seleccionar_modelos as seleccionar_build
+    with pytest.raises(ValueError) as exc:
+        seleccionar_build("gemma-3-270m-it")
+    assert "excluido" in str(exc.value)
+    assert "403" in str(exc.value) or "resolve" in str(exc.value)
+
+
+def test_run_sweep_desde_un_modelo_excluido_falla_con_el_motivo():
+    from run_sweep import seleccionar_modelos as seleccionar_run
+    with pytest.raises(ValueError) as exc:
+        seleccionar_run("Llama-3.2-1B-Instruct")
+    assert "excluido" in str(exc.value)
+
+
+def test_build_all_pedir_un_modelo_activo_sigue_funcionando():
+    from build_all import seleccionar_modelos as seleccionar_build
+    seleccionados = seleccionar_build("SmolLM2-360M-Instruct")
+    assert [m.nombre for m in seleccionados] == ["SmolLM2-360M-Instruct"]
+
+
+def test_el_readme_documenta_la_matriz_del_roster_activo_con_necesidad():
+    """RF5 + F11: los 12 del roster activo estan en la matriz con necesario/heredado."""
+    readme = (RAIZ / "docker" / "README.md").read_text(encoding="utf-8")
+    for m in roster_activo():
+        assert m.nombre in readme, f"falta {m.nombre} en la matriz de docker/README.md"
+    necesarios = {m.nombre for m in roster_activo() if m.motivo_pin}
+    assert necesarios == {
+        "LFM2.5-230M", "LFM2.5-350M", "Qwen3.5-0.8B", "Qwen3.5-2B", "granite-4.0-350m",
+    }
+
+
+def test_el_readme_documenta_las_dos_exclusiones():
+    readme = (RAIZ / "docker" / "README.md").read_text(encoding="utf-8")
+    for m in MODELOS_2026:
+        if not m.activo:
+            assert m.nombre in readme, f"falta la exclusion de {m.nombre}"
+            assert "403" in readme

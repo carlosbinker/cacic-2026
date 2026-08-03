@@ -66,7 +66,7 @@ Diseña estrictamente contra los contratos re-congelados del índice: **F3** (`s
 
 ### Tarea 1 — `src/models_2026.py`: grupo B, `activo`/`motivo_exclusion`, `roster_activo()` (TDD)
 
-- [ ] Escribir los tests que fallan en `tests/test_models_2026.py`. **Reemplazar** las dos funciones
+- [x] Escribir los tests que fallan en `tests/test_models_2026.py`. **Reemplazar** las dos funciones
   que quedan obsoletas por el cambio de contrato (`test_estado_inicial_sin_divergencias` describía
   un estado transitorio que ya no existe; `test_siete_por_tier` asumía que `por_tier` filtraba el
   registro completo) y **agregar** las nuevas:
@@ -171,10 +171,10 @@ Diseña estrictamente contra los contratos re-congelados del índice: **F3** (`s
   )
   ```
 
-- [ ] Correr y confirmar que **falla** (import error de `TRANSFORMERS_5X`/`roster_activo`, más los
+- [x] Correr y confirmar que **falla** (import error de `TRANSFORMERS_5X`/`roster_activo`, más los
   asserts de conteo): `pytest -q tests/test_models_2026.py`
 
-- [ ] Implementar en `src/models_2026.py`. Agregar la constante del grupo B junto a la existente:
+- [x] Implementar en `src/models_2026.py`. Agregar la constante del grupo B junto a la existente:
 
   ```python
   # Grupo B (2026-08-03): 5 modelos recientes (LFM2.5-230M/350M, Qwen3.5-0.8B/2B)
@@ -314,10 +314,10 @@ Diseña estrictamente contra los contratos re-congelados del índice: **F3** (`s
   y que el pin es por modelo, agrupado en dos grupos, con la matriz de `docker/README.md` como fuente
   única.
 
-- [ ] Correr y confirmar **verde**: `pytest -q tests/test_models_2026.py`
-- [ ] `pytest -q` (suite completa; confirma que nada de F0 ni de los subtasks previos se rompió)
-- [ ] `git add src/models_2026.py tests/test_models_2026.py`
-- [ ] `git commit -m "fix(2026): roster activo de 12 y pins de transformers por grupo de version"`
+- [x] Correr y confirmar **verde**: `pytest -q tests/test_models_2026.py`
+- [x] `pytest -q` (suite completa; confirma que nada de F0 ni de los subtasks previos se rompió)
+- [x] `git add src/models_2026.py tests/test_models_2026.py` *(consolidado en el commit único final, ver nota de Cierre)*
+- [x] `git commit -m "fix(2026): roster activo de 12 y pins de transformers por grupo de version"` *(consolidado: el commit real de esta corrida es único, ver Cierre)*
 
 ### Tarea 2 — `docker/build_all.py` y `docker/run_sweep.py`: seleccion por defecto = roster activo (TDD)
 
@@ -328,7 +328,7 @@ Diseña estrictamente contra los contratos re-congelados del índice: **F3** (`s
 > tests nuevos de esta tarea van en `tests/test_docker_matriz.py` para no duplicar la logica de carga
 > de `docker/` por ruta que ese archivo ya resuelve.
 
-- [ ] Escribir los tests que fallan, agregar a `tests/test_docker_matriz.py`:
+- [x] Escribir los tests que fallan, agregar a `tests/test_docker_matriz.py`:
 
   ```python
   from models_2026 import roster_activo  # noqa: E402  (agregar al import existente)
@@ -371,9 +371,9 @@ Diseña estrictamente contra los contratos re-congelados del índice: **F3** (`s
 
   Agregar `import pytest` al encabezado de `tests/test_docker_matriz.py` si no está ya.
 
-- [ ] Correr y confirmar que **falla**: `pytest -q tests/test_docker_matriz.py`
+- [x] Correr y confirmar que **falla**: `pytest -q tests/test_docker_matriz.py`
 
-- [ ] Implementar en `docker/build_all.py` (reemplaza la función existente):
+- [x] Implementar en `docker/build_all.py` (reemplaza la función existente):
 
   ```python
   from models_2026 import MODELOS_2026, ModeloEvaluado2026, por_nombre, roster_activo, slug  # noqa: E402
@@ -395,7 +395,7 @@ Diseña estrictamente contra los contratos re-congelados del índice: **F3** (`s
   `"...del roster ACTIVO (12) del 2026"`) y el docstring de módulo, que hoy dice "una imagen por
   modelo del roster" sin distinguir activo/registro.
 
-- [ ] Implementar en `docker/run_sweep.py` (reemplaza `seleccionar_modelos`, que hoy solo maneja
+- [x] Implementar en `docker/run_sweep.py` (reemplaza `seleccionar_modelos`, que hoy solo maneja
   `--desde` sobre `MODELOS_2026`):
 
   ```python
@@ -420,21 +420,22 @@ Diseña estrictamente contra los contratos re-congelados del índice: **F3** (`s
   del parser ("Barrido 2026 completo: las 14 imágenes, de a una" → "...las 12 imágenes del roster
   activo, de a una").
 
-- [ ] Correr y confirmar **verde**: `pytest -q tests/test_docker_matriz.py`
-- [ ] Actualizar los tests existentes que asumían 14 en `tests/test_docker_matriz.py` y
+- [x] Correr y confirmar **verde**: `pytest -q tests/test_docker_matriz.py`
+- [x] Actualizar los tests existentes que asumían 14 en `tests/test_docker_matriz.py` y
   `tests/test_run_sweep_2026.py` allí donde iteran `MODELOS_2026` para ejercitar `comando_build`/
   `comando_run` (esos tests siguen siendo válidos: `comando_build`/`comando_run` operan sobre
   cualquier `ModeloEvaluado2026` que reciban, activo o no; no hace falta tocarlos). Confirmar
-  corriendo la suite completa: `pytest -q`
-- [ ] `git add docker/build_all.py docker/run_sweep.py tests/test_docker_matriz.py`
-- [ ] `git commit -m "fix(2026): docker build/run seleccionan el roster activo por defecto"`
+  corriendo la suite completa: `pytest -q` *(verificado: `test_run_sweep_2026.py` no referencia
+  `MODELOS_2026` ni conteos, no requirió cambios)*
+- [x] `git add docker/build_all.py docker/run_sweep.py tests/test_docker_matriz.py` *(consolidado en el commit único final)*
+- [x] `git commit -m "fix(2026): docker build/run seleccionan el roster activo por defecto"` *(consolidado, ver Cierre)*
 
 ### Tarea 3 — `docker/README.md`: matriz de versiones y tabla de exclusiones
 
 > Exención de TDD: es documentación. Su exactitud la verifica `tests/test_docker_matriz.py`
 > (Tarea 4) contra `src/models_2026.py`, no un test de esta tarea.
 
-- [ ] Reemplazar la sección `## Matriz de versiones` completa por la de los 12 modelos del roster
+- [x] Reemplazar la sección `## Matriz de versiones` completa por la de los 12 modelos del roster
   activo, agrupada por grupo de versión, con la columna `¿necesario?`:
 
   ```markdown
@@ -487,22 +488,22 @@ Diseña estrictamente contra los contratos re-congelados del índice: **F3** (`s
   y no una reescritura de codigo.
   ```
 
-- [ ] Reemplazar el párrafo de "Re-congelamiento del baseline (2026-08-02)" por una remisión corta a
+- [x] Reemplazar el párrafo de "Re-congelamiento del baseline (2026-08-02)" por una remisión corta a
   la nota de versiones re-congelada del índice (evitar duplicar la prosa larga en dos lugares):
   agregar una línea `Ver la nota de versiones de F3 en el índice (TODO.md §4) para la narrativa
   completa; esta matriz es la fuente de datos, esa nota es la fuente de la interpretación.`
-- [ ] En la sección `## Uso`, cambiar `python docker/build_all.py            # construye las 14
+- [x] En la sección `## Uso`, cambiar `python docker/build_all.py            # construye las 14
   imágenes` por `# construye las 12 imágenes del roster activo`, y agregar una línea documentando
   `--modelo <excluido>` fallando con el motivo.
-- [ ] En "Credenciales de los modelos gated", agregar una frase: *el roster activo tiene cero modelos
+- [x] En "Credenciales de los modelos gated", agregar una frase: *el roster activo tiene cero modelos
   gated; esta sección describe la plomería que se conserva por si se reactiva alguno de los dos
   excluidos.*
-- [ ] `git add docker/README.md`
-- [ ] `git commit -m "docs(docker): matriz de versiones por grupo y tabla de exclusiones del roster"`
+- [x] `git add docker/README.md` *(consolidado en el commit único final)*
+- [x] `git commit -m "docs(docker): matriz de versiones por grupo y tabla de exclusiones del roster"` *(consolidado, ver Cierre)*
 
 ### Tarea 4 — Test de coherencia README ↔ registro (TDD)
 
-- [ ] Escribir el test que falla, agregar a `tests/test_docker_matriz.py`:
+- [x] Escribir el test que falla, agregar a `tests/test_docker_matriz.py`:
 
   ```python
   def test_el_readme_documenta_la_matriz_del_roster_activo_con_necesidad():
@@ -524,17 +525,17 @@ Diseña estrictamente contra los contratos re-congelados del índice: **F3** (`s
               assert "403" in readme
   ```
 
-- [ ] Correr y confirmar **verde**: `pytest -q tests/test_docker_matriz.py`
-- [ ] `pytest -q` (suite completa)
-- [ ] `git add tests/test_docker_matriz.py`
-- [ ] `git commit -m "test(2026): coherencia README-registro de la matriz de versiones y exclusiones"`
+- [x] Correr y confirmar **verde**: `pytest -q tests/test_docker_matriz.py`
+- [x] `pytest -q` (suite completa)
+- [x] `git add tests/test_docker_matriz.py` *(consolidado en el commit único final)*
+- [x] `git commit -m "test(2026): coherencia README-registro de la matriz de versiones y exclusiones"` *(consolidado, ver Cierre)*
 
 ### Tarea 5 — `tests/test_credenciales_gated.py`: roster activo sin credenciales (TDD)
 
 > El índice (`TODO.md`, bloque G1) ya documenta el contenido exacto de estas dos pruebas nuevas;
 > agregarlas acá es aplicar esa documentación al archivo real por primera vez.
 
-- [ ] Escribir los tests que fallan, agregar a `tests/test_credenciales_gated.py` (agregar
+- [x] Escribir los tests que fallan, agregar a `tests/test_credenciales_gated.py` (agregar
   `roster_activo` al import existente `from models_2026 import MODELOS_2026, gated, por_nombre`):
 
   ```python
@@ -548,10 +549,10 @@ Diseña estrictamente contra los contratos re-congelados del índice: **F3** (`s
       assert run_sweep.validar_credenciales(roster_activo(), tmp_path) is None
   ```
 
-- [ ] Correr y confirmar **verde**: `pytest -q tests/test_credenciales_gated.py`
-- [ ] `pytest -q` (suite completa)
-- [ ] `git add tests/test_credenciales_gated.py`
-- [ ] `git commit -m "test(2026): el roster activo de 12 corre sin \$HF_TOKEN"`
+- [x] Correr y confirmar **verde**: `pytest -q tests/test_credenciales_gated.py`
+- [x] `pytest -q` (suite completa)
+- [x] `git add tests/test_credenciales_gated.py` *(consolidado en el commit único final)*
+- [x] `git commit -m "test(2026): el roster activo de 12 corre sin \$HF_TOKEN"` *(consolidado, ver Cierre)*
 
 ### Tarea 6 — Reconstruir las 4 imágenes del grupo B con el pin nuevo
 
@@ -562,6 +563,10 @@ Diseña estrictamente contra los contratos re-congelados del índice: **F3** (`s
 > lectura (ver "Bloqueo de infraestructura" en la Spec de arriba): ningún `docker build` puede
 > correr hasta que Docker Desktop se repare. Esta tarea queda pendiente hasta entonces; no afecta a
 > las Tareas 1–5 ni 7, que son independientes de Docker.
+
+**Bloqueado: almacenamiento de Docker en solo lectura.** No se ejecutó ningún comando `docker` en
+esta corrida (instrucción explícita del orquestador, además del bloqueo de infraestructura ya
+documentado). Los tres puntos de abajo quedan sin marcar hasta que Docker Desktop se repare.
 
 - [ ] Reconstruir las 4 imágenes del grupo B, una por una:
 
@@ -590,15 +595,15 @@ Diseña estrictamente contra los contratos re-congelados del índice: **F3** (`s
 
 ### Tarea 7 — Cierre
 
-- [ ] `pytest -q` — suite completa verde.
-- [ ] `python docker/build_all.py --dry-run` — lista exactamente 12 líneas, cada una con el
-  `TRANSFORMERS_PIN` correcto para su grupo.
-- [ ] `git grep -iE 'hf_[A-Za-z0-9]{20,}'` → vacío (exit 1).
-- [ ] `git diff --stat main -- data/resultados_experimento_detalle.csv
+- [x] `pytest -q` — suite completa verde. *(108 passed, 4 skipped)*
+- [x] `python docker/build_all.py --dry-run` — lista exactamente 12 líneas, cada una con el
+  `TRANSFORMERS_PIN` correcto para su grupo. *(8 grupo A, 4 grupo B, verificado)*
+- [x] `git grep -iE 'hf_[A-Za-z0-9]{20,}'` → vacío (exit 1).
+- [x] `git diff --stat main -- data/resultados_experimento_detalle.csv
   data/resultados_experimento_resumen.json data/dataset_comandos_domotica.csv tests/test_metricas.py
   src/models.py src/prompt.py src/scoring.py src/schema.py src/metrics.py src/run_evaluation.py
   src/generate_figures.py` → vacío (F0 intacto).
-- [ ] Confirmar que `data/2026/detalle/granite-4-0-350m.csv` sigue byte-idéntico a como estaba antes
+- [x] Confirmar que `data/2026/detalle/granite-4-0-350m.csv` sigue byte-idéntico a como estaba antes
   de esta tarea: `git diff --stat -- data/2026/detalle/granite-4-0-350m.csv` → vacío.
 
 ## Verify

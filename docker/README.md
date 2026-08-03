@@ -5,77 +5,66 @@ Cada modelo del roster 2026 corre en su propia imagen, construida desde
 comparten un único volumen de caché de pesos (`.hf_cache`): se aíslan los
 árboles de dependencias, no las descargas.
 
-Baseline del proyecto: `transformers>=4.57.0,<5.0.0`.
-
-**Re-congelamiento del baseline (2026-08-02).** El baseline original no tenía
-cota superior (`transformers>=4.57.0`) y pip lo resolvía a `transformers
-5.14.1`. Bajo esa versión, `ibm-granite/granite-4.0-350m` falla en el primer
-`generate()`, dentro de `_prefill`, con:
-
-```
-ValueError: `has_previous_state` can only be called on LinearAttention layers, and the current Cache seem to only contain Attention layers.
-```
-
-Es una regresión de `transformers` 5.x en el manejo de cache
-híbrida/linear-attention que afecta la arquitectura Granite 4, 100%
-reproducible. Reconstruyendo la misma imagen con la cota `<5.0.0`, pip resuelve
-a `transformers 4.57.6`, y bajo esa versión el modelo genera con normalidad
-(verificado empíricamente). La cota se aplica al baseline mismo —las 14 filas
-del roster, no solo las Granite— para que las 14 imágenes compartan una única
-versión mayor de la librería: eso elimina, en vez de introducir, el confusor
-"versiones de librería divergentes entre modelos" para la comparación de
-latencia.
+Baseline del proyecto: `transformers>=4.57.0,<5.0.0` (grupo A). Ver la nota de
+versiones de F3 en el índice (`TODO.md` §4) para la narrativa completa; esta
+matriz es la fuente de datos, esa nota es la fuente de la interpretación.
 
 ## Matriz de versiones
 
-| Modelo | `transformers_pin` | `trust_remote_code` | ¿Divergente? | Motivo | ¿Gated? |
-|---|---|---|---|---|---|
-| LFM2.5-230M | `transformers>=4.57.0,<5.0.0` | no | no | — | no |
-| LFM2.5-350M | `transformers>=4.57.0,<5.0.0` | no | no | — | no |
-| granite-4.0-350m | `transformers>=4.57.0,<5.0.0` | no | no | — | no |
-| granite-4.0-h-350m | `transformers>=4.57.0,<5.0.0` | no | no | — | no |
-| Qwen3.5-0.8B | `transformers>=4.57.0,<5.0.0` | no | no | — | no |
-| SmolLM2-360M-Instruct | `transformers>=4.57.0,<5.0.0` | no | no | — | no |
-| gemma-3-270m-it | `transformers>=4.57.0,<5.0.0` | no | no | — | **sí** |
-| LFM2.5-1.2B-Instruct | `transformers>=4.57.0,<5.0.0` | no | no | — | no |
-| granite-4.0-1b | `transformers>=4.57.0,<5.0.0` | no | no | — | no |
-| granite-4.0-h-1b | `transformers>=4.57.0,<5.0.0` | no | no | — | no |
-| Qwen3.5-2B | `transformers>=4.57.0,<5.0.0` | no | no | — | no |
-| OLMo-2-0425-1B-Instruct | `transformers>=4.57.0,<5.0.0` | no | no | — | no |
-| SmolLM2-1.7B-Instruct | `transformers>=4.57.0,<5.0.0` | no | no | — | no |
-| Llama-3.2-1B-Instruct | `transformers>=4.57.0,<5.0.0` | no | no | — | **sí** |
+Dos grupos de version, no doce pines distintos. Evidencia por modelo, nunca inferida por familia
+(ver `.claude-scratch/logs/probe.log`, `.claude-scratch/logs/probe5x.log`,
+`.claude-scratch/logs/sweep2.log` -- sondeos de compatibilidad, nunca datos de latencia).
 
-Versión resuelta por pip para el baseline acotado en esta corrida:
-`transformers 4.57.6`.
+### Grupo A -- `BASELINE_TRANSFORMERS = "transformers>=4.57.0,<5.0.0"`, resuelve 4.57.6 (8 modelos)
 
-Los modelos marcados como no divergentes heredan el baseline; su pin no es una
-decisión, es la ausencia de una. Solo las filas marcadas como divergentes
-representan una restricción real descubierta empíricamente, y son las que se
-reportan en la Tabla 5 y en la Sección 6 (Amenazas a la validez) del paper:
-correr distintos modelos con distintas versiones de la librería de inferencia
-es un confusor para la comparación de latencia.
+| Modelo | ¿Necesario? | Evidencia |
+|---|---|---|
+| `granite-4.0-350m` | **si** | Falla bajo 5.14.1: `ValueError: has_previous_state can only be called on LinearAttention layers, and the current Cache seem to only contain Attention layers` (regresion de transformers 5.x en el cache hibrido de Granite 4). `PROBE_OK` en 4.57.6. |
+| `granite-4.0-h-350m` | heredado | `PROBE_OK` en 4.57.6; 5.x no probado. |
+| `granite-4.0-1b` | heredado | idem. |
+| `granite-4.0-h-1b` | heredado | idem. |
+| `SmolLM2-360M-Instruct` | heredado | idem. |
+| `SmolLM2-1.7B-Instruct` | heredado | idem. |
+| `LFM2.5-1.2B-Instruct` | heredado | idem. |
+| `OLMo-2-0425-1B-Instruct` | heredado | idem. |
 
-La matriz **no tiene divergencias**: los 14 modelos heredan el baseline (ya
-acotado a `<5.0.0`) y ninguno necesita `trust_remote_code`. Es el mejor caso
-posible para la validez interna del estudio, porque elimina ese confusor. Si
-la ejecución real del barrido descubriera que algún modelo no carga ni con el
-baseline acotado, la corrección va en los campos `transformers_pin` /
-`trust_remote_code` / `motivo_pin` de `src/models_2026.py` y en una fila de
-esta tabla, en el mismo commit — el test
-`test_todo_pin_divergente_esta_justificado_en_el_readme` no deja que una cosa
-avance sin la otra.
+### Grupo B -- `TRANSFORMERS_5X = "transformers>=5.0.0"`, resuelve 5.14.1 (4 modelos)
 
-> Nota informativa: Gemma 3 requiere `transformers >= 4.50.0`; cubierto por el
-> baseline `transformers>=4.57.0,<5.0.0`. No es un pin divergente —
-> `gemma-3-270m-it` hereda el baseline igual que los demás.
+| Modelo | ¿Necesario? | Evidencia (`motivo_pin` de `src/models_2026.py`) |
+|---|---|---|
+| `LFM2.5-230M` | **si** | Necesario: falla bajo transformers 4.57.6 con ValueError 'Tokenizer class TokenizersBackend does not exist or is not currently imported'. PROBE_OK en 5.14.1 (.claude-scratch/logs/probe5x.log). |
+| `LFM2.5-350M` | **si** | Necesario: falla bajo transformers 4.57.6 con ValueError 'Tokenizer class TokenizersBackend does not exist or is not currently imported'. PROBE_OK en 5.14.1 (.claude-scratch/logs/probe5x.log). |
+| `Qwen3.5-0.8B` | **si** | Necesario: falla bajo transformers 4.57.6 con ValueError "You can update Transformers with the command 'pip install --upgrade transformers'..." (.claude-scratch/logs/probe.log). |
+| `Qwen3.5-2B` | **si** | Necesario: falla bajo transformers 4.57.6 con ValueError "You can update Transformers with the command 'pip install --upgrade transformers'..." (.claude-scratch/logs/probe.log). Su confirmacion positiva bajo 5.14.1 queda **pendiente**: la sonda no llego a correr por el bloqueo de infraestructura de Docker (ver abajo); la evidencia negativa bajo 4.57.6 ya alcanza para fijar el pin. |
+
+**La evidencia clave.** El grupo B resuelve a `transformers 5.14.1`, que es precisamente la version
+que rompe a `granite-4.0-350m` (grupo A). Es la prueba mas limpia posible de que ninguna version
+mayor unica cubre el roster: 4.57.6 y 5.14.1 son ambas necesarias y mutuamente excluyentes. La
+premisa del commit `d6c7581` (que una unica version mayor elimina el confusor) queda refutada por
+esto, y el confusor "versiones de libreria divergentes entre modelos" se declara en metodologia y
+en Amenazas a la Validez del paper, no se descarta.
+
+## Exclusiones del roster activo
+
+| Modelo | Endpoint que devolvio 403 | Fecha |
+|---|---|---|
+| `google/gemma-3-270m-it` | `/google/gemma-3-270m-it/resolve/main/config.json` | 2026-08-03 |
+| `meta-llama/Llama-3.2-1B-Instruct` | `/meta-llama/Llama-3.2-1B-Instruct/resolve/main/config.json` | 2026-08-03 |
+
+Los dos repos estan marcados `gated: "manual"`: el token es valido (verificado con `whoami-v2` y
+con `/api/models/<id>`, ambos 200), pero el unico endpoint que prueba acceso de DESCARGA es
+`/<id>/resolve/<rev>/<archivo>`, y ese devuelve 403 para los dos. Permanecen en `MODELOS_2026`
+(`gated=True`, `activo=False`) para que reactivarlos, si la aprobacion llega, sea un cambio de flag
+y no una reescritura de codigo.
 
 ## Credenciales de los modelos gated
 
-Dos modelos del roster son *gated*: `google/gemma-3-270m-it` y
-`meta-llama/Llama-3.2-1B-Instruct` (columna "¿Gated?" de la tabla). El token
+El roster activo tiene **cero** modelos gated; esta sección describe la plomería que se conserva por
+si se reactiva alguno de los dos excluidos: `google/gemma-3-270m-it` y
+`meta-llama/Llama-3.2-1B-Instruct`. El token
 de Hugging Face vive **solo** en `.env` en la raíz del repo (ignorado por
 git) y se inyecta **únicamente en tiempo de ejecución**, vía
-`docker run --env-file .env`, y **solo** a esas dos imágenes; las otras 12
+`docker run --env-file .env`, y **solo** a esas dos imágenes si se reactivan; las otras 12
 corren sin credenciales.
 
 Prohibido: declarar `HF_TOKEN` como `ARG` o como `ENV` en `Dockerfile.modelo`,
@@ -101,11 +90,19 @@ Formato de `.env` en la raíz del repo (nunca se versiona):
 
 ## Uso
 
-    python docker/build_all.py            # construye las 14 imágenes
+    python docker/build_all.py            # construye las 12 imágenes del roster activo
     python docker/run_sweep.py            # corre el barrido completo, de a una
     python docker/run_sweep.py --desde "Qwen3.5-2B"   # retoma tras una interrupción
+    python docker/build_all.py --modelo "gemma-3-270m-it"   # falla: ValueError con el motivo_exclusion
 
 El barrido es reanudable en dos niveles (RF3): `src/run_sweep_2026.py` saltea
 solo los modelos cuyo CSV de detalle ya está completo y bien formado, y
 `--desde` permite además arrancar directamente en el modelo que falló, sin
 volver a levantar los contenedores anteriores.
+
+**Bloqueo de infraestructura (2026-08-03).** El almacenamiento del daemon de
+Docker quedó en modo solo lectura (`mkdir .../overlay2/...-init: read-only
+file system`), así que la reconstrucción real de las 4 imágenes del grupo B
+con el pin nuevo queda pendiente hasta que se repare Docker Desktop. No
+afecta al código, a los tests ni a esta matriz, que son independientes de
+Docker.
