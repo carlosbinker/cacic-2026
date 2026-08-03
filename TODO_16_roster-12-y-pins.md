@@ -39,6 +39,14 @@ como tales en ningún lado):
    con la misma información que la futura `tabla5_versiones.tex` del subtask 11 (columna
    `¿necesario?` incluida).
 
+**Bloqueo de infraestructura (2026-08-03).** El daemon de Docker dejó su almacenamiento en modo
+solo lectura (`mkdir .../overlay2/...-init: read-only file system`,
+`write .../buildkit/snapshots.db: read-only file system`): ningún `docker build`/`docker run` puede
+correr mientras persista. Esto bloquea **únicamente** la Tarea 6 (reconstrucción de las 4 imágenes
+del grupo B). Las Tareas 1–5 y 7 — código de `src/models_2026.py`, `docker/build_all.py`,
+`docker/run_sweep.py`, `docker/README.md`, los tests nuevos y `pytest -q` — no dependen de Docker y
+pueden completarse ahora.
+
 Diseña estrictamente contra los contratos re-congelados del índice: **F3** (`src/models_2026.py`,
 §4), **F5** (invariante versión↔CSV), **F8** (`tabla5_versiones.tex` desde `roster_activo()`) y
 **F11** (Docker, selección por defecto = `roster_activo()`).
@@ -549,6 +557,11 @@ Diseña estrictamente contra los contratos re-congelados del índice: **F3** (`s
 
 > Exención de TDD: es una operación de build, no comportamiento nuevo. La cache de pip para
 > `transformers>=5.0.0` ya está poblada (sonda de confirmación de Phase 3), así que es rápido.
+
+> **Bloqueada por infraestructura.** El almacenamiento del daemon de Docker está en modo solo
+> lectura (ver "Bloqueo de infraestructura" en la Spec de arriba): ningún `docker build` puede
+> correr hasta que Docker Desktop se repare. Esta tarea queda pendiente hasta entonces; no afecta a
+> las Tareas 1–5 ni 7, que son independientes de Docker.
 
 - [ ] Reconstruir las 4 imágenes del grupo B, una por una:
 

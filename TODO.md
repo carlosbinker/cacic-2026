@@ -463,6 +463,15 @@ cubre el roster. La premisa de `d6c7581` (que una única versión mayor elimina 
 por lo tanto refutada, y el confusor "versiones de librería divergentes entre modelos" se declara,
 no se descarta.
 
+**Confirmación positiva bajo 5.14.1, por modelo (actualizado, ver
+`.claude-scratch/logs/probe5x.log`).** `LFM2.5-230M`, `LFM2.5-350M` y `Qwen3.5-0.8B` tienen
+`PROBE_OK` confirmado bajo 5.14.1, modo `chat_template`. La confirmación positiva de `Qwen3.5-2B`
+bajo 5.14.1 queda **pendiente**: su sonda nunca llegó a correr porque el almacenamiento del daemon
+de Docker quedó en modo solo lectura a mitad de ronda — un bloqueo de infraestructura, **no**
+evidencia sobre el modelo. Su evidencia negativa bajo 4.57.6 sí existe. Los cuatro modelos del
+grupo B mantienen su pin sin cambios: los cuatro tienen evidencia negativa propia bajo 4.57.6, y esa
+evidencia por sí sola ya hace necesario el grupo B para los cuatro.
+
 ### F4 — Vocabularios cerrados: `src/taxonomia_2026.py`
 
 ```python

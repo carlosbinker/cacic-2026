@@ -39,6 +39,28 @@ Si un modelo falla de forma irrecuperable, **no** se lo silencia ni se lo elimin
 
 ### Tarea 1 — Preparación
 
+- [ ] **Gate bloqueante — Docker Desktop reparado y con almacenamiento en modo escritura.** El
+  daemon quedó con su almacenamiento en solo lectura a mitad de ronda de sondeo:
+  ```
+  mkdir /var/lib/docker/overlay2/...-init: read-only file system
+  write /var/lib/docker/buildkit/snapshots.db: read-only file system
+  ```
+  En ese estado ninguna imagen se puede construir ni correr (un contenedor puede incluso figurar
+  `Up` mientras el mismo daemon responde `container ... is not running`). No arrancar el barrido
+  hasta reiniciar Docker Desktop o recuperar/agrandar su disco virtual, y confirmar que un `docker
+  run` trivial funciona.
+- [ ] **Gate bloqueante — confirmación positiva de `Qwen3.5-2B` bajo 5.14.1.** Su sonda nunca llegó
+  a correr (bloqueada por el gate anterior); todavía no hay evidencia positiva propia. Antes de
+  arrancar el barrido:
+  ```bash
+  docker run --rm -v <repo>/.hf_cache:/app/.hf_cache \
+    -v <repo>/.claude-scratch/probe.py:/app/probe.py \
+    slm-domotica-2026:qwen3-5-2b python /app/probe.py "Qwen3.5-2B"
+  ```
+  Se espera `PROBE_OK|Qwen3.5-2B|5.*|chat_template`. Si esa sonda falla también bajo 5.14.1,
+  `Qwen3.5-2B` no correría bajo ninguna versión mayor y **eso es una decisión del usuario** —
+  sacarlo del roster activo (queda en 11) o abrir un tercer grupo de versión con su propio confusor
+  declarado — nunca algo que se resuelva inventando un tercer grupo por cuenta propia.
 - [ ] **Confirmar que el roster activo no necesita credenciales.** El roster activo
   (`roster_activo()`) tiene cero modelos `gated`, así que este barrido **no** requiere `.env` ni
   `$HF_TOKEN`:
