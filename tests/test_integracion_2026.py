@@ -11,7 +11,7 @@ import pytest
 RAIZ = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RAIZ / "src"))
 
-from models_2026 import MODELOS_2026, roster_activo  # noqa: E402
+from models_2026 import roster_activo  # noqa: E402
 from taxonomia_2026 import (  # noqa: E402
     CATEGORIAS_LINGUISTICAS,
     ETIQUETAS_ERROR,
@@ -72,9 +72,9 @@ def test_las_categorias_cubren_los_32_comandos_una_sola_vez():
 
 
 @requiere_resumen
-def test_la_exactitud_laxa_domina_a_la_estricta_en_los_14_modelos():
+def test_la_exactitud_laxa_domina_a_la_estricta_en_el_roster_activo():
     resumen = json.loads(RESUMEN.read_text(encoding="utf-8"))
-    assert [f["modelo"] for f in resumen] == [m.nombre for m in MODELOS_2026]
+    assert [f["modelo"] for f in resumen] == [m.nombre for m in roster_activo()]
     for fila in resumen:
         estricta, laxa = fila["exact_match_pct"], fila["exact_match_laxo_pct"]
         assert 0 <= estricta <= 100, f"{fila['modelo']}: estricta fuera de rango"
