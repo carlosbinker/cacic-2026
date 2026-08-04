@@ -91,11 +91,39 @@ def test_fila_modelo_con_datos_reales_de_un_ancla_ya_corrida():
     assert fila["efecto_prompt_exact_match_pp"] == round(9.4 - 0.0, 1)
 
 
-def test_fila_modelo_reporta_pendiente_la_celda_que_todavia_no_existe():
-    """Qwen2.5-0.5B-Instruct todavía no tiene su CSV bajo el prompt original
-    (lo agrega el orquestador después de este reporte): la fila no debe
-    crashear, tiene que reportarlo como pendiente (None)."""
-    fila = cb.fila_modelo(por_nombre("Qwen2.5-0.5B-Instruct"))
+def test_fila_modelo_reporta_pendiente_la_celda_que_todavia_no_existe(tmp_path, monkeypatch):
+    """Cuando un modelo aún no tiene su CSV bajo un prompt, la fila no debe
+    crashear: tiene que reportarlo como pendiente (None). Esta prueba usa una
+    matriz sintética en vez de datos reales para que no dependa de que una
+    celda real esté ausente (las celdas reales pueden completarse en cualquier
+    momento)."""
+    # Monkeypatch directory paths to use tmp_path
+    monkeypatch.setattr(cb, "DIR_CONTROL", tmp_path / "control_prompt_original")
+    monkeypatch.setattr(cb, "DIR_BASELINE", tmp_path / "baseline_original")
+    monkeypatch.setattr(cb, "DIR_DETALLE", tmp_path / "detalle")
+
+    # Create directories
+    (tmp_path / "control_prompt_original").mkdir()
+    (tmp_path / "baseline_original").mkdir()
+    (tmp_path / "detalle").mkdir()
+
+    # Create synthetic data for prompt_2026 (baseline_original/)
+    # To get exact_match_pct == 21.9, we need 7 exact matches out of 32:
+    # 7/32 * 100 = 21.875 → rounds to 21.9
+    df_baseline = pd.DataFrame([
+        {"match_exact": i < 7, "json_valido": True}
+        for i in range(32)
+    ])
+    (tmp_path / "baseline_original" / "qwen2-5-0-5b-instruct.csv").write_text(
+        df_baseline.to_csv(index=False),
+        encoding="utf-8"
+    )
+
+    # No CSV in control_prompt_original/ for this model, so prompt_original is None
+
+    # Test the fila_modelo function
+    modelo = por_nombre("Qwen2.5-0.5B-Instruct")
+    fila = cb.fila_modelo(modelo)
     assert fila["prompt_original"] is None
     assert fila["prompt_2026"] is not None
     assert fila["prompt_2026"]["exact_match_pct"] == 21.9
