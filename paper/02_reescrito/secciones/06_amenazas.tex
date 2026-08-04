@@ -11,9 +11,11 @@ cuánta exactitud estricta perdida corresponde a \texttt{uso\_de\_sinonimos} o
 a \texttt{sin\_error\_semantico} en lugar de a un error de contenido real. La
 brecha sigue siendo una cota superior semántica, no una medición
 independiente con un evaluador humano, y la Sección 4.4 mostró que esta
-métrica laxa es a su vez poco confiable donde la validez de formato es débil
-(ver más abajo, amenaza de validez interna sobre el sesgo del juez y la
-fragilidad de \texttt{SmolLM2-360M-Instruct}).
+métrica laxa es a su vez poco confiable donde la validez de formato es débil:
+24 de las 27 respuestas que la métrica laxa acreditó a
+\texttt{SmolLM2-360M-Instruct} tenían JSON inválido (ver más abajo, amenaza de
+validez interna sobre el sesgo del juez y la fragilidad de
+\texttt{SmolLM2-360M-Instruct}).
 
 \textbf{Validez interna.}
 
