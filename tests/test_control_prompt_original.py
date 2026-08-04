@@ -16,6 +16,7 @@ run_control_prompt_original.py`), luego el runner host-side
 bandas (`src/comparar_control.py`).
 """
 
+import json
 import sys
 from pathlib import Path
 
@@ -31,6 +32,7 @@ from prompt_2026 import SYSTEM_PROMPT_2026, construir_entrada_con_prompt  # noqa
 
 import run_sweep_2026  # noqa: E402
 import run_control_prompt_original as rcpo  # noqa: E402
+import run_control  # noqa: E402
 
 RAIZ = Path(__file__).resolve().parent.parent
 
@@ -249,3 +251,140 @@ def test_el_modulo_de_control_se_importa_sin_torch_ni_transformers():
     for linea in fuente.splitlines():
         if linea.startswith(("import ", "from ")):
             assert "torch" not in linea and "transformers" not in linea, linea
+
+
+# --------------------------------------------------------------------------
+# Task 2: docker/run_control.py
+# --------------------------------------------------------------------------
+
+def test_modelos_control_son_los_tres_anclajes_en_orden_fijo():
+    nombres = [m.nombre for m in run_control.modelos_control()]
+    assert nombres == list(rcpo.ANCLAS_CONTROL)
+
+
+def test_comando_run_control_respeta_el_mismo_envolvente_de_recursos():
+    modelo = por_nombre("SmolLM2-360M-Instruct")
+    cmd = run_control.comando_run_control(modelo, RAIZ)
+    assert "--memory=8g" in cmd and "--cpus=2" in cmd
+    assert f"--cpuset-cpus={run_control.CPUSET_POR_DEFECTO}" in cmd
+    assert run_control.CPUSET_POR_DEFECTO == "0-1"
+    assert "--rm" in cmd
+
+
+def test_comando_run_control_monta_datos_y_cache_compartida():
+    cmd = run_control.comando_run_control(por_nombre("SmolLM2-360M-Instruct"), RAIZ)
+    montajes = [cmd[i + 1] for i, a in enumerate(cmd) if a == "-v"]
+    assert any(m.endswith(":/app/data") for m in montajes)
+    assert any(m.endswith(":/app/.hf_cache") for m in montajes)
+
+
+def test_comando_run_control_no_usa_env_file_ninguno_de_los_tres_es_gated():
+    for nombre in rcpo.ANCLAS_CONTROL:
+        cmd = run_control.comando_run_control(por_nombre(nombre), RAIZ)
+        assert "--env-file" not in cmd
+
+
+def test_comando_run_control_invoca_el_entrypoint_de_control_no_el_del_barrido():
+    modelo = por_nombre("SmolLM2-360M-Instruct")
+    cmd = run_control.comando_run_control(modelo, RAIZ)
+    assert cmd[-3:] == ["src/run_control_prompt_original.py", "--modelo", modelo.nombre]
+
+
+def test_comando_run_control_reusa_la_imagen_ya_construida_sin_rebuild():
+    from build_all import tag_imagen
+    modelo = por_nombre("Qwen2.5-1.5B-Instruct")
+    cmd = run_control.comando_run_control(modelo, RAIZ)
+    assert tag_imagen(modelo) in cmd
+    assert tag_imagen(modelo) == "slm-domotica-2026:qwen2-5-1-5b-instruct"
+    assert cmd[:2] == ["docker", "run"], "la corrida de control nunca hace build"
+
+
+def test_dry_run_imprime_tres_comandos_con_el_mismo_envolvente_de_recursos(capsys):
+    codigo = run_control.ejecutar_control(run_control.modelos_control(), force=False, dry_run=True)
+    assert codigo == 0
+    lineas_comando = [
+        linea for linea in capsys.readouterr().out.splitlines() if linea.startswith("docker run")
+    ]
+    assert len(lineas_comando) == 3
+    for linea in lineas_comando:
+        assert "--memory=8g" in linea and "--cpus=2" in linea
+        assert "--cpuset-cpus=0-1" in linea
+
+
+def test_ejecutar_control_no_corta_al_primer_fallo_y_registra_verbatim(monkeypatch, tmp_path):
+    corridos = []
+    objetivo = run_control.modelos_control()[1].nombre
+
+    def falso_correr_modelo(modelo, _posicion, _force, _dry_run, _cpuset):
+        corridos.append(modelo.nombre)
+        return (1, "boom textual") if modelo.nombre == objetivo else (0, "")
+
+    monkeypatch.setattr(run_control, "_correr_modelo", falso_correr_modelo)
+    monkeypatch.setattr(run_control, "_csv_ya_completo", lambda _ruta: False)
+    monkeypatch.setattr(run_control, "FALLOS_PATH", tmp_path / "fallos_control.json")
+
+    codigo = run_control.ejecutar_control(run_control.modelos_control(), force=False, dry_run=False)
+    assert codigo == 1
+    assert corridos == [m.nombre for m in run_control.modelos_control()]
+
+    fallos = json.loads((tmp_path / "fallos_control.json").read_text(encoding="utf-8"))
+    assert len(fallos) == 1
+    assert fallos[0]["modelo"] == objetivo
+    assert fallos[0]["error_textual"] == "boom textual"
+    assert set(fallos[0]) == {
+        "modelo", "hf_repo_id", "transformers_pin", "codigo_salida", "error_textual", "momento_iso",
+    }
+
+
+def test_ejecutar_control_sin_fallos_escribe_lista_vacia_siempre(monkeypatch, tmp_path):
+    monkeypatch.setattr(run_control, "_correr_modelo", lambda *_a, **_k: (0, ""))
+    monkeypatch.setattr(run_control, "_csv_ya_completo", lambda _ruta: False)
+    monkeypatch.setattr(run_control, "FALLOS_PATH", tmp_path / "fallos_control.json")
+    assert run_control.ejecutar_control(run_control.modelos_control(), force=False, dry_run=False) == 0
+    assert json.loads((tmp_path / "fallos_control.json").read_text(encoding="utf-8")) == []
+
+
+def test_dry_run_no_escribe_fallos_control(monkeypatch, tmp_path):
+    monkeypatch.setattr(run_control, "FALLOS_PATH", tmp_path / "fallos_control.json")
+    assert run_control.ejecutar_control(run_control.modelos_control(), force=False, dry_run=True) == 0
+    assert not (tmp_path / "fallos_control.json").exists()
+
+
+def test_ejecutar_control_saltea_un_anclaje_con_csv_ya_completo(monkeypatch, tmp_path):
+    monkeypatch.setattr(run_control, "FALLOS_PATH", tmp_path / "fallos_control.json")
+    llamados = []
+    modelos = run_control.modelos_control()
+    completo = modelos[0].nombre
+
+    def falso_correr_modelo(modelo, *_a, **_k):
+        llamados.append(modelo.nombre)
+        return 0, ""
+
+    monkeypatch.setattr(run_control, "_correr_modelo", falso_correr_modelo)
+    monkeypatch.setattr(run_control, "ruta_control", lambda nombre: tmp_path / f"{slug(nombre)}.csv")
+    monkeypatch.setattr(run_control, "_csv_ya_completo",
+                        lambda ruta: ruta.name == f"{slug(completo)}.csv")
+
+    codigo = run_control.ejecutar_control(modelos, force=False, dry_run=False)
+    assert codigo == 0
+    assert completo not in llamados
+    assert len(llamados) == len(modelos) - 1
+
+
+def test_ejecutar_control_con_force_no_saltea_aunque_este_completo(monkeypatch, tmp_path):
+    monkeypatch.setattr(run_control, "FALLOS_PATH", tmp_path / "fallos_control.json")
+    llamados = []
+    monkeypatch.setattr(run_control, "_correr_modelo",
+                        lambda modelo, *_a, **_k: (llamados.append(modelo.nombre), (0, ""))[1])
+    monkeypatch.setattr(run_control, "_csv_ya_completo", lambda _ruta: True)
+    modelos = run_control.modelos_control()
+    codigo = run_control.ejecutar_control(modelos, force=True, dry_run=False)
+    assert codigo == 0
+    assert len(llamados) == len(modelos)
+
+
+def test_no_hay_credenciales_en_run_control():
+    import re
+    fuente = (RAIZ / "docker" / "run_control.py").read_text(encoding="utf-8")
+    assert not re.search(r"hf_[A-Za-z0-9]{20,}", fuente)
+    assert "ARG HF_TOKEN" not in fuente and "ENV HF_TOKEN" not in fuente
