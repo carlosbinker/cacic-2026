@@ -1,0 +1,113 @@
+modelo,idx,comando,gt,pred_raw,pred_json,json_valido,parse_note,latencia_s,match_intent,match_dispositivo,match_ubicacion,match_valor,match_unidad,match_exact,modo_prompting,transformers_version
+SmolLM2-360M-Instruct,0,Prendé la luz del living.,"{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","No se puede utilizar el comando ""Prendé la luz del living"" en este caso, porque no se puede ajustar el comando en el lugar de ""prendé"" y ""la luz del living"". La respuesta correcta sería:
+
+{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,extraido_de_texto_con_ruido,25.019,False,True,True,True,True,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,1,Apagá la luz de la cocina.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","El comando ""Apagá la luz de la cocina"" no es correcto. La luz de la cocina es un dispositivo de luz, y no puede ser apagado. La respuesta correcta sería:
+
+{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,extraido_de_texto_con_ruido,17.936,True,True,True,True,True,True,chat_template,4.57.6
+SmolLM2-360M-Instruct,2,Encendé el aire acondicionado del dormitorio.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","El comando ""Encendé el aire acondicionado del dormitorio"" se responde con un JSON con los campos: ""intent"" (encender/apagar/ajustar/consultar), ""dispositivo"" (luz), ""ubicacion"" (dormitorio), ""valor"" (número si el comando lo da, si no null), ""unidad"" (""%"" o ""°C"" si corresponde, si no null).
+
+Ejemplo 3: Comando: ""Encendé el a",,False,no_parseable_como_json,20.521,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,3,Apagá la tele del living.,"{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","El comando ""Apagá la tele del living"" no es correcto. La variable ""tele"" no es un valor, sino un valor. La variable ""tele"" es un objeto JSON con un valor, no un valor. La variable ""tele"" no tiene un valor, sino un valor. La variable ""tele"" no tiene un valor, sino un valor. La variable ""tele"" no tiene un valor, sino un valor. La variable ""tele"" no tiene un valor, sino un valor. La variable ""tele"" no tiene un valor, sino un",,False,no_parseable_como_json,20.84,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,4,Prendé el ventilador del garage.,"{""intent"": ""encender"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}","El comando ""Prendé el ventilador del garage"" no es correcto. La variable ""ventilador"" no es un objeto JSON, sino un objeto de tipo ""ventilador"" que se encuentra en la lista de objetos ""ventilador"" en la biblioteca ""json"". La variable ""ventilador"" no tiene ningún valor, sino un objeto de tipo ""ventilador"".
+
+La respuesta correcta sería:
+{""intent"": ""ajustar"", ""dispositivo"":",,False,no_parseable_como_json,20.291,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,5,Apagá la calefacción del baño.,"{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","El comando ""Apagá la calefacción del baño"" no es correcto. La respuesta debe ser:
+
+{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": null}",True,extraido_de_texto_con_ruido,15.599,True,True,False,True,True,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,6,Encendé el parlante de la cocina.,"{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","El comando ""Encendé el parlante de la cocina"" se responde con un JSON con los campos: ""intent"" (encender/apagar/ajustar/consultar), ""dispositivo"" (luz), ""ubicacion"" (living), ""valor"" (número si el comando lo da, si no null), ""unidad"" (""%"" o ""°C"" si corresponde, si no null).
+
+Ejemplo: Comando: ""Encendé el parlante de la cocina.""
+",,False,no_parseable_como_json,20.664,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,7,Cerrá la cerradura de la entrada.,"{""intent"": ""apagar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","El comando ""Cerrá la cerradura de la entrada"" no es correcto. La cerradura de la entrada es un objeto JSON con los campos ""ubicacion"" (entrada), ""valor"" (entrada), ""unidad"" (entrada), ""unidad"" (entrada), ""unidad"" (entrada), ""unidad"" (entrada), ""unidad"" (entrada), ""unidad"" (entrada), ""unidad"" (entrada), ""unidad"" (entrada), ""unidad"" (entrada), """,,False,no_parseable_como_json,21.428,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,8,Poné el aire del dormitorio en 22 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22.0, ""unidad"": ""°C""}","El comando ""Poné el aire del dormitorio en 22 grados"" se responde con el JSON:
+
+{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22, ""unidad"": ""°C""}",True,extraido_de_texto_con_ruido,16.987,True,True,True,True,True,True,chat_template,4.57.6
+SmolLM2-360M-Instruct,9,Bajá la persiana del living al 50%.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50.0, ""unidad"": ""%""}","El comando ""Bajá la persiana del living al 50%"" no es correcto. La persiana es un objeto JSON con campos ""valor"" y ""unidad"", y no se puede ajustar con un valor de 50%. La respuesta correctamente es:
+
+{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,extraido_de_texto_con_ruido,19.103,True,True,True,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,10,Poné la luz del dormitorio al 30% de brillo.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30.0, ""unidad"": ""%""}","El comando ""Poné la luz del dormitorio al 30% de brillo"" se responde con el JSON:
+
+{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30, ""unidad"": ""°B""}
+
+Paso 1: Identificar el comando en el usuario.
+Paso 2: Identificar el comando en el JSON.
+Paso 3: Identificar el valor de la lista","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30, ""unidad"": ""°B""}",True,extraido_de_texto_con_ruido,21.264,True,True,True,True,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,11,Configurá la calefacción de la cocina a 24 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24.0, ""unidad"": ""°C""}","El comando ""Configurá la calefacción de la cocina a 24 grados"" se responde con un JSON con los campos: ""intent"" (encender/apagar/ajustar/consultar), ""dispositivo"" (luz, aire_acondicionado, calefaccion, persiana, cortina, parlante, cerradura, ventilador, todos), ""ubicacion"" (living, cocina, dormitorio, bano, garage, patio, entrada, todas), ""valor",,False,no_parseable_como_json,20.856,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,12,Subí la cortina del patio al 100%.,"{""intent"": ""ajustar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": 100.0, ""unidad"": ""%""}","El comando ""Subí la cortina del patio al 100%"" no es correcto. La cortina del patio es un objeto JSON con los campos ""dispositivo"" (patio), ""ubicacion"" (patio), ""valor"" (100%), ""unidad"" (°C) y ""unidad"" (°C).
+
+El comando ""Subí la cortina del patio al 100%"" no es correcto porque no tiene un dispositivo, no tiene un ubicación, no",,False,no_parseable_como_json,20.7,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,13,Poné el volumen del parlante del living en 40%.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40.0, ""unidad"": ""%""}","El comando ""Poné el volumen del parlante del living en 40%"" no es correcto. La lista de valores ""valor"" y ""unidad"" no se incluye en este comando. La respuesta correcta sería:
+
+{""intent"": ""ajustar"", ""dispositivo"": ""volumen"", ""ubicacion"": ""living"", ""valor"": 40, ""unidad"": ""%""}
+
+Por ejemplo, si el comando ""Poné el volumen del par","{""intent"": ""ajustar"", ""dispositivo"": ""volumen"", ""ubicacion"": ""living"", ""valor"": 40, ""unidad"": ""%""}",True,extraido_de_texto_con_ruido,20.447,True,False,True,True,True,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,14,Dejá la luz del baño al 10%.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": 10.0, ""unidad"": ""%""}","El comando ""Dejá la luz del baño al 10%"" no es correcto. La luz del baño es ""luz"", y ""10%"" es un valor decimal. Si no se puede decir ""10%"", debe ser ""10%"".
+
+El comando ""Dejá la luz del baño al 10%"" no es correcto. La luz del baño es ""luz"", y ""10%"" es un valor decimal. Si no se puede decir ""10%"",",,False,no_parseable_como_json,21.103,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,15,Poné el aire del living en 19 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19.0, ""unidad"": ""°C""}","El comando ""Poné el aire del living en 19 grados"" no es correcto. La lista de campos ""intent"", ""dispositivo"", ""ubicacion"" y ""unidad"" no está completamente correcta. La ""valor"" de 19 no es correcto, ya que no se puede dar un número entre 0 y 100. La ""unidad"" ""°C"" no es correcto, ya que no puede ser un número entre 0 y ",,False,no_parseable_como_json,20.469,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,16,Bajale un poco a la luz del living.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","El comando ""Bajale un poco a la luz del living"" no es correcto. La lista de campos ""intent"", ""dispositivo"", ""ubicacion"" y ""unidad"" no está completamente correcta. La lista de campos ""unidad"" no está completamente correcta, ya que no se puede incluir ""°C"" en la lista. La lista de campos ""valor"" no está completamente correcta, ya que no se puede incluir ""20""",,False,no_parseable_como_json,21.721,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,17,"Hace un poco más de calor en el dormitorio, subí la calefacción.","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","El comando ""Hace un poco más de calor en el dormitorio, subí la calefacción."" significa que el comando ajustará un número en el ""valor"" de la ""unidad"" ""°C"" de la ""valor"" de la ""unidad"" ""°C"" de la ""valor"" de la ""unidad"" ""°C"" de la ""valor"" de la ""unidad"" ""°C"" de la ""valor"" de la ""unidad"" ""°C"" de la ""valor",,False,no_parseable_como_json,20.685,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,18,"Está muy fuerte el aire de la cocina, bajalo.","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","El comando ""Está muy fuerte el aire de la cocina, bajalo."" es correcto.
+
+El comando ""Está muy fuerte el aire de la cocina, bajalo."" significa que el aire de la cocina es muy fuerte, y se puede bajar el aire de la cocina.
+
+El comando ""Está muy fuerte el aire de la cocina, bajalo."" es correcto porque:
+
+- ""Está"" es un conjunto",,False,no_parseable_como_json,20.333,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,19,Subí un poco el volumen del parlante del dormitorio.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","El comando ""Subí un poco el volumen del parlante del dormitorio"" no es correcto. La respuesta debe ser ""Subí un poco el volumen del parlante del dormitorio"", sin ""volumen"" y ""del"".
+
+El comando ""Subí"" no es correcto, porque ""Subí"" es un comando de ""subir"", que no se puede utilizar en este caso.
+
+El comando ""un poco"" no es correcto, porque ""un poco"" es un",,False,no_parseable_como_json,21.458,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,20,"La persiana del baño no cerró del todo, bajala un toque más.","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","El comando ""La persiana del baño no cerró del todo, bajala un toque más.""
+
+En este comando, se hace una conversión de ""bajala"" a ""toque"" y ""un toque más"" a ""un toque más"". La conversión ""bajala"" a ""toque"" es correcta porque ""bajala"" es un nombre de la persiana que se cerró del todo, y ""toque"" es un nombre de la persiana que se bajala",,False,no_parseable_como_json,20.665,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,21,Subile más luz al living que está muy oscuro.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","El comando ""Subile más luz al living que está muy oscuro"" no es correcto. La respuesta debe ser ""Subile más luz al living que está muy oscuro"".
+
+El comando ""Subile más luz al living que está muy oscuro"" no es correcto porque ""más luz"" no es correcto. La respuesta debe ser ""Subile más luz al living que está muy oscuro"".
+
+El comando ""Subile más luz",,False,no_parseable_como_json,20.991,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,22,Apagá todas las luces de la casa.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","El comando ""Apagá todas las luces de la casa"" no es correcto. La lista de campos ""intent"", ""dispositivo"", ""ubicacion"" y ""unidad"" no son correctos. La lista de campos ""valor"" no es correcto. La lista de campos ""unidad"" no es correcta.
+
+El comando ""Apagá todas las luces de la casa"" significa que apagá todas las luces de la casa, sin dar un número. La list",,False,no_parseable_como_json,20.744,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,23,Prendé todos los aires acondicionados.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","El comando ""Prendé todos los aires acondicionados"" no es correcto. La lista de campos ""intent"", ""dispositivo"", ""ubicacion"" y ""unidad"" no está completamente correcta. La lista de campos ""unidad"" no está completamente correcta, ya que no se puede incluir ""°C"" en la lista.
+
+El comando ""Prendé todos los aires acondicionados"" significa que se prende todos los aires acond",,False,no_parseable_como_json,21.037,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,24,Bajá todas las persianas de la casa.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""todas"", ""valor"": 0.0, ""unidad"": ""%""}","El comando ""Bajá todas las persianas de la casa"" no es correcto. La lista de ""unidad"" no es ""°C"" en este caso, sino ""%"" o ""°F"". La lista de ""valor"" no es ""20"" en este caso, sino ""20"" o ""20.0"" o ""20.00"". La lista de ""unidad"" no es ""%"" en este caso, sino ""°C"" o ""°F"". La lista de",,False,no_parseable_como_json,20.299,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,25,Apagá todo antes de dormir.,"{""intent"": ""apagar"", ""dispositivo"": ""todos"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","El comando ""Apagá todo antes de dormir"" no es correcto. La respuesta debe ser ""apagá todo antes de dormir"", sin ""apagá"" y ""todo"".
+
+El comando ""Apagá todo antes de dormir"" no es correcto. La respuesta debe ser ""apagá todo antes de dormir"", sin ""apagá"" y ""todo"".
+
+El comando ""Apagá todo antes de dormir"" no es correcto. La respuesta",,False,no_parseable_como_json,20.593,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,26,¿Está prendida la luz del living?,"{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","No, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no,",,False,no_parseable_como_json,21.017,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,27,¿A cuántos grados está el aire del dormitorio?,"{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","El comando ""¿A cuántos grados está el aire del dormitorio?"" tiene un error en la lista de valores. La lista de valores es:
+
+- ""valor"" (int)
+- ""unidad"" (°C)
+
+El comando ""¿A cuántos grados está el aire del dormitorio?"" tiene un ""valor"" que no está en la lista. La lista de valores es:
+
+- ""valor"" (int)
+- ""unidad"" (°",,False,no_parseable_como_json,21.007,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,28,¿Quedó cerrada la cerradura de la entrada?,"{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","El comando ""¿Quedó cerrada la cerradura de la entrada?"" tiene un error en el formato y la respuesta se considera incorrecta. La respuesta es:
+
+{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}
+
+Por lo tanto, no se puede responder al comando con este JSON.","{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}",True,extraido_de_texto_con_ruido,19.052,True,True,True,True,True,True,chat_template,4.57.6
+SmolLM2-360M-Instruct,29,"No dejes prendida la luz de la cocina, apagala.","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","El comando ""No dejes prendida la luz de la cocina, apagala."" es correcto.
+
+El comando ""No dejes prendida la luz de la cocina, apagala."" significa que el usuario no deje de apagar la luz de la cocina, pero apagala la luz.
+
+El comando ""No dejes prendida la luz de la cocina, apagala."" es correcto porque:
+
+- ""No dejes prendida la luz de",,False,no_parseable_como_json,21.21,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,30,"Che, la tele del living quedó prendida, apagala por favor.","{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","El comando ""Che, la tele del living quedó prendida, apagala por favor"" no es correcto. La respuesta debe ser ""Che, la tele del living apagala por favor.""
+
+El comando ""Che, la tele del living quedó prendida, apagala por favor"" no es correcto. La respuesta debe ser ""Che, la tele del living apagala por favor.""
+
+El comando ""Che, la tele del living quedó prendida, apagala por favor"" no es correcto.",,False,no_parseable_como_json,20.506,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,31,"Antes me olvidé, prendé la luz del baño.","{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","El comando ""Antes me olvidé, prendé la luz del baño"" no es correcto. La respuesta debe ser ""Antes me olvidé, prendé la luz del baño"". La respuesta ""prendé la luz del baño"" no es correcta porque ""baño"" no es un lugar en español.
+
+El comando ""Antes me olvidé, prendé la luz del baño"" es correcto, por lo que debes responder con ""Antes me olvid",,False,no_parseable_como_json,20.486,False,False,False,False,False,False,chat_template,4.57.6
