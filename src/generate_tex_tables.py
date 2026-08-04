@@ -315,7 +315,7 @@ def tabla5_versiones() -> str:
     )
 
 
-_ANCHO_VERBATIM = 84  # columnas de \ttfamily\small que entran a ancho LNCS sin overfull
+_ANCHO_VERBATIM = 64  # columnas de \ttfamily\small que entran a ancho LNCS sin overfull
 
 
 def _envolver_para_verbatim(texto: str, ancho: int = _ANCHO_VERBATIM) -> str:

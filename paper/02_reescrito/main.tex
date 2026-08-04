@@ -16,6 +16,12 @@
 
 \hypersetup{pdfauthor={},pdfsubject={},pdfkeywords={}}
 
+% Los identificadores de modelo largos (p.ej. OLMo-2-0425-1B-Instruct) en
+% \texttt{} dentro de prosa justificada producen Overfull \hbox puntuales;
+% \emergencystretch le da a LaTeX margen para estirar espacios en vez de
+% desbordar el margen en esos casos, sin alterar el resto del documento.
+\emergencystretch=3em
+
 \begin{document}
 
 \title{Modelos de Lenguaje Pequeños para la Interpretación de Comandos de
