@@ -53,15 +53,24 @@ def detectar_modo(tokenizer) -> ModoPrompting:
     return "raw_completion" if not plantilla else "chat_template"
 
 
-def construir_entrada(tokenizer, comando: str) -> tuple[dict, ModoPrompting]:
-    """Devuelve (entrada, modo), con entrada apta para modelo.generate(**entrada)."""
+def construir_entrada_con_prompt(tokenizer, comando: str,
+                                 system_prompt: str) -> tuple[dict, ModoPrompting]:
+    """Igual que `construir_entrada`, pero con el prompt de sistema como
+    parámetro en vez de hardcodeado a `SYSTEM_PROMPT_2026`.
+
+    Factorización mínima (Delta 04 / corrida de control): existe para que
+    `src/run_control_prompt_original.py` pueda reusar exactamente la misma
+    lógica de despacho por capacidad (chat_template vs. raw_completion) y
+    sustituir únicamente el texto del prompt, sin copiar esta función. La
+    firma pública de `construir_entrada` (F2, congelada) no cambia.
+    """
     if not comando or not comando.strip():
         raise ValueError(f"Se recibió un comando vacío: {comando!r}")
 
     modo = detectar_modo(tokenizer)
     if modo == "chat_template":
         mensajes = [
-            {"role": "system", "content": SYSTEM_PROMPT_2026},
+            {"role": "system", "content": system_prompt},
             {"role": "user", "content": construir_prompt_usuario(comando)},
         ]
         entrada = tokenizer.apply_chat_template(
@@ -71,6 +80,11 @@ def construir_entrada(tokenizer, comando: str) -> tuple[dict, ModoPrompting]:
             return_dict=True,
         )
     else:
-        texto = RAW_TEMPLATE.format(system=SYSTEM_PROMPT_2026, comando=comando)
+        texto = RAW_TEMPLATE.format(system=system_prompt, comando=comando)
         entrada = tokenizer(texto, return_tensors="pt")
     return entrada, modo
+
+
+def construir_entrada(tokenizer, comando: str) -> tuple[dict, ModoPrompting]:
+    """Devuelve (entrada, modo), con entrada apta para modelo.generate(**entrada)."""
+    return construir_entrada_con_prompt(tokenizer, comando, SYSTEM_PROMPT_2026)

@@ -24,12 +24,12 @@ import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 import pandas as pd
 
 from models_2026 import MODELOS_2026, ModeloEvaluado2026, por_nombre, slug
-from prompt_2026 import construir_entrada
+from prompt_2026 import construir_entrada as _construir_entrada_2026
 from scoring import comparar_campos, extraer_json, fila_a_ground_truth
 
 RAIZ = Path(__file__).resolve().parent.parent
@@ -53,6 +53,13 @@ MODOS_VALIDOS = ("chat_template", "raw_completion")
 # la lógica pura siga siendo testeable sin esas dependencias.
 Tokenizer = Any
 RedCausal = Any
+
+# Constructor de entrada inyectable (Delta 04): por defecto arma la entrada
+# con el prompt 2026 (`prompt_2026.construir_entrada`), igual que siempre.
+# `src/run_control_prompt_original.py` pasa un builder alternativo que solo
+# cambia el prompt de sistema, para que la corrida de control reuse este
+# mismo bucle de inferencia sin copiarlo.
+ConstructorEntrada = Callable[[Tokenizer, str], tuple[dict[str, Any], str]]
 
 
 # --------------------------------------------------------------------------
@@ -211,8 +218,9 @@ def _generar_respuesta(ctx: ContextoInferencia,
     return texto, latencia_s
 
 
-def _evaluar_comando(ctx: ContextoInferencia, idx: int,
-                     fila_ds: pd.Series) -> dict[str, Any]:
+def _evaluar_comando(ctx: ContextoInferencia, idx: int, fila_ds: pd.Series,
+                     construir_entrada: ConstructorEntrada = _construir_entrada_2026,
+                     ) -> dict[str, Any]:
     """Corre un comando del dataset y devuelve su fila de detalle."""
     comando = fila_ds["comando"]
     entrada, modo = construir_entrada(ctx.tokenizer, comando)
@@ -229,15 +237,22 @@ def _evaluar_comando(ctx: ContextoInferencia, idx: int,
     )
 
 
-def evaluar_modelo(modelo: ModeloEvaluado2026,
-                   dataset: pd.DataFrame) -> list[dict[str, Any]]:
-    """Evalúa el modelo sobre todo el dataset y devuelve las 32 filas."""
+def evaluar_modelo(modelo: ModeloEvaluado2026, dataset: pd.DataFrame,
+                   construir_entrada: ConstructorEntrada = _construir_entrada_2026,
+                   ) -> list[dict[str, Any]]:
+    """Evalúa el modelo sobre todo el dataset y devuelve las 32 filas.
+
+    `construir_entrada` por defecto es el prompt 2026 (barrido principal); la
+    corrida de control (Delta 04) pasa un builder que solo cambia el prompt
+    de sistema, dejando el resto del bucle -- carga, decodificación greedy,
+    scoring -- idéntico (invariante de diseño de la corrida de control).
+    """
     verificar_credencial_gated(modelo)  # F11: antes de descargar/cargar pesos
     ctx = _abrir_contexto(modelo)
 
     filas: list[dict[str, Any]] = []
     for idx, fila_ds in dataset.iterrows():
-        fila = _evaluar_comando(ctx, int(idx), fila_ds)
+        fila = _evaluar_comando(ctx, int(idx), fila_ds, construir_entrada)
         filas.append(fila)
         print(f"  [{fila['idx']:2d}] exact={fila['match_exact']} "
               f"lat={fila['latencia_s']:.2f}s modo={fila['modo_prompting']} "
