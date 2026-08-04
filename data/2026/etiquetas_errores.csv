@@ -154,3 +154,6 @@ LFM2.5-1.2B-Instruct,24,uso_de_sinonimos,uso_de_sinonimos,True
 LFM2.5-1.2B-Instruct,25,confusion_dispositivo,confusion_dispositivo;,True
 LFM2.5-1.2B-Instruct,27,uso_de_sinonimos,uso_de_sinonimos,True
 LFM2.5-1.2B-Instruct,31,confusion_intencion,confusion_intencion,True
+granite-4.0-1b,3,sin_error_semantico,sin_error_semantico,True
+granite-4.0-1b,7,uso_de_sinonimos,uso_de_sinonimos,True
+granite-4.0-1b,24,uso_de_sinonimos,uso_de_sinonimos,True
