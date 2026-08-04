@@ -1,0 +1,265 @@
+modelo,idx,comando,gt,pred_raw,pred_json,json_valido,parse_note,latencia_s,match_intent,match_dispositivo,match_ubicacion,match_valor,match_unidad,match_exact,modo_prompting,transformers_version
+LFM2.5-230M,0,Prendé la luz del living.,"{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""living"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,10.378,False,True,True,True,True,False,chat_template,5.14.1
+LFM2.5-230M,1,Apagá la luz de la cocina.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""apagar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""cocina"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,5.802,True,True,True,True,True,True,chat_template,5.14.1
+LFM2.5-230M,2,Encendé el aire acondicionado del dormitorio.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""dormitorio"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,6.377,False,False,True,True,True,False,chat_template,5.14.1
+LFM2.5-230M,3,Apagá la tele del living.,"{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""apagar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""living"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,5.724,True,False,True,True,True,False,chat_template,5.14.1
+LFM2.5-230M,4,Prendé el ventilador del garage.,"{""intent"": ""encender"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""ventilador"",
+  ""ubicacion"": ""garage"",
+  ""valor"": null,
+  ""unidad"": ""°C""
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": ""°C""}",True,extraido_de_fence_markdown,6.21,False,True,True,True,False,False,chat_template,5.14.1
+LFM2.5-230M,5,Apagá la calefacción del baño.,"{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""apagar"",
+  ""dispositivo"": ""calefaccion"",
+  ""ubicacion"": ""baño"",
+  ""valor"": null,
+  ""unidad"": ""°C""
+}
+```","{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": ""°C""}",True,extraido_de_fence_markdown,6.292,True,True,False,True,False,False,chat_template,5.14.1
+LFM2.5-230M,6,Encendé el parlante de la cocina.,"{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""cocina"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,6.226,False,False,True,True,True,False,chat_template,5.14.1
+LFM2.5-230M,7,Cerrá la cerradura de la entrada.,"{""intent"": ""apagar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""cerrar"",
+  ""dispositivo"": ""cierre"",
+  ""ubicacion"": ""entrada"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""cerrar"", ""dispositivo"": ""cierre"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,6.361,False,False,True,True,True,False,chat_template,5.14.1
+LFM2.5-230M,8,Poné el aire del dormitorio en 22 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22.0, ""unidad"": ""°C""}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""dormitorio"",
+  ""valor"": null,
+  ""unidad"": ""°C""
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""°C""}",True,extraido_de_fence_markdown,6.358,True,False,True,False,True,False,chat_template,5.14.1
+LFM2.5-230M,9,Bajá la persiana del living al 50%.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50.0, ""unidad"": ""%""}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""living"",
+  ""valor"": null,
+  ""unidad"": ""%""
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}",True,extraido_de_fence_markdown,6.011,True,False,True,False,True,False,chat_template,5.14.1
+LFM2.5-230M,10,Poné la luz del dormitorio al 30% de brillo.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30.0, ""unidad"": ""%""}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""dormitorio"",
+  ""valor"": null,
+  ""unidad"": ""%""
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""%""}",True,extraido_de_fence_markdown,6.156,True,True,True,False,True,False,chat_template,5.14.1
+LFM2.5-230M,11,Configurá la calefacción de la cocina a 24 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24.0, ""unidad"": ""°C""}","```json
+{
+  ""intent"": ""configurar"",
+  ""dispositivo"": ""calefaccion"",
+  ""ubicacion"": ""cocina"",
+  ""valor"": null,
+  ""unidad"": ""°C""
+}
+```","{""intent"": ""configurar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": ""°C""}",True,extraido_de_fence_markdown,6.147,False,True,True,False,True,False,chat_template,5.14.1
+LFM2.5-230M,12,Subí la cortina del patio al 100%.,"{""intent"": ""ajustar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": 100.0, ""unidad"": ""%""}","```json
+{
+  ""intent"": ""subir"",
+  ""dispositivo"": ""cortina"",
+  ""ubicacion"": ""patio"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""subir"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,7.092,False,True,True,False,False,False,chat_template,5.14.1
+LFM2.5-230M,13,Poné el volumen del parlante del living en 40%.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40.0, ""unidad"": ""%""}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""living"",
+  ""valor"": null,
+  ""unidad"": ""%""
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}",True,extraido_de_fence_markdown,7.459,True,False,True,False,True,False,chat_template,5.14.1
+LFM2.5-230M,14,Dejá la luz del baño al 10%.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": 10.0, ""unidad"": ""%""}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""baño"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,6.096,True,True,False,False,False,False,chat_template,5.14.1
+LFM2.5-230M,15,Poné el aire del living en 19 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19.0, ""unidad"": ""°C""}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""living"",
+  ""valor"": null,
+  ""unidad"": ""°C""
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""°C""}",True,extraido_de_fence_markdown,6.462,True,False,True,False,True,False,chat_template,5.14.1
+LFM2.5-230M,16,Bajale un poco a la luz del living.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""living"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,6.658,True,True,True,True,True,True,chat_template,5.14.1
+LFM2.5-230M,17,"Hace un poco más de calor en el dormitorio, subí la calefacción.","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""calefacción"",
+  ""ubicacion"": ""dormitorio"",
+  ""valor"": null,
+  ""unidad"": ""°C""
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""calefacción"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""°C""}",True,extraido_de_fence_markdown,6.427,True,False,True,True,False,False,chat_template,5.14.1
+LFM2.5-230M,18,"Está muy fuerte el aire de la cocina, bajalo.","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""cocina"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,6.016,True,False,True,True,True,False,chat_template,5.14.1
+LFM2.5-230M,19,Subí un poco el volumen del parlante del dormitorio.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""subir"",
+  ""dispositivo"": ""volumen"",
+  ""ubicacion"": ""dormitorio"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""subir"", ""dispositivo"": ""volumen"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,6.08,False,False,True,True,True,False,chat_template,5.14.1
+LFM2.5-230M,20,"La persiana del baño no cerró del todo, bajala un toque más.","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""baño"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,6.227,True,False,False,True,True,False,chat_template,5.14.1
+LFM2.5-230M,21,Subile más luz al living que está muy oscuro.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""subile"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""living"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""subile"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,5.977,False,True,True,True,True,False,chat_template,5.14.1
+LFM2.5-230M,22,Apagá todas las luces de la casa.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""apagar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""casa"",
+  ""valor"": null,
+  ""unidad"": ""%""""
+}
+```",,False,no_parseable_como_json,5.91,False,False,False,False,False,False,chat_template,5.14.1
+LFM2.5-230M,23,Prendé todos los aires acondicionados.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""air_conditioned"",
+  ""ubicacion"": ""living"",
+  ""valor"": null,
+  ""unidad"": ""%""
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""air_conditioned"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}",True,extraido_de_fence_markdown,6.367,False,False,False,True,False,False,chat_template,5.14.1
+LFM2.5-230M,24,Bajá todas las persianas de la casa.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""todas"", ""valor"": 0.0, ""unidad"": ""%""}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""cocina"",
+  ""valor"": null,
+  ""unidad"": ""%""
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": ""%""}",True,extraido_de_fence_markdown,6.05,True,False,False,False,True,False,chat_template,5.14.1
+LFM2.5-230M,25,Apagá todo antes de dormir.,"{""intent"": ""apagar"", ""dispositivo"": ""todos"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""apagar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""cocina"",
+  ""valor"": null,
+  ""unidad"": ""°C""
+}
+```","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": ""°C""}",True,extraido_de_fence_markdown,6.122,True,False,False,True,False,False,chat_template,5.14.1
+LFM2.5-230M,26,¿Está prendida la luz del living?,"{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","La respuesta es ""no"".",,False,no_parseable_como_json,4.315,False,False,False,False,False,False,chat_template,5.14.1
+LFM2.5-230M,27,¿A cuántos grados está el aire del dormitorio?,"{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","El comando ""¿A cuántos grados está el aire del dormitorio?"" se responde con ""cocina"". El valor es 20 grados.",,False,no_parseable_como_json,5.342,False,False,False,False,False,False,chat_template,5.14.1
+LFM2.5-230M,28,¿Quedó cerrada la cerradura de la entrada?,"{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","El comando ""¿Quedó cerrada la cerradura de la entrada?"" está configurado para responder ""valor"" y ""unidad"" como null. Esto indica que el comando no proporciona un valor numérico para el campo ""valor"".",,False,no_parseable_como_json,6.228,False,False,False,False,False,False,chat_template,5.14.1
+LFM2.5-230M,29,"No dejes prendida la luz de la cocina, apagala.","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""no dejar prendida la luz de la cocina, apagala"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""cocina"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""no dejar prendida la luz de la cocina, apagala"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,6.664,False,True,True,True,True,False,chat_template,5.14.1
+LFM2.5-230M,30,"Che, la tele del living quedó prendida, apagala por favor.","{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""living"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,5.999,False,False,True,True,True,False,chat_template,5.14.1
+LFM2.5-230M,31,"Antes me olvidé, prendé la luz del baño.","{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""baño"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,6.264,False,True,False,True,True,False,chat_template,5.14.1
