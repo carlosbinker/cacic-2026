@@ -3,7 +3,7 @@
 **Source TODO:** `TODO.md`
 **Goal:** Probar que el DAG completo (subtasks 01–17 + G1/G2, tras el Delta 2026-08-04) produce un barrido de 12 modelos del roster activo coherente de punta a punta, dos papers LaTeX que compilan y pasan el filtro de envío ciego, y un árbol versionado sin secretos ni regresiones sobre el material congelado de F0.
 
-**Scope:** Solo checks **globales / cross-task**: los criterios de §5 *Cross-task acceptance* del índice (extendido a **17** puntos por el Delta 2026-08-04), más los invariantes de los tres deltas: roster activo de **12** con cero gated sobre un registro de **15**; **3** excluidos con **dos causas distintas** (2 por acceso de descarga no otorgado, 1 por compatibilidad de versión **no verificada**); dos grupos de versión de `transformers` mutuamente excluyentes, repartidos **9 / 3** sobre el roster activo; plomería de `$HF_TOKEN` conservada pero no exigida por el roster activo; envelope de recursos con **pinning de núcleos** idéntico en las 12 corridas; **persistencia incremental** con un commit por modelo y **continuación ante fallo**; **continuidad con la Tabla 2 publicada** sobre los 3 modelos presentes en ambos estudios; y cero secretos versionados. Fuera de alcance acá: todo lo que sea atribuible a un único subtask — vive en el bloque `Verify` de su `TODO_<NN>_<slug>.md` y **no** se reproduce en este archivo. También fuera de alcance lo que el índice declara *out of scope* en §2.4 (login interactivo, `Qwen2.5-0.5B-Instruct`, sondear `Qwen3.5-2B` bajo 5.14.1, ejecución concurrente de varios modelos, abstract en inglés, chequeo del límite de 10 páginas, GPU/cuantización, juez externo por API). **Ojo:** `Qwen2.5-1.5B-Instruct` **sí** está en alcance — el Delta 2026-08-04 lo reincorporó al roster activo.
+**Scope:** Solo checks **globales / cross-task**: los criterios de §5 *Cross-task acceptance* del índice (extendido a **17** puntos por el Delta 2026-08-04), más los invariantes de los tres deltas: roster activo de **12** con cero gated sobre un registro de **15**; **3** excluidos con **dos causas distintas** (2 por acceso de descarga no otorgado, 1 por compatibilidad de versión **no verificada**); dos grupos de versión de `transformers` mutuamente excluyentes, repartidos **9 / 3** sobre el roster activo; plomería de `$HF_TOKEN` conservada pero no exigida por el roster activo; envelope de recursos con **pinning de núcleos** idéntico en las 12 corridas; **persistencia incremental** con un commit por modelo y **continuación ante fallo**; **ningún dato ni prosa de la ronda 2025 en el paper** (Delta 04: esa ronda fue un borrador de este mismo trabajo, nunca publicado, con el entorno sin fijar, y la comparación generacional legítima que la reemplaza —`granite-4.0-1b` vs. `Qwen2.5-1.5B-Instruct`, ambos medidos ahora— sigue intacta); y cero secretos versionados. Fuera de alcance acá: todo lo que sea atribuible a un único subtask — vive en el bloque `Verify` de su `TODO_<NN>_<slug>.md` y **no** se reproduce en este archivo. También fuera de alcance lo que el índice declara *out of scope* en §2.4 (login interactivo, `Qwen2.5-0.5B-Instruct`, sondear `Qwen3.5-2B` bajo 5.14.1, ejecución concurrente de varios modelos, abstract en inglés, chequeo del límite de 10 páginas, GPU/cuantización, juez externo por API). **Ojo:** `Qwen2.5-1.5B-Instruct` **sí** está en alcance — el Delta 2026-08-04 lo reincorporó al roster activo.
 
 Nota deliberada sobre solape: los criterios AC1–AC14 están declarados por el índice como *"se verifica al final del ciclo (`create-test-plan` / `run-test-plan`), no dentro de ningún subtask"*. Algunos subtasks hacen un *smoke check* del mismo hecho en el momento de su propio commit (p. ej. 15 compila los papers). Este plan los reejecuta como **compuerta de regresión sobre el estado final del árbol**, que es un hecho distinto del smoke check puntual: un fix posterior puede romperlos.
 
@@ -94,8 +94,8 @@ Y **host ocioso** (RNF1, RNF6): nada más consumiendo CPU mientras corre E2, ni 
 1. Abrir `paper/02_reescrito/main.pdf`.
 2. Localizar las cinco tablas (`tab:modelos`, `tab:globales`, `tab:categorias`, `tab:taxonomia`, `tab:versiones`) y las dos figuras.
 3. Buscar en el texto la cadena `??`.
-**Expected observation:** las **cinco** tablas y las dos figuras aparecen, ninguna se sale del margen de la caja de texto LNCS, la tabla 1 lista 12 filas de modelos (el roster activo, sin los **3** excluidos), y no hay ninguna ocurrencia de `??` (referencia cruzada rota) en todo el PDF. **Prestar atención especial a la Tabla 2**, que pasó de 5 a **7** columnas con las dos de continuidad 2025 (F8): es la más ancha del paper y la primera candidata a desbordar la caja LNCS. Sus dos últimas columnas deben mostrar valores solo en **3** de las 12 filas y `--` en las otras 9.
-**On failure indicates:** un fragmento `.tex` generado por `generate_tex_tables.py` es demasiado ancho para el formato LNCS —muy probablemente la Tabla 2 de 7 columnas—, o un `\label`/`\ref` quedó desparejado entre secciones. Si la Tabla 2 desborda, el arreglo es acortar los encabezados o el `spec` de columnas en `generate_tex_tables.py`, **nunca** quitar las columnas de continuidad: son el mecanismo de RF19 y de C15. Siguen siendo cinco tablas: no se agregó una sexta.
+**Expected observation:** las **cinco** tablas y las dos figuras aparecen, ninguna se sale del margen de la caja de texto LNCS, la tabla 1 lista 12 filas de modelos (el roster activo, sin los excluidos), y no hay ninguna ocurrencia de `??` (referencia cruzada rota) en todo el PDF. **Prestar atención especial a la Tabla 2**, que tiene **cinco** columnas (Modelo, JSON válido, Estricta, Laxa, Latencia): desde el Delta 04 ya no lleva columnas de continuidad 2025 (ver nota siguiente), así que ya no es la más ancha del paper.
+**On failure indicates:** un fragmento `.tex` generado por `generate_tex_tables.py` es demasiado ancho para el formato LNCS, o un `\label`/`\ref` quedó desparejado entre secciones. **Actualizado (Delta 04).** Este check exigía antes preservar las dos columnas de continuidad 2025 de la Tabla 2 como "mecanismo de RF19 y de C15" — ese requisito quedó retractado: no hay un "paper 2025" publicado (fue un borrador de este mismo trabajo, nunca publicado), y esas cifras se produjeron con el entorno sin fijar, por lo que no son comparables de forma válida. Si la Tabla 2 desborda, el arreglo es acortar los encabezados o el `spec` de columnas en `generate_tex_tables.py`. Siguen siendo cinco tablas: no se agregó ni se quitó ninguna.
 
 ---
 
@@ -464,79 +464,58 @@ PY
 **Expected:** imprime `exclusiones declaradas OK: 4 excluidos (2 por acceso, 1 por compatibilidad no verificada, 1 por baseline-completion) en docker/README.md, fuera de tablas, sin sobreafirmar en el paper`, exit 0.
 **On failure indicates:** o bien un modelo excluido se coló en una tabla de resultados (contaminando una comparación que no corrió), o bien `docker/README.md` dejó de documentar alguna de las tres causas de exclusión, o bien el paper **sobreafirma** sobre `Qwen3.5-2B` si alguien reintrodujo su mención en `03_metodologia.tex`/`06_amenazas.tex`. Esto último es el error más fácil de cometer y el más caro: su sonda bajo 5.14.1 **nunca corrió** por un bloqueo de infraestructura de Docker, así que no hay evidencia de que falle bajo esa versión — solo ausencia de evidencia de que funcione. Escribir "incompatible con las dos versiones mayores" sería una afirmación empírica sin respaldo en un paper.
 
-### Check C15 — Continuidad con la Tabla 2 publicada (RF19, Delta 2026-08-04)
-**Covers AC:** AC15 (*las dos columnas de continuidad de la Tabla 2 existen, sus valores coinciden dígito a dígito con `data/resultados_experimento_resumen.json` para los **3** modelos presentes en ambos estudios y son `--` para los otros **9**; §4 reporta la comparación y §5 la interpreta, incluida cualquier divergencia; y el texto declara que no es una réplica*), RF19.
+### Check C15 — Sin datos de la ronda 2025 en el paper; sobrevive la comparación generacional (RF19 retractado, Delta 04)
+**Covers AC:** AC15 (*la Tabla 2 tiene exactamente **cinco** columnas, sin ninguna cifra de la ronda 2025; ninguna sección del paper atribuye datos, prosa o metodología a una "ronda inicial"/versión previa de este experimento; y la comparación generacional entre `granite-4.0-1b` (90,6\%) y `Qwen2.5-1.5B-Instruct` (65,6\%), ambos medidos ahora bajo el mismo prompt 2026, sigue presente*).
+**Nota de alcance (Delta 04).** Este check reemplaza al C15 original ("Continuidad con la Tabla 2 publicada"). No hay un "paper 2025" publicado: era un borrador de este mismo trabajo, nunca publicado ni a publicarse, y sus cifras se produjeron con el entorno sin fijar (`transformers`, `torch`, `attn_implementation`, `revision`), por lo que no son comparables de forma válida. Los datos de esa ronda salieron del paper por completo, no solo su atribución — presentarlos como columnas de continuidad invitaba a una comparación inválida. `data/resultados_experimento_resumen.json` sigue existiendo como F0 congelado (no se modifica), pero ya no alimenta ninguna tabla ni prosa del paper.
 **Cost:** `cheap`
 **Run:**
 ```bash
 python - <<'PY'
-import json
-import sys
 from pathlib import Path
-sys.path.insert(0, "src")
-from models_2026 import por_nombre, roster_activo
-
-# 1. Los 3 anclas, derivados del cruce entre el registro y el resumen publicado (F0).
-publicado = json.loads(
-    Path("data/resultados_experimento_resumen.json").read_text(encoding="utf-8")
-)
-por_pub = {f["modelo"]: f for f in publicado}
-anclas = sorted({m.nombre for m in roster_activo()} & set(por_pub))
-assert anclas == ["Qwen2.5-1.5B-Instruct", "SmolLM2-1.7B-Instruct",
-                  "SmolLM2-360M-Instruct"], anclas
-for n in anclas:
-    assert por_nombre(n).params_b == por_pub[n]["params_b"], n
 
 fallas = []
 
-# 2. La Tabla 2 trae las dos columnas y los valores publicados salen del JSON de F0.
+# 1. La Tabla 2 tiene exactamente 5 columnas y ninguna mencion a 2025.
 tabla2 = Path("paper/02_reescrito/tablas/tabla2_resultados_globales.tex")
 if tabla2.exists():
     tex = tabla2.read_text(encoding="utf-8")
-    # Encabezados envueltos en \shortstack (fix de alineacion del item 1 de la
-    # revision de PDF): "Estricta 2025"/"Latencia 2025" ya no son substrings
-    # contiguos (quedan partidos por un \\ de \shortstack), asi que se busca
-    # por celda de encabezado en vez de por substring de la tabla completa.
-    encabezado = next(l for l in tex.splitlines() if "2025" in l)
-    celdas_enc = encabezado.split(" & ")
-    if not any("Estricta" in c and "2025" in c for c in celdas_enc):
-        fallas.append("tabla2: falta la columna 'Estricta 2025'")
-    if not any("Latencia" in c and "2025" in c for c in celdas_enc):
-        fallas.append("tabla2: falta la columna 'Latencia 2025'")
-    for n in anclas:
-        estricta = f"{por_pub[n]['exact_match_pct']:.1f}"
-        if estricta not in tex and estricta.replace(".", ",") not in tex:
-            fallas.append(f"tabla2: falta la estricta publicada de {n} ({estricta})")
-    # 9 de las 12 filas no tienen ancla publicada: sus dos celdas son '--'.
-    sin_ancla = [m.nombre for m in roster_activo() if m.nombre not in por_pub]
-    assert len(sin_ancla) == 9, sin_ancla
-    if tex.count("--") < 2 * len(sin_ancla):
-        fallas.append("tabla2: faltan celdas '--' para los 9 modelos sin ancla publicada")
+    if "2025" in tex:
+        fallas.append("tabla2: todavia menciona 2025")
+    encabezado = next(l for l in tex.splitlines() if "Modelo" in l)
+    if encabezado.count("&") != 4:
+        fallas.append(f"tabla2: se esperan 5 columnas (4 '&'), hay {encabezado.count('&') + 1}")
 
-# 3. §4 reporta la comparacion nombrando los 3 anclas; §5 la interpreta y aclara
-#    que NO es una replica.
-res = Path("paper/02_reescrito/secciones/04_resultados.tex")
-if res.exists():
-    t = res.read_text(encoding="utf-8")
-    for n in anclas:
-        if n not in t:
-            fallas.append(f"04_resultados.tex: no nombra el ancla {n}")
+# 2. Ninguna seccion del paper atribuye datos/prosa a una "ronda inicial" o
+#    version previa de este experimento (fuera de citas bibliograficas de
+#    terceros, que llevan su propia clave *2025* de refs.bib).
+secciones_dir = Path("paper/02_reescrito/secciones")
+patrones_prohibidos = ("ronda inicial", "continuidad con", "paper 2025", "estudio publicado",
+                        "medición inicial", "medicion inicial")
+for archivo in sorted(secciones_dir.glob("*.tex")):
+    # El .tex envuelve lineas a mano: se normaliza espacio en blanco antes de
+    # buscar, para que una frase de dos palabras partida por un salto de
+    # linea de formato no escape la deteccion.
+    t = " ".join(archivo.read_text(encoding="utf-8").lower().split())
+    for p in patrones_prohibidos:
+        if p in t:
+            fallas.append(f"{archivo.name}: todavia contiene '{p}'")
 
-dis = Path("paper/02_reescrito/secciones/05_discusion.tex")
-if dis.exists():
-    t = dis.read_text(encoding="utf-8").lower()
-    if not any(k in t for k in ("divergenc", "diferencia con el estudio", "respecto de lo publicado")):
-        fallas.append("05_discusion.tex: no discute la comparacion contra lo publicado")
-    if not any(k in t for k in ("no es una replica", "no es una réplica",
-                                "no es directamente comparable")):
-        fallas.append("05_discusion.tex: no declara la salvedad de que no es una replica")
+# 3. La comparacion generacional (titular) sigue presente y medida ahora, no
+#    heredada de 2025. El .tex envuelve lineas a mano, asi que se normaliza
+#    espacio en blanco (incluidos saltos de linea) antes de buscar la frase.
+res_crudo = Path("paper/02_reescrito/secciones/04_resultados.tex").read_text(encoding="utf-8")
+res = " ".join(res_crudo.split())
+if "90,6" not in res or "65,6" not in res:
+    fallas.append("04_resultados.tex: no encuentro el titular 90,6% vs 65,6%")
+if "generación anterior" not in res:
+    fallas.append("04_resultados.tex: se perdio la referencia a la generacion anterior")
 
 assert not fallas, fallas
-print("continuidad OK: 3 anclas publicadas, 9 filas con '--', comparacion reportada y discutida")
+print("sin-2025 OK: tabla2 con 5 columnas, sin prosa de ronda inicial/continuidad, titular generacional intacto")
 PY
 ```
-**Expected:** imprime `continuidad OK: 3 anclas publicadas, 9 filas con '--', comparacion reportada y discutida`, exit 0. Antes del subtask 11 los bloques 2 y 3 se saltean porque los archivos no existen todavía; el bloque 1 aplica desde el subtask 17.
-**On failure indicates:** se perdió el único mecanismo de **validación cruzada del harness nuevo contra un resultado publicado**. Si faltan las columnas, la comparación quedó como prosa a mano (viola AC9: los números del paper vienen de fragmentos generados). Si falta la salvedad de §5, el paper presenta como réplica algo que no lo es: el prompt se endureció (RF1), así que la exactitud estricta no es directamente comparable, y la latencia arrastra además el confusor de los dos grupos de versión.
+**Expected:** imprime `sin-2025 OK: tabla2 con 5 columnas, sin prosa de ronda inicial/continuidad, titular generacional intacto`, exit 0.
+**On failure indicates:** o bien reapareció una columna/cifra de la ronda 2025 (regresión del Delta 04), o bien el titular generacional (90,6\% vs 65,6\%, medido bajo el prompt 2026 para ambos modelos) se perdió al remover la prosa de continuidad — ese resultado es válido y debe sobrevivir, es la versión legítima de la comparación contra la generación anterior.
 
 ---
 
@@ -580,7 +559,7 @@ print(f"cpuset registrado en docker/README.md OK: {CPUSET_POR_DEFECTO}")
 PY
 ```
 **Expected:** `sin GPU OK` (cero menciones de GPU en las invocaciones), `12` imágenes **distintas** en el plan de build (roster activo), `9` y `3` para los dos pines, `12` invocaciones con `--cpuset-cpus`, **`1`** valor distinto de `--cpuset-cpus` (el mismo par de núcleos en las doce), `12` × `--memory=8g`, `12` × `--cpus=2`, y `cpuset registrado en docker/README.md OK: 0-1`. Esto fija el envelope completo de las 12 corridas.
-**On failure indicates:** una corrida con recursos distintos hace que su latencia no sea comparable ni con las otras 11 ni con el paper original — rompe el eje derecho de fig1, la columna de latencia de la Tabla 2 y, con ella, la comparación de continuidad de C15. Si el conteo de valores distintos de `--cpuset-cpus` es mayor que 1, la comparabilidad se pierde de la peor forma posible: silenciosamente. Si el reparto no es 9/3, el intercambio de roster del subtask 17 no se aplicó. **Por qué el flag no es redundante con `--cpus=2`:** `--cpus` es una **cuota** del planificador CFS —permite migración entre núcleos y no reserva nada— mientras que `--cpuset-cpus` fija los núcleos y elimina la variabilidad por migración. Lo que ningún flag puede hacer es particionar la caché L3 ni el bus de memoria, y por eso la ejecución es **secuencial** (RNF6): correr 4 modelos en paralelo habría inflado los tiempos por comando de forma invisible en la tabla final.
+**On failure indicates:** una corrida con recursos distintos hace que su latencia no sea comparable ni con las otras 11 — rompe el eje derecho de fig1 y la columna de latencia de la Tabla 2, contaminando con ella la comparación generacional que valida C15. Si el conteo de valores distintos de `--cpuset-cpus` es mayor que 1, la comparabilidad se pierde de la peor forma posible: silenciosamente. Si el reparto no es 9/3, el intercambio de roster del subtask 17 no se aplicó. **Por qué el flag no es redundante con `--cpus=2`:** `--cpus` es una **cuota** del planificador CFS —permite migración entre núcleos y no reserva nada— mientras que `--cpuset-cpus` fija los núcleos y elimina la variabilidad por migración. Lo que ningún flag puede hacer es particionar la caché L3 ni el bus de memoria, y por eso la ejecución es **secuencial** (RNF6): correr 4 modelos en paralelo habría inflado los tiempos por comando de forma invisible en la tabla final.
 
 ### NF4 — Persistencia incremental y continuación ante fallo (RF20, F12)
 **Covers AC:** AC16 (*un commit por modelo con el nombre y la versión efectiva de `transformers` en el asunto; `data/2026/fallos_barrido.json` existe, `[]` si no hubo fallos; ningún CSV parcial truncado*).
@@ -707,7 +686,7 @@ Ninguno de estos comandos arranca un contenedor de modelo, descarga pesos ni hac
 | 12 | Manual Check 1 + Check 2 (figuras y PDF) | ver §3 | `cheap` |
 | 13 | C13 (correspondencia versión↔CSV) | ver §4 | `cheap` |
 | 14 | C14 (exclusiones declaradas, 3 con dos causas, sin sobreafirmar) | ver §4 | `cheap` |
-| 15 | C15 (continuidad con la Tabla 2 publicada) | ver §4 | `cheap` |
+| 15 | C15 (sin datos de la ronda 2025 en el paper; comparación generacional intacta) | ver §4 | `cheap` |
 | 16 | NF4 (persistencia incremental y registro de fallos) | ver §5 | `cheap` |
 
 Los ítems 7–15 requieren que el DAG haya llegado al subtask 15 y que `data/2026/` exista; el ítem 16 requiere el subtask 05. Antes de eso, `/run-test-plan --scope=cheap` debe reportarlos como *no aplicables todavía*, no como fallos; los ítems 1–6 aplican desde el primer commit de la rama. **El ítem 4 aplica desde el primer commit pero sus números cambian con el subtask 17**: antes de que 17 esté cerrado, el registro es de 14, los excluidos son 2 y el reparto es 8/4, y **no hay** `--cpuset-cpus` — eso es esperado, no un fallo, hasta que 17 cierre. Después de 17, los valores de la tabla son los definitivos y cualquier desvío sí es un fallo.
@@ -725,7 +704,7 @@ Nunca en una iteración de fix. Requiere P4 (Docker up).
 
 Nota: como el roster activo tiene cero modelos *gated*, P4/E1/E2 ya **no** requieren `.env` ni `HF_TOKEN` para el roster de 12; esa plomería solo se ejercita si alguien reactiva explícitamente uno de los dos modelos excluidos **por acceso**. Reactivar `Qwen3.5-2B`, el tercer excluido, no requiere credenciales (no es *gated*) sino su sonda positiva bajo 5.14.1, que nunca se obtuvo.
 
-**Nada en paralelo durante E2 (RNF6).** E2 corre **un modelo a la vez** y sobre **host ocioso**: no lanzar E1 de otras imágenes, ni E3, ni ningún check `cheap` que use Docker mientras E2 avanza. `--cpus=2` es una cuota de CFS y `--memory=8g` un techo, no reservas; `--cpuset-cpus` fija los núcleos pero ni la caché L3 ni el bus de memoria se pueden particionar por contenedor, y la inferencia de LLM en CPU está limitada por ancho de banda de memoria. Cualquier carga concurrente infla los tiempos por comando de forma **invisible** en la tabla final y contamina la columna de latencia, la comparación de continuidad de C15 y el eje derecho de fig1.
+**Nada en paralelo durante E2 (RNF6).** E2 corre **un modelo a la vez** y sobre **host ocioso**: no lanzar E1 de otras imágenes, ni E3, ni ningún check `cheap` que use Docker mientras E2 avanza. `--cpus=2` es una cuota de CFS y `--memory=8g` un techo, no reservas; `--cpuset-cpus` fija los núcleos pero ni la caché L3 ni el bus de memoria se pueden particionar por contenedor, y la inferencia de LLM en CPU está limitada por ancho de banda de memoria. Cualquier carga concurrente infla los tiempos por comando de forma **invisible** en la tabla final y contamina la columna de latencia, la comparación generacional que valida C15, y el eje derecho de fig1.
 
 **E2 es reanudable y no se bloquea.** Si se interrumpe, `python docker/run_sweep.py --desde "<modelo>"` retoma y los modelos ya completos se saltean. Si un modelo falla, E2 **no corta**: registra el fallo en `data/2026/fallos_barrido.json` y sigue (F12.1). La única excepción es un 401/403, que corta inmediato (AUTH-STOP) y no se reintenta.
 
