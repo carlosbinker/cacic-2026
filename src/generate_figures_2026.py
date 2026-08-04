@@ -177,18 +177,29 @@ def generar_figuras(path_resumen: Path, dir_salida: Path, sufijo: str) -> list[P
     izq.invert_yaxis()
     izq.set_xlabel("Coincidencia exacta (%)")
     izq.set_xlim(0, 108)
-    # Tercera entrada de leyenda como parche proxy: el rayado no lo dibuja
-    # ninguna serie de barh (se aplica post-hoc solo a los dos parches
-    # afectados en _marcar_laxo_con_json_invalido), así que sin este proxy
-    # la leyenda de 2 entradas termina atribuyéndole el rayado a "laxa
-    # (semántica)" completa y las barras rayadas quedan sin explicar.
-    handles, labels = izq.get_legend_handles_labels()
+    # Leyenda armada con parches proxy explícitos, no con
+    # get_legend_handles_labels(): ese helper toma el estilo *actual* de los
+    # artistas, y _marcar_laxo_con_json_invalido ya mutó dos de los parches
+    # de "laxa (semántica)" (rayado + borde rojo) antes de este punto. Si el
+    # primer parche mutado coincide con el primero del contenedor -- como
+    # pasa con LFM2.5-230M -- la leyenda hereda ese estilo mutado para toda
+    # la serie "laxa (semántica)", dejando dos entradas idénticas. Los
+    # proxies fijan el estilo real de cada serie sin depender del orden ni
+    # del estado mutable de los parches.
+    handles = [
+        mpatches.Patch(facecolor="#2b6cb0", label="estricta"),
+        mpatches.Patch(facecolor="#90cdf4", label="laxa (semántica)"),
+    ]
     if notas_laxo:
         handles.append(mpatches.Patch(
             facecolor="#90cdf4", hatch="///", edgecolor="#4a1010",
             linewidth=0.7, label="laxa con JSON inválido",
         ))
-    izq.legend(handles=handles, loc="lower right", fontsize=9)
+    # Leyenda debajo del área de datos (igual criterio que fig. 2): con 2
+    # entradas "lower right" ya rozaba la barra laxa de granite-4.0-1b (100%,
+    # el titular del paper); con 3 la caja creció y la tapaba.
+    izq.legend(handles=handles, loc="upper center",
+               bbox_to_anchor=(0.5, -0.08), fontsize=9, ncol=len(handles))
     izq.grid(axis="x", alpha=0.3)
     _etiquetas_de_tier(izq, tiers, pos)
 
