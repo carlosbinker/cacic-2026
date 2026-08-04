@@ -487,16 +487,27 @@ def test_comparar_anclaje_calcula_los_tres_deltas(tmp_path, monkeypatch):
     assert d["nuevo_vs_control"] == 0.0
 
 
-def test_comparar_anclaje_con_datos_reales_nuevo_control_ausente():
-    """Sin monkeypatch: usa el CSV real de data/2026/detalle/ (commiteado, de
-    solo lectura) y confirma que la banda de control -- que todavía no corrió
-    -- da `None` en vez de crashear."""
+def test_comparar_anclaje_con_datos_reales_de_las_tres_bandas():
+    """Sin monkeypatch: usa los CSV reales de data/2026/detalle/ y
+    data/2026/control_prompt_original/ (ambos commiteados, de solo lectura).
+
+    Actualizado tras el subtask 18: la corrida de control real ya se ejecutó
+    (el orquestador la lanzó después del reporte de ese subtask, ver commits
+    `544b988`/`9f584a6`/`3fe0ac3`) y NO reprodujo la cifra publicada -- esa
+    divergencia es precisamente la evidencia que motiva el Delta 05. La banda
+    ya no da `None`; se compara contra el propio CSV en vez de hardcodear un
+    número, para no duplicar el dato real en dos lugares."""
+    ruta_control_real = RAIZ / "data" / "2026" / "control_prompt_original" / "smollm2-360m-instruct.csv"
+    metricas_control = cc.metricas_de_detalle(pd.read_csv(ruta_control_real))
+
     publicado = cc.cargar_publicado()
     resultado = cc.comparar_anclaje("SmolLM2-360M-Instruct", publicado)
     assert resultado["nuevo_prompt_2026"] is not None
     assert resultado["nuevo_prompt_2026"]["n"] == 32
-    assert resultado["control_prompt_original"] is None
-    assert resultado["deltas_exact_match_pp"]["control_vs_publicado"] is None
+    assert resultado["control_prompt_original"] == metricas_control
+    assert resultado["deltas_exact_match_pp"]["control_vs_publicado"] == round(
+        metricas_control["exact_match_pct"] - resultado["publicado"]["exact_match_pct"], 1
+    )
 
 
 def test_escribir_comparacion_escribe_json_indentado(tmp_path):
