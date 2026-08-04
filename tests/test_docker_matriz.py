@@ -20,7 +20,7 @@ RAIZ = Path(__file__).resolve().parent.parent
 
 def test_tag_por_modelo_es_unico_y_usa_el_slug():
     tags = [tag_imagen(m) for m in MODELOS_2026]
-    assert len(set(tags)) == 14
+    assert len(set(tags)) == 15
     assert tag_imagen(MODELOS_2026[0]) == f"slm-domotica-2026:{slug(MODELOS_2026[0].nombre)}"
 
 
@@ -191,19 +191,17 @@ def test_docker_no_contiene_el_valor_del_token():
 
 
 def test_run_sweep_agrega_env_file_solo_a_los_gated():
-    """F11: --env-file .env solo para los dos modelos gated; los otros 12 no."""
-    gated = [m for m in MODELOS_2026 if m.gated]
+    """F11: --env-file solo para los 2 gated; los otros 13 no (12 activos + Qwen3.5-2B)."""
+    gated_ = [m for m in MODELOS_2026 if m.gated]
     no_gated = [m for m in MODELOS_2026 if not m.gated]
-    assert len(gated) == 2
-    assert len(no_gated) == 12
-    for m in gated:
+    assert len(gated_) == 2
+    assert len(no_gated) == 13
+    for m in gated_:
         cmd = comando_run(m, RAIZ)
         assert "--env-file" in cmd
-        i = cmd.index("--env-file")
-        assert cmd[i + 1] == str(RAIZ / ".env")
+        assert cmd[cmd.index("--env-file") + 1] == str(RAIZ / ".env")
     for m in no_gated:
-        cmd = comando_run(m, RAIZ)
-        assert "--env-file" not in cmd
+        assert "--env-file" not in comando_run(m, RAIZ)
 
 
 def test_el_readme_documenta_la_matriz_completa():
@@ -262,19 +260,39 @@ def test_build_all_pedir_un_modelo_activo_sigue_funcionando():
 
 
 def test_el_readme_documenta_la_matriz_del_roster_activo_con_necesidad():
-    """RF5 + F11: los 12 del roster activo estan en la matriz con necesario/heredado."""
+    """RF5 + F11: los 12 del roster activo estan en la matriz. Los necesarios
+    DENTRO del roster activo son 4 (F3 (g)): Qwen3.5-2B sigue siendo necesario
+    pero ya no esta en el roster."""
     readme = (RAIZ / "docker" / "README.md").read_text(encoding="utf-8")
     for m in roster_activo():
         assert m.nombre in readme, f"falta {m.nombre} en la matriz de docker/README.md"
     necesarios = {m.nombre for m in roster_activo() if m.motivo_pin}
     assert necesarios == {
-        "LFM2.5-230M", "LFM2.5-350M", "Qwen3.5-0.8B", "Qwen3.5-2B", "granite-4.0-350m",
+        "LFM2.5-230M", "LFM2.5-350M", "Qwen3.5-0.8B", "granite-4.0-350m",
     }
 
 
-def test_el_readme_documenta_las_dos_exclusiones():
+def test_el_readme_documenta_las_tres_exclusiones_con_su_causa():
     readme = (RAIZ / "docker" / "README.md").read_text(encoding="utf-8")
-    for m in MODELOS_2026:
-        if not m.activo:
-            assert m.nombre in readme, f"falta la exclusion de {m.nombre}"
-            assert "403" in readme
+    excluidos = [m for m in MODELOS_2026 if not m.activo]
+    assert len(excluidos) == 3
+    for m in excluidos:
+        assert m.nombre in readme, f"falta la exclusion de {m.nombre}"
+    assert "403" in readme                      # los dos gated
+    assert "no verificada" in readme.lower()    # Qwen3.5-2B
+
+
+def test_el_readme_registra_el_cpuset_usado():
+    """AC17: el valor efectivo de --cpuset-cpus queda escrito, no solo en el codigo."""
+    from run_sweep import CPUSET_POR_DEFECTO
+    readme = (RAIZ / "docker" / "README.md").read_text(encoding="utf-8")
+    assert f"--cpuset-cpus={CPUSET_POR_DEFECTO}" in readme
+
+
+def test_el_readme_no_promete_reanudar_desde_un_modelo_excluido():
+    """El ejemplo viejo `--desde "Qwen3.5-2B"` ahora falla con ValueError: si
+    figura como uso normal, el README miente."""
+    readme = (RAIZ / "docker" / "README.md").read_text(encoding="utf-8")
+    for linea in readme.splitlines():
+        if "--desde" in linea and "Qwen3.5-2B" in linea:
+            assert "falla" in linea.lower() or "excluido" in linea.lower(), linea
