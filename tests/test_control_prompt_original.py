@@ -279,6 +279,21 @@ def test_comando_run_control_monta_datos_y_cache_compartida():
     assert any(m.endswith(":/app/.hf_cache") for m in montajes)
 
 
+def test_comando_run_control_monta_src_de_solo_lectura_con_el_envolvente_completo():
+    """Las imágenes `slm-domotica-2026:*` hornean `src/` al build time y por lo
+    tanto no tienen `run_control_prompt_original.py` (postdata esas imágenes).
+    En vez de reconstruir, se monta el `src/` del working tree de solo
+    lectura, para que el contenedor ejecute exactamente el código versionado
+    (incluidas las funciones aditivas de `prompt_2026`/`run_sweep_2026` de las
+    que depende el entrypoint de control)."""
+    cmd = run_control.comando_run_control(por_nombre("SmolLM2-360M-Instruct"), RAIZ)
+    montajes = [cmd[i + 1] for i, a in enumerate(cmd) if a == "-v"]
+    assert any(m.endswith(":/app/src:ro") for m in montajes)
+    assert "--cpuset-cpus=0-1" in cmd
+    assert "--memory=8g" in cmd
+    assert "--cpus=2" in cmd
+
+
 def test_comando_run_control_no_usa_env_file_ninguno_de_los_tres_es_gated():
     for nombre in rcpo.ANCLAS_CONTROL:
         cmd = run_control.comando_run_control(por_nombre(nombre), RAIZ)

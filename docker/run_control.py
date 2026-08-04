@@ -58,6 +58,15 @@ def comando_run_control(modelo: ModeloEvaluado2026, raiz: Path, force: bool = Fa
         "--memory=8g", "--cpus=2", f"--cpuset-cpus={cpuset}",
         "-v", f"{raiz / 'data'}:/app/data",
         "-v", f"{raiz / '.hf_cache'}:/app/.hf_cache",
+        # Las imágenes slm-domotica-2026:* hornean src/ al build time y por
+        # eso no tienen `run_control_prompt_original.py` (postdata a esas
+        # imágenes), ni las funciones aditivas de las que depende
+        # (`prompt_2026.construir_entrada_con_prompt`,
+        # `run_sweep_2026.evaluar_modelo(construir_entrada=...)`). En vez de
+        # reconstruir tres imágenes de 5.6 GB para dos funciones aditivas, se
+        # monta de solo lectura el src/ del working tree, que ejecuta el
+        # código real versionado.
+        "-v", f"{raiz / 'src'}:/app/src:ro",
         tag_imagen(modelo),
         "python",
     ]
