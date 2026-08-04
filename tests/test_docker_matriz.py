@@ -177,6 +177,68 @@ def test_correr_modelo_decodifica_stderr_utf8_sin_reventar_con_bytes_invalidos_c
     assert texto_utf8 in stderr
 
 
+def test_ejecutar_barrido_continua_si_un_modelo_revienta_con_excepcion_inesperada(monkeypatch, tmp_path):
+    """F12.1: no solo un codigo de salida no-cero puede fallar un modelo:
+    cualquier excepcion host-side (como el UnicodeDecodeError real que corto
+    el barrido) tiene que quedar atrapada y registrada verbatim, y el
+    barrido tiene que seguir con el siguiente modelo en vez de abortar
+    entero."""
+    import run_sweep
+
+    corridos = []
+    objetivo = roster_activo()[1].nombre
+    excepcion = UnicodeDecodeError("cp1252", b"\x8d", 0, 1, "character maps to <undefined>")
+
+    def falso_correr_modelo(modelo, posicion, force, dry_run, cpuset):
+        corridos.append(modelo.nombre)
+        if modelo.nombre == objetivo:
+            raise excepcion
+        return 0, ""
+
+    monkeypatch.setattr(run_sweep, "_correr_modelo", falso_correr_modelo)
+    monkeypatch.setattr(run_sweep, "FALLOS_PATH", tmp_path / "fallos_barrido.json")
+
+    codigo = run_sweep.ejecutar_barrido(roster_activo(), force=False, dry_run=False)
+
+    assert [m.nombre for m in roster_activo()] == corridos, "se aborto en vez de seguir"
+    assert codigo == 1
+
+    fallos = json.loads((tmp_path / "fallos_barrido.json").read_text(encoding="utf-8"))
+    assert len(fallos) == 1
+    assert fallos[0]["modelo"] == objetivo
+    assert str(excepcion) in fallos[0]["error_textual"], "el mensaje textual no quedo verbatim"
+    assert set(fallos[0]) == {
+        "modelo", "hf_repo_id", "transformers_pin",
+        "codigo_salida", "error_textual", "momento_iso",
+    }
+
+
+def test_fallos_barrido_se_escribe_aunque_el_barrido_termine_de_forma_anormal(monkeypatch, tmp_path):
+    """F12.1: el archivo tiene que existir SIEMPRE despues de correr (salvo
+    --dry-run), incluso si algo revienta fuera del catch por-modelo (guarda
+    de ultima instancia, no solo el catch de la excepcion del contenedor).
+    Antes del fix, un crash entre el loop y la escritura final dejaba
+    `fallos_barrido.json` sin existir del todo."""
+    import run_sweep
+
+    monkeypatch.setattr(run_sweep, "FALLOS_PATH", tmp_path / "fallos_barrido.json")
+
+    def falso_correr_modelo(modelo, posicion, force, dry_run, cpuset):
+        return 1, "boom"
+
+    def registrar_fallo_que_revienta(*args, **kwargs):
+        raise RuntimeError("bug interno imprevisto, no cubierto por el catch por-modelo")
+
+    monkeypatch.setattr(run_sweep, "_correr_modelo", falso_correr_modelo)
+    monkeypatch.setattr(run_sweep, "_registrar_fallo", registrar_fallo_que_revienta)
+
+    with pytest.raises(RuntimeError):
+        run_sweep.ejecutar_barrido(roster_activo(), force=False, dry_run=False)
+
+    assert (tmp_path / "fallos_barrido.json").exists(), \
+        "el archivo tiene que existir aunque el barrido termine de forma anormal"
+
+
 def test_no_hay_credenciales_en_capas_ni_login_interactivo():
     """F11: prohibido declarar HF_TOKEN en el Dockerfile, copiar .env, pasar el
     token por --build-arg o hacer login interactivo. NO prohibido: --env-file

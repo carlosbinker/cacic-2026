@@ -192,19 +192,30 @@ def ejecutar_barrido(modelos: list[ModeloEvaluado2026], force: bool, dry_run: bo
     saltea, asi que relanzar no rehace nada (RF3).
     """
     fallos: list[dict] = []
-    for i, modelo in enumerate(modelos, 1):
-        codigo, error = _correr_modelo(modelo, f"{i}/{len(modelos)}", force,
-                                       dry_run, cpuset)
-        if codigo != 0:
-            fallos.append(_registrar_fallo(modelo, codigo, error))
-            print(f"FALLO {modelo.nombre} (codigo {codigo}). Se registra y se "
-                  f"CONTINUA con el siguiente modelo.\n{error}", file=sys.stderr)
-
-    if not dry_run:
-        FALLOS_PATH.parent.mkdir(parents=True, exist_ok=True)
-        FALLOS_PATH.write_text(
-            json.dumps(fallos, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
-        )
+    try:
+        for i, modelo in enumerate(modelos, 1):
+            try:
+                codigo, error = _correr_modelo(modelo, f"{i}/{len(modelos)}", force,
+                                               dry_run, cpuset)
+            except Exception as exc:
+                # F12.1: cualquier excepcion host-side (no solo un codigo de
+                # salida no-cero del contenedor) tiene que quedar atrapada
+                # aca. El UnicodeDecodeError real que corto el barrido es un
+                # ejemplo: un modelo nunca puede tirar abajo a los demas.
+                codigo, error = 1, f"{type(exc).__name__}: {exc}"
+            if codigo != 0:
+                fallos.append(_registrar_fallo(modelo, codigo, error))
+                print(f"FALLO {modelo.nombre} (codigo {codigo}). Se registra y se "
+                      f"CONTINUA con el siguiente modelo.\n{error}", file=sys.stderr)
+    finally:
+        # F12.1: el archivo de fallos tiene que existir SIEMPRE despues de
+        # correr (salvo --dry-run), incluso si algo revienta de forma
+        # anormal y no cubierta por el catch por-modelo de arriba.
+        if not dry_run:
+            FALLOS_PATH.parent.mkdir(parents=True, exist_ok=True)
+            FALLOS_PATH.write_text(
+                json.dumps(fallos, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+            )
 
     if fallos:
         print(f"\nBarrido terminado con {len(fallos)} fallo(s): "
