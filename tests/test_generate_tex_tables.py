@@ -112,9 +112,17 @@ def _publicado_2025() -> dict:
 
 
 def test_tabla2_agrega_las_dos_columnas_de_continuidad_2025_con_siete_columnas():
+    # Encabezados envueltos en \shortstack (fix de alineacion del item 1 de la
+    # revision de PDF: sin resizebox, el encabezado de una linea desbordaba
+    # ~130pt): "Estricta 2025"/"Latencia 2025" ya no son substrings contiguos
+    # del encabezado (quedan partidos por un \\ de \shortstack), asi que se
+    # verifica por celda en vez de por substring de la linea completa.
     tex = tabla2_resultados(_resumen())
-    encabezado = next(l for l in tex.splitlines() if "Estricta 2025" in l or "Latencia 2025" in l)
-    assert "Estricta 2025" in encabezado and "Latencia 2025" in encabezado
+    encabezado = next(l for l in tex.splitlines() if "2025" in l)
+    celdas = encabezado.split(" & ")
+    assert sum("2025" in c for c in celdas) == 2
+    assert any("Estricta" in c and "2025" in c for c in celdas)
+    assert any("Latencia" in c and "2025" in c for c in celdas)
     assert encabezado.count("&") == 6  # 7 columnas
 
 

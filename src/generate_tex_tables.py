@@ -190,7 +190,14 @@ def _celdas_continuidad_2025(nombre_modelo: str) -> tuple[str, str]:
 def tabla2_resultados(resumen: list[dict]) -> str:
     """Tabla 2: resultados globales 2026 (JSON válido, estricta, laxa, latencia) más
     las dos columnas de continuidad 2025 (enmienda F8/RF19b), en el orden
-    canónico del paper (item 3 de la revisión de PDF)."""
+    canónico del paper (item 3 de la revisión de PDF). Sin `resizebox`
+    (criterio del item 1 de la revisión de PDF, extendido a las 5 tablas):
+    con `\\small` sólo no alcanza -- los 7 encabezados en una línea siguen
+    desbordando por ~130pt --, así que además se parten en \\shortstack de
+    2-3 líneas cortas (p.ej. "Estricta" / "2025" / "(\\%)"): el ancho de
+    columna que exige `tabular` es el de la línea más ancha del encabezado,
+    no el de la frase completa, y los datos (siempre más angostos) nunca
+    lo determinan."""
     filas = []
     resumen_ordenado = sorted(
         resumen, key=lambda f: clave_orden_canonico(f["tier"], f["params_b"], f["modelo"])
@@ -211,11 +218,16 @@ def tabla2_resultados(resumen: list[dict]) -> str:
         label="tab:globales",
         spec="lrrrrrr",
         encabezado=[
-            "Modelo", "JSON válido (\\%)", "Estricta (\\%)", "Laxa (\\%)",
-            "Latencia (s)", "Estricta 2025 (\\%)", "Latencia 2025 (s)",
+            "Modelo",
+            r"\shortstack{JSON\\válido\\(\%)}",
+            r"\shortstack{Estricta\\(\%)}",
+            r"\shortstack{Laxa\\(\%)}",
+            r"\shortstack{Latencia\\(s)}",
+            r"\shortstack{Estricta\\2025\\(\%)}",
+            r"\shortstack{Latencia\\2025 (s)}",
         ],
         filas=filas,
-        ancho_completo=True,
+        fuente_pequena=True,
     )
 
 
@@ -229,20 +241,24 @@ def tabla3_por_categoria(df: pd.DataFrame) -> str:
     orden = {m.nombre: i for i, m in enumerate(orden_canonico(roster_activo()))}
     columnas_modelo_orig = [c for c in df.columns if c not in ("categoria", "n")]
     modelos = sorted(columnas_modelo_orig, key=lambda c: orden.get(c, len(orden)))
+    # El encabezado de categoría ("Encendido / apagado simple (15)") es más
+    # largo que cualquier dato de la columna, así que necesita envolver en
+    # varias líneas -- pero la columna de datos debe quedar alineada a la
+    # derecha por el punto decimal (6.7 vs 100.0). Con columnas `r` los datos
+    # ya alinean bien; el encabezado se envuelve aparte, en su propia celda,
+    # con `\multicolumn{1}{c}{\parbox[b]{2.2cm}{\centering ...}}` -- así la
+    # columna en sí sigue siendo `r` para las filas de datos.
     encabezado = ["Modelo"] + [
+        r"\multicolumn{1}{c}{\parbox[b]{2.2cm}{\centering "
         f"{_escapar(CATEGORIAS_DISPLAY.get(fila['categoria'], fila['categoria']))} ({fila['n']})"
+        "}}"
         for _, fila in df.iterrows()
     ]
     filas = []
     for m in modelos:
         fila = [_escapar(m)] + [f"{fila_df[m]:.1f}" for _, fila_df in df.iterrows()]
         filas.append(fila)
-    # Encabezados de categoría en `p{}` (no `r`): el nombre de categoría más
-    # su `n` ("Encendido / apagado simple (15)") es más largo que cualquier
-    # dato de la columna, y una columna `r`/`l` no envuelve texto -- eso
-    # producía un desborde de más de 5 cm. `p{}` sí envuelve, en la propia
-    # celda de encabezado.
-    spec = "l" + "p{2.2cm}" * len(df)
+    spec = "l" + "r" * len(df)
     return _tabla(
         caption="Exactitud estricta por categoría lingüística",
         label="tab:categorias",
@@ -259,7 +275,10 @@ def tabla4_taxonomia(df: pd.DataFrame) -> str:
     versión anterior, que ponía un modelo por columna: con doce modelos esa
     orientación desbordaba el ancho de columna LNCS. Los encabezados de
     etiqueta van rotados 90° para que las 12 filas no exijan comprimir tanto
-    el ancho de cada columna."""
+    el ancho de cada columna. Sin `resizebox` (corrección del item 1 de la
+    revisión de PDF: `resizebox` no tiene piso de tamaño de letra): 9
+    columnas de enteros chicos con encabezados rotados entran a ancho de
+    columna LNCS con `\\small`."""
     orden = {m.nombre: i for i, m in enumerate(orden_canonico(roster_activo()))}
     modelos = sorted(df["modelo"], key=lambda m: orden.get(m, len(orden)))
     encabezado = ["Modelo", "Incorrectas"] + [
@@ -279,7 +298,7 @@ def tabla4_taxonomia(df: pd.DataFrame) -> str:
         spec=spec,
         encabezado=encabezado,
         filas=filas,
-        ancho_completo=True,
+        fuente_pequena=True,
     )
 
 
