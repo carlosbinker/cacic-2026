@@ -172,7 +172,8 @@ git check-ignore -v .env paper_cacic_LNCS_word.docx
 **On failure indicates:** el token o el fuente del paper entraron al índice de git. Si es `.env`, es un incidente: rotar el token.
 
 ### Check C6 — el barrido corre sin `--env-file`; pedir un excluido falla con el motivo
-**Covers AC:** RF4 / RF17 / F11 tras los Deltas 02 y 2026-08-04 (*el plan por defecto son 12 invocaciones sobre el roster activo de un registro de 15, ninguna con `--env-file`; pedir explícitamente cualquiera de los **3** modelos excluidos falla con su `motivo_exclusion`; la receta con `--env-file` sigue existiendo y se aplica solo a `gated()` cuando se la fuerza*), y RNF1 (*`--memory=8g --cpus=2 --cpuset-cpus` en las 12 invocaciones*).
+**Covers AC:** RF4 / RF17 / F11 tras los Deltas 02, 2026-08-04 y 05 (*el plan por defecto son 12 invocaciones sobre el roster activo de un registro de 16, ninguna con `--env-file`; pedir explícitamente cualquiera de los **4** modelos excluidos falla con su `motivo_exclusion`; la receta con `--env-file` sigue existiendo y se aplica solo a `gated()` cuando se la fuerza*), y RNF1 (*`--memory=8g --cpus=2 --cpuset-cpus` en las 12 invocaciones*).
+**Nota sobre el conteo (Delta 05).** El registro subió de 15 a 16 porque `Qwen2.5-0.5B-Instruct` se agregó para completar el brazo de generación anterior (`baseline_original=True`, `activo=False`): es una exclusión nueva, por una causa nueva (no es gated, no es compatibilidad no verificada), que no cambia el roster activo de 12. El umbral de excluidos pasa de 3 a 4 por esto, no por una regresión.
 **Cost:** `cheap` — `--dry-run` solo imprime los comandos; no arranca ningún contenedor ni descarga nada.
 **Run:**
 ```bash
@@ -184,13 +185,13 @@ python -c "import sys; sys.path.insert(0,'src'); from models_2026 import MODELOS
 python docker/run_sweep.py --dry-run | grep -c '^==='
 python docker/run_sweep.py --dry-run | grep -c -- '--env-file'
 ```
-**Expected:** `15` (registro completo), `2` (gated en el registro), `12` (roster activo), `3` (excluidos), `12` (invocaciones planeadas), `0` (ninguna con `--env-file`).
-**On failure indicates:** si el conteo de `--env-file` es mayor que 0, algo reactivó un modelo gated sin que el índice lo sepa (el token se expondría a un contenedor sin necesitarlo). Si los conteos de registro/gated/activo/excluidos no son 15/2/12/3, el registro o el roster activo se desalinearon del contrato de F3 — en particular, `2` excluidos en vez de `3` significa que el intercambio de roster del subtask 17 no se aplicó y `Qwen3.5-2B` sigue en el barrido.
+**Expected:** `16` (registro completo), `2` (gated en el registro), `12` (roster activo), `4` (excluidos), `12` (invocaciones planeadas), `0` (ninguna con `--env-file`).
+**On failure indicates:** si el conteo de `--env-file` es mayor que 0, algo reactivó un modelo gated sin que el índice lo sepa (el token se expondría a un contenedor sin necesitarlo). Si los conteos de registro/gated/activo/excluidos no son 16/2/12/4, el registro o el roster activo se desalinearon del contrato de F3 — en particular, menos de `4` excluidos significa que alguna de las cuatro exclusiones documentadas (los dos gated, `Qwen3.5-2B` por compatibilidad no verificada, o `Qwen2.5-0.5B-Instruct` por completar el baseline del Delta 05) se perdió, y `12` roster activo es el invariante que nunca debe moverse.
 
 **Verificaciones adicionales (mismo check, no entran en la fila 4 de la tabla de regresión):**
 ```bash
-# Pedir explicitamente cualquiera de los 3 excluidos falla con el motivo
-for m in "gemma-3-270m-it" "Llama-3.2-1B-Instruct" "Qwen3.5-2B"; do
+# Pedir explicitamente cualquiera de los 4 excluidos falla con el motivo
+for m in "gemma-3-270m-it" "Llama-3.2-1B-Instruct" "Qwen3.5-2B" "Qwen2.5-0.5B-Instruct"; do
   python docker/run_sweep.py --desde "$m" --dry-run >/dev/null 2>&1 ; echo "$m exit=$?"
 done
 
@@ -207,7 +208,7 @@ for m in gated():
 print("receta --env-file conservada para los 2 gated OK")
 PY
 ```
-**Expected (adicional):** `exit=1` para los **tres** excluidos, cada uno con un mensaje que nombra su `motivo_exclusion` (403/acceso no otorgado para los dos gated; compatibilidad no verificada para `Qwen3.5-2B`); `receta --env-file conservada para los 2 gated OK`.
+**Expected (adicional):** `exit=1` para los **cuatro** excluidos, cada uno con un mensaje que nombra su `motivo_exclusion` (403/acceso no otorgado para los dos gated; compatibilidad no verificada para `Qwen3.5-2B`; completar el baseline del Delta 05 para `Qwen2.5-0.5B-Instruct`); `receta --env-file conservada para los 2 gated OK`.
 **On failure indicates (adicional):** si pedir un excluido no falla, el barrido podría intentar descargar un modelo sin acceso —o correr `Qwen3.5-2B`, cuya compatibilidad no está verificada— y romper a mitad de camino. Si la receta con `--env-file` desapareció, se perdió la plomería de credenciales que el Delta 01 introdujo — necesaria si algún modelo se reactiva en el futuro. Ojo con el caso mixto: `Qwen3.5-2B` está excluido y **no** es gated, así que tiene que fallar por `motivo_exclusion` **sin** que aparezca `--env-file` en ninguna parte.
 
 ### Check C7 — Trazabilidad de versiones (dos grupos, roster activo)
@@ -380,8 +381,9 @@ PY
 **Expected:** `sin CSV todavia: C13 no aplica (requiere el subtask 05)` antes del barrido, o `correspondencia version-pin OK para 12 CSV` después: **9** con `4.57.*` (grupo A) y **3** con `5.*` (grupo B), tras el reparto del subtask 17. Exit 0 en ambos casos.
 **On failure indicates:** un CSV se produjo bajo una versión de `transformers` distinta de la fijada para ese modelo — por ejemplo, `granite-4.0-350m` corrido bajo 5.x por error. Ese CSV es inválido y debe rehacerse (ver protocolo de fallo del subtask 05). Un caso concreto a vigilar tras el Delta 2026-08-04: `data/2026/detalle/qwen2-5-1-5b-instruct.csv` es el CSV del modelo que entró, y su `transformers_version` **tiene que** empezar con `4.57.` — su pin es del grupo A, sondeado (`PROBE_OK|Qwen2.5-1.5B-Instruct|4.57.6|chat_template`), no inferido de la familia Qwen (que resuelve a grupo B en Qwen3.5).
 
-### Check C14 — Exclusiones declaradas, con sus dos causas (Deltas 02 y 2026-08-04)
-**Covers AC:** AC13 (*los **tres** modelos excluidos no aparecen en ninguna tabla ni figura de resultados, y sí aparecen en la tabla de exclusiones de `docker/README.md` y en el texto del paper como limitación, con sus **dos causas distintas** correctamente atribuidas*), RF18.
+### Check C14 — Exclusiones declaradas, con sus tres causas (Deltas 02, 2026-08-04 y 05)
+**Covers AC:** AC13 (*los **cuatro** modelos excluidos no aparecen en ninguna tabla ni figura de resultados, y sí aparecen en la tabla de exclusiones de `docker/README.md` y en el texto del paper como limitación, con sus **tres causas distintas** correctamente atribuidas*), RF18.
+**Nota sobre el conteo (Delta 05).** `Qwen2.5-0.5B-Instruct` se sumó al registro (15 → 16) para completar el brazo de generación anterior del baseline original (`baseline_original=True`, `activo=False`); es una tercera causa de exclusión (baseline-completion, de alcance de roster), no una regresión de las dos causas ya cubiertas (acceso no otorgado / compatibilidad no verificada). El roster activo de 12 no cambia.
 **Cost:** `cheap`
 **Run:**
 ```bash
@@ -392,13 +394,15 @@ sys.path.insert(0, "src")
 from models_2026 import MODELOS_2026
 
 excluidos = [m for m in MODELOS_2026 if not m.activo]
-assert len(excluidos) == 3, [m.nombre for m in excluidos]
+assert len(excluidos) == 4, [m.nombre for m in excluidos]
 assert {m.nombre for m in excluidos} == {
-    "gemma-3-270m-it", "Llama-3.2-1B-Instruct", "Qwen3.5-2B",
+    "gemma-3-270m-it", "Llama-3.2-1B-Instruct", "Qwen3.5-2B", "Qwen2.5-0.5B-Instruct",
 }, [m.nombre for m in excluidos]
-# Dos causas distintas: 2 por acceso no otorgado (gated), 1 por compatibilidad no verificada.
+# Tres causas distintas: 2 por acceso no otorgado (gated), 1 por compatibilidad no
+# verificada (Qwen3.5-2B), 1 por baseline-completion (Qwen2.5-0.5B-Instruct, Delta 05).
 assert len([m for m in excluidos if m.gated]) == 2
-assert len([m for m in excluidos if not m.gated]) == 1
+assert len([m for m in excluidos if not m.gated]) == 2
+assert len([m for m in excluidos if m.baseline_original]) == 1
 
 readme = Path("docker/README.md").read_text(encoding="utf-8")
 fallas = [f"{m.nombre}: falta en la tabla de exclusiones de docker/README.md"
@@ -407,6 +411,8 @@ if "403" not in readme:
     fallas.append("docker/README.md: falta el 403 de los dos excluidos gated")
 if "no verificada" not in readme.lower():
     fallas.append("docker/README.md: falta la causa 'compatibilidad no verificada' de Qwen3.5-2B")
+if "baseline-completion" not in readme.lower():
+    fallas.append("docker/README.md: falta la causa 'baseline-completion' de Qwen2.5-0.5B-Instruct")
 
 for archivo in ("paper/02_reescrito/tablas/tabla1_modelos.tex",
                 "paper/02_reescrito/tablas/tabla2_resultados_globales.tex",
@@ -435,11 +441,12 @@ for seccion in ("03_metodologia.tex", "06_amenazas.tex"):
             fallas.append(f"{seccion}: sobreafirma sobre Qwen3.5-2B ({sobreafirmacion!r})")
 
 assert not fallas, fallas
-print("exclusiones declaradas OK: 3 excluidos (2 por acceso, 1 por compatibilidad no "
-      "verificada), fuera de tablas, dentro de exclusiones/limitacion, sin sobreafirmar")
+print("exclusiones declaradas OK: 4 excluidos (2 por acceso, 1 por compatibilidad no "
+      "verificada, 1 por baseline-completion), fuera de tablas, dentro de "
+      "exclusiones/limitacion, sin sobreafirmar")
 PY
 ```
-**Expected:** imprime `exclusiones declaradas OK: 3 excluidos (2 por acceso, 1 por compatibilidad no verificada), fuera de tablas, dentro de exclusiones/limitacion, sin sobreafirmar`, exit 0.
+**Expected:** imprime `exclusiones declaradas OK: 4 excluidos (2 por acceso, 1 por compatibilidad no verificada, 1 por baseline-completion), fuera de tablas, dentro de exclusiones/limitacion, sin sobreafirmar`, exit 0.
 **On failure indicates:** o bien un modelo excluido se coló en una tabla de resultados (contaminando una comparación que no corrió), o bien la exclusión no está documentada como limitación, o bien el paper **sobreafirma** sobre `Qwen3.5-2B`. Esto último es el error más fácil de cometer y el más caro: su sonda bajo 5.14.1 **nunca corrió** por un bloqueo de infraestructura de Docker, así que no hay evidencia de que falle bajo esa versión — solo ausencia de evidencia de que funcione. Escribir "incompatible con las dos versiones mayores" sería una afirmación empírica sin respaldo en un paper.
 
 ### Check C15 — Continuidad con la Tabla 2 publicada (RF19, Delta 2026-08-04)
