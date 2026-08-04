@@ -191,3 +191,300 @@ Traceback (most recent call last):
     return codecs.charmap_decode(input,self.errors,decoding_table)[0]
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 UnicodeDecodeError: 'charmap' codec can't decode byte 0x8d in position 554: character maps to <undefined>
+LFM2.5-230M: ya completo en /app/data/2026/detalle/lfm2-5-230m.csv, se saltea (usá --force)
+LFM2.5-350M: ya completo en /app/data/2026/detalle/lfm2-5-350m.csv, se saltea (usá --force)
+granite-4.0-350m: ya completo en /app/data/2026/detalle/granite-4-0-350m.csv, se saltea (usá --force)
+granite-4.0-h-350m: ya completo en /app/data/2026/detalle/granite-4-0-h-350m.csv, se saltea (usá --force)
+Qwen3.5-0.8B: ya completo en /app/data/2026/detalle/qwen3-5-0-8b.csv, se saltea (usá --force)
+=== SmolLM2-360M-Instruct (HuggingFaceTB/SmolLM2-360M-Instruct) | transformers 4.57.6 ===
+  [ 0] exact=False lat=25.02s modo=chat_template 'Prendé la luz del living.'
+  [ 1] exact=True lat=17.94s modo=chat_template 'Apagá la luz de la cocina.'
+  [ 2] exact=False lat=20.52s modo=chat_template 'Encendé el aire acondicionado del dorm'
+  [ 3] exact=False lat=20.84s modo=chat_template 'Apagá la tele del living.'
+  [ 4] exact=False lat=20.29s modo=chat_template 'Prendé el ventilador del garage.'
+  [ 5] exact=False lat=15.60s modo=chat_template 'Apagá la calefacción del baño.'
+  [ 6] exact=False lat=20.66s modo=chat_template 'Encendé el parlante de la cocina.'
+  [ 7] exact=False lat=21.43s modo=chat_template 'Cerrá la cerradura de la entrada.'
+  [ 8] exact=True lat=16.99s modo=chat_template 'Poné el aire del dormitorio en 22 grad'
+  [ 9] exact=False lat=19.10s modo=chat_template 'Bajá la persiana del living al 50%.'
+  [10] exact=False lat=21.26s modo=chat_template 'Poné la luz del dormitorio al 30% de b'
+  [11] exact=False lat=20.86s modo=chat_template 'Configurá la calefacción de la cocina '
+  [12] exact=False lat=20.70s modo=chat_template 'Subí la cortina del patio al 100%.'
+  [13] exact=False lat=20.45s modo=chat_template 'Poné el volumen del parlante del livin'
+  [14] exact=False lat=21.10s modo=chat_template 'Dejá la luz del baño al 10%.'
+  [15] exact=False lat=20.47s modo=chat_template 'Poné el aire del living en 19 grados.'
+  [16] exact=False lat=21.72s modo=chat_template 'Bajale un poco a la luz del living.'
+  [17] exact=False lat=20.68s modo=chat_template 'Hace un poco más de calor en el dormit'
+  [18] exact=False lat=20.33s modo=chat_template 'Está muy fuerte el aire de la cocina, '
+  [19] exact=False lat=21.46s modo=chat_template 'Subí un poco el volumen del parlante d'
+  [20] exact=False lat=20.66s modo=chat_template 'La persiana del baño no cerró del todo'
+  [21] exact=False lat=20.99s modo=chat_template 'Subile más luz al living que está muy '
+  [22] exact=False lat=20.74s modo=chat_template 'Apagá todas las luces de la casa.'
+  [23] exact=False lat=21.04s modo=chat_template 'Prendé todos los aires acondicionados.'
+  [24] exact=False lat=20.30s modo=chat_template 'Bajá todas las persianas de la casa.'
+  [25] exact=False lat=20.59s modo=chat_template 'Apagá todo antes de dormir.'
+  [26] exact=False lat=21.02s modo=chat_template '¿Está prendida la luz del living?'
+  [27] exact=False lat=21.01s modo=chat_template '¿A cuántos grados está el aire del dor'
+  [28] exact=True lat=19.05s modo=chat_template '¿Quedó cerrada la cerradura de la entr'
+  [29] exact=False lat=21.21s modo=chat_template 'No dejes prendida la luz de la cocina,'
+  [30] exact=False lat=20.51s modo=chat_template 'Che, la tele del living quedó prendida'
+  [31] exact=False lat=20.49s modo=chat_template 'Antes me olvidé, prendé la luz del bañ'
+Listo: 32 filas en /app/data/2026/detalle/smollm2-360m-instruct.csv | exactas 3/32
+`torch_dtype` is deprecated! Use `dtype` instead!
+
+=== LFM2.5-1.2B-Instruct (LiquidAI/LFM2.5-1.2B-Instruct) | transformers 4.57.6 ===
+  [ 0] exact=False lat=55.12s modo=chat_template 'Prendé la luz del living.'
+  [ 1] exact=True lat=32.40s modo=chat_template 'Apagá la luz de la cocina.'
+  [ 2] exact=False lat=32.99s modo=chat_template 'Encendé el aire acondicionado del dorm'
+  [ 3] exact=True lat=30.58s modo=chat_template 'Apagá la tele del living.'
+  [ 4] exact=False lat=31.06s modo=chat_template 'Prendé el ventilador del garage.'
+  [ 5] exact=True lat=31.05s modo=chat_template 'Apagá la calefacción del baño.'
+  [ 6] exact=True lat=31.07s modo=chat_template 'Encendé el parlante de la cocina.'
+  [ 7] exact=False lat=30.43s modo=chat_template 'Cerrá la cerradura de la entrada.'
+  [ 8] exact=True lat=32.10s modo=chat_template 'Poné el aire del dormitorio en 22 grad'
+  [ 9] exact=True lat=30.80s modo=chat_template 'Bajá la persiana del living al 50%.'
+  [10] exact=True lat=31.07s modo=chat_template 'Poné la luz del dormitorio al 30% de b'
+  [11] exact=True lat=32.09s modo=chat_template 'Configurá la calefacción de la cocina '
+  [12] exact=True lat=31.04s modo=chat_template 'Subí la cortina del patio al 100%.'
+  [13] exact=False lat=31.03s modo=chat_template 'Poné el volumen del parlante del livin'
+  [14] exact=True lat=31.11s modo=chat_template 'Dejá la luz del baño al 10%.'
+  [15] exact=True lat=31.99s modo=chat_template 'Poné el aire del living en 19 grados.'
+  [16] exact=True lat=30.61s modo=chat_template 'Bajale un poco a la luz del living.'
+  [17] exact=False lat=32.25s modo=chat_template 'Hace un poco más de calor en el dormit'
+  [18] exact=False lat=31.18s modo=chat_template 'Está muy fuerte el aire de la cocina, '
+  [19] exact=True lat=31.51s modo=chat_template 'Subí un poco el volumen del parlante d'
+  [20] exact=False lat=30.60s modo=chat_template 'La persiana del baño no cerró del todo'
+  [21] exact=True lat=30.04s modo=chat_template 'Subile más luz al living que está muy '
+  [22] exact=False lat=30.86s modo=chat_template 'Apagá todas las luces de la casa.'
+  [23] exact=False lat=31.62s modo=chat_template 'Prendé todos los aires acondicionados.'
+  [24] exact=False lat=30.18s modo=chat_template 'Bajá todas las persianas de la casa.'
+  [25] exact=False lat=30.38s modo=chat_template 'Apagá todo antes de dormir.'
+  [26] exact=True lat=30.19s modo=chat_template '¿Está prendida la luz del living?'
+  [27] exact=False lat=31.82s modo=chat_template '¿A cuántos grados está el aire del dor'
+  [28] exact=True lat=30.81s modo=chat_template '¿Quedó cerrada la cerradura de la entr'
+  [29] exact=True lat=31.21s modo=chat_template 'No dejes prendida la luz de la cocina,'
+  [30] exact=True lat=29.89s modo=chat_template 'Che, la tele del living quedó prendida'
+  [31] exact=False lat=30.90s modo=chat_template 'Antes me olvidé, prendé la luz del bañ'
+Listo: 32 filas en /app/data/2026/detalle/lfm2-5-1-2b-instruct.csv | exactas 18/32
+`torch_dtype` is deprecated! Use `dtype` instead!
+
+=== granite-4.0-1b (ibm-granite/granite-4.0-1b) | transformers 4.57.6 ===
+  [ 0] exact=True lat=75.78s modo=chat_template 'Prendé la luz del living.'
+  [ 1] exact=True lat=41.85s modo=chat_template 'Apagá la luz de la cocina.'
+  [ 2] exact=True lat=41.97s modo=chat_template 'Encendé el aire acondicionado del dorm'
+  [ 3] exact=False lat=40.99s modo=chat_template 'Apagá la tele del living.'
+  [ 4] exact=True lat=42.71s modo=chat_template 'Prendé el ventilador del garage.'
+  [ 5] exact=True lat=44.34s modo=chat_template 'Apagá la calefacción del baño.'
+  [ 6] exact=True lat=41.87s modo=chat_template 'Encendé el parlante de la cocina.'
+  [ 7] exact=False lat=41.62s modo=chat_template 'Cerrá la cerradura de la entrada.'
+  [ 8] exact=True lat=43.23s modo=chat_template 'Poné el aire del dormitorio en 22 grad'
+  [ 9] exact=True lat=41.74s modo=chat_template 'Bajá la persiana del living al 50%.'
+  [10] exact=True lat=42.28s modo=chat_template 'Poné la luz del dormitorio al 30% de b'
+  [11] exact=True lat=42.39s modo=chat_template 'Configurá la calefacción de la cocina '
+  [12] exact=True lat=42.73s modo=chat_template 'Subí la cortina del patio al 100%.'
+  [13] exact=True lat=41.86s modo=chat_template 'Poné el volumen del parlante del livin'
+  [14] exact=True lat=41.65s modo=chat_template 'Dejá la luz del baño al 10%.'
+  [15] exact=True lat=42.20s modo=chat_template 'Poné el aire del living en 19 grados.'
+  [16] exact=True lat=41.10s modo=chat_template 'Bajale un poco a la luz del living.'
+  [17] exact=True lat=42.02s modo=chat_template 'Hace un poco más de calor en el dormit'
+  [18] exact=True lat=41.86s modo=chat_template 'Está muy fuerte el aire de la cocina, '
+  [19] exact=True lat=42.28s modo=chat_template 'Subí un poco el volumen del parlante d'
+  [20] exact=True lat=41.68s modo=chat_template 'La persiana del baño no cerró del todo'
+  [21] exact=True lat=40.95s modo=chat_template 'Subile más luz al living que está muy '
+  [22] exact=True lat=40.45s modo=chat_template 'Apagá todas las luces de la casa.'
+  [23] exact=True lat=41.71s modo=chat_template 'Prendé todos los aires acondicionados.'
+  [24] exact=False lat=40.96s modo=chat_template 'Bajá todas las persianas de la casa.'
+  [25] exact=True lat=40.44s modo=chat_template 'Apagá todo antes de dormir.'
+  [26] exact=True lat=40.52s modo=chat_template '¿Está prendida la luz del living?'
+  [27] exact=True lat=42.23s modo=chat_template '¿A cuántos grados está el aire del dor'
+  [28] exact=True lat=40.79s modo=chat_template '¿Quedó cerrada la cerradura de la entr'
+  [29] exact=True lat=41.18s modo=chat_template 'No dejes prendida la luz de la cocina,'
+  [30] exact=True lat=41.08s modo=chat_template 'Che, la tele del living quedó prendida'
+  [31] exact=True lat=40.58s modo=chat_template 'Antes me olvidé, prendé la luz del bañ'
+Listo: 32 filas en /app/data/2026/detalle/granite-4-0-1b.csv | exactas 29/32
+`torch_dtype` is deprecated! Use `dtype` instead!
+
+=== granite-4.0-h-1b (ibm-granite/granite-4.0-h-1b) | transformers 4.57.6 ===
+  [ 0] exact=True lat=158.47s modo=chat_template 'Prendé la luz del living.'
+  [ 1] exact=True lat=123.23s modo=chat_template 'Apagá la luz de la cocina.'
+  [ 2] exact=True lat=123.37s modo=chat_template 'Encendé el aire acondicionado del dorm'
+  [ 3] exact=True lat=122.08s modo=chat_template 'Apagá la tele del living.'
+  [ 4] exact=True lat=124.45s modo=chat_template 'Prendé el ventilador del garage.'
+  [ 5] exact=False lat=124.22s modo=chat_template 'Apagá la calefacción del baño.'
+  [ 6] exact=True lat=123.38s modo=chat_template 'Encendé el parlante de la cocina.'
+  [ 7] exact=False lat=123.88s modo=chat_template 'Cerrá la cerradura de la entrada.'
+  [ 8] exact=True lat=126.27s modo=chat_template 'Poné el aire del dormitorio en 22 grad'
+  [ 9] exact=True lat=124.57s modo=chat_template 'Bajá la persiana del living al 50%.'
+  [10] exact=True lat=124.98s modo=chat_template 'Poné la luz del dormitorio al 30% de b'
+  [11] exact=True lat=122.88s modo=chat_template 'Configurá la calefacción de la cocina '
+  [12] exact=True lat=121.10s modo=chat_template 'Subí la cortina del patio al 100%.'
+  [13] exact=True lat=120.72s modo=chat_template 'Poné el volumen del parlante del livin'
+  [14] exact=False lat=121.96s modo=chat_template 'Dejá la luz del baño al 10%.'
+  [15] exact=True lat=122.29s modo=chat_template 'Poné el aire del living en 19 grados.'
+  [16] exact=True lat=119.66s modo=chat_template 'Bajale un poco a la luz del living.'
+  [17] exact=True lat=120.47s modo=chat_template 'Hace un poco más de calor en el dormit'
+  [18] exact=True lat=122.19s modo=chat_template 'Está muy fuerte el aire de la cocina, '
+  [19] exact=True lat=126.92s modo=chat_template 'Subí un poco el volumen del parlante d'
+  [20] exact=False lat=120.80s modo=chat_template 'La persiana del baño no cerró del todo'
+  [21] exact=True lat=120.41s modo=chat_template 'Subile más luz al living que está muy '
+  [22] exact=False lat=119.31s modo=chat_template 'Apagá todas las luces de la casa.'
+  [23] exact=False lat=117.78s modo=chat_template 'Prendé todos los aires acondicionados.'
+  [24] exact=False lat=121.68s modo=chat_template 'Bajá todas las persianas de la casa.'
+  [25] exact=False lat=119.67s modo=chat_template 'Apagá todo antes de dormir.'
+  [26] exact=True lat=118.85s modo=chat_template '¿Está prendida la luz del living?'
+  [27] exact=True lat=121.40s modo=chat_template '¿A cuántos grados está el aire del dor'
+  [28] exact=True lat=120.40s modo=chat_template '¿Quedó cerrada la cerradura de la entr'
+  [29] exact=True lat=122.05s modo=chat_template 'No dejes prendida la luz de la cocina,'
+  [30] exact=True lat=120.44s modo=chat_template 'Che, la tele del living quedó prendida'
+  [31] exact=False lat=120.76s modo=chat_template 'Antes me olvidé, prendé la luz del bañ'
+Listo: 32 filas en /app/data/2026/detalle/granite-4-0-h-1b.csv | exactas 23/32
+`torch_dtype` is deprecated! Use `dtype` instead!
+The fast path is not available because one of `(selective_state_update, causal_conv1d_fn, causal_conv1d_update)` is None. Falling back to the naive implementation. To install follow https://github.com/state-spaces/mamba/#installation and https://github.com/Dao-AILab/causal-conv1d
+
+=== OLMo-2-0425-1B-Instruct (allenai/OLMo-2-0425-1B-Instruct) | transformers 4.57.6 ===
+  [ 0] exact=False lat=68.26s modo=chat_template 'Prendé la luz del living.'
+  [ 1] exact=False lat=33.52s modo=chat_template 'Apagá la luz de la cocina.'
+  [ 2] exact=False lat=33.39s modo=chat_template 'Encendé el aire acondicionado del dorm'
+  [ 3] exact=False lat=31.33s modo=chat_template 'Apagá la tele del living.'
+  [ 4] exact=False lat=31.85s modo=chat_template 'Prendé el ventilador del garage.'
+  [ 5] exact=False lat=32.07s modo=chat_template 'Apagá la calefacción del baño.'
+  [ 6] exact=False lat=32.76s modo=chat_template 'Encendé el parlante de la cocina.'
+  [ 7] exact=False lat=31.79s modo=chat_template 'Cerrá la cerradura de la entrada.'
+  [ 8] exact=False lat=32.76s modo=chat_template 'Poné el aire del dormitorio en 22 grad'
+  [ 9] exact=False lat=32.87s modo=chat_template 'Bajá la persiana del living al 50%.'
+  [10] exact=False lat=39.23s modo=chat_template 'Poné la luz del dormitorio al 30% de b'
+  [11] exact=False lat=42.84s modo=chat_template 'Configurá la calefacción de la cocina '
+  [12] exact=False lat=37.88s modo=chat_template 'Subí la cortina del patio al 100%.'
+  [13] exact=False lat=32.32s modo=chat_template 'Poné el volumen del parlante del livin'
+  [14] exact=False lat=32.26s modo=chat_template 'Dejá la luz del baño al 10%.'
+  [15] exact=True lat=32.12s modo=chat_template 'Poné el aire del living en 19 grados.'
+  [16] exact=False lat=31.19s modo=chat_template 'Bajale un poco a la luz del living.'
+  [17] exact=False lat=39.36s modo=chat_template 'Hace un poco más de calor en el dormit'
+  [18] exact=False lat=32.57s modo=chat_template 'Está muy fuerte el aire de la cocina, '
+  [19] exact=False lat=32.09s modo=chat_template 'Subí un poco el volumen del parlante d'
+  [20] exact=False lat=37.92s modo=chat_template 'La persiana del baño no cerró del todo'
+  [21] exact=False lat=35.59s modo=chat_template 'Subile más luz al living que está muy '
+  [22] exact=False lat=34.16s modo=chat_template 'Apagá todas las luces de la casa.'
+  [23] exact=False lat=39.69s modo=chat_template 'Prendé todos los aires acondicionados.'
+  [24] exact=False lat=35.39s modo=chat_template 'Bajá todas las persianas de la casa.'
+  [25] exact=False lat=31.43s modo=chat_template 'Apagá todo antes de dormir.'
+  [26] exact=False lat=33.84s modo=chat_template '¿Está prendida la luz del living?'
+  [27] exact=False lat=32.14s modo=chat_template '¿A cuántos grados está el aire del dor'
+  [28] exact=False lat=31.11s modo=chat_template '¿Quedó cerrada la cerradura de la entr'
+  [29] exact=False lat=31.54s modo=chat_template 'No dejes prendida la luz de la cocina,'
+  [30] exact=False lat=36.12s modo=chat_template 'Che, la tele del living quedó prendida'
+  [31] exact=False lat=38.40s modo=chat_template 'Antes me olvidé, prendé la luz del bañ'
+Listo: 32 filas en /app/data/2026/detalle/olmo-2-0425-1b-instruct.csv | exactas 1/32
+`torch_dtype` is deprecated! Use `dtype` instead!
+
+=== SmolLM2-1.7B-Instruct (HuggingFaceTB/SmolLM2-1.7B-Instruct) | transformers 4.57.6 ===
+  [ 0] exact=False lat=93.09s modo=chat_template 'Prendé la luz del living.'
+  [ 1] exact=True lat=55.61s modo=chat_template 'Apagá la luz de la cocina.'
+  [ 2] exact=False lat=56.50s modo=chat_template 'Encendé el aire acondicionado del dorm'
+  [ 3] exact=False lat=53.99s modo=chat_template 'Apagá la tele del living.'
+  [ 4] exact=False lat=54.95s modo=chat_template 'Prendé el ventilador del garage.'
+  [ 5] exact=True lat=55.41s modo=chat_template 'Apagá la calefacción del baño.'
+  [ 6] exact=True lat=55.30s modo=chat_template 'Encendé el parlante de la cocina.'
+  [ 7] exact=False lat=54.57s modo=chat_template 'Cerrá la cerradura de la entrada.'
+  [ 8] exact=True lat=57.37s modo=chat_template 'Poné el aire del dormitorio en 22 grad'
+  [ 9] exact=True lat=55.33s modo=chat_template 'Bajá la persiana del living al 50%.'
+  [10] exact=True lat=55.94s modo=chat_template 'Poné la luz del dormitorio al 30% de b'
+  [11] exact=True lat=56.96s modo=chat_template 'Configurá la calefacción de la cocina '
+  [12] exact=True lat=55.82s modo=chat_template 'Subí la cortina del patio al 100%.'
+  [13] exact=True lat=55.66s modo=chat_template 'Poné el volumen del parlante del livin'
+  [14] exact=True lat=55.28s modo=chat_template 'Dejá la luz del baño al 10%.'
+  [15] exact=True lat=56.63s modo=chat_template 'Poné el aire del living en 19 grados.'
+  [16] exact=True lat=54.81s modo=chat_template 'Bajale un poco a la luz del living.'
+  [17] exact=False lat=57.65s modo=chat_template 'Hace un poco más de calor en el dormit'
+  [18] exact=False lat=56.15s modo=chat_template 'Está muy fuerte el aire de la cocina, '
+  [19] exact=True lat=55.49s modo=chat_template 'Subí un poco el volumen del parlante d'
+  [20] exact=True lat=55.33s modo=chat_template 'La persiana del baño no cerró del todo'
+  [21] exact=False lat=55.78s modo=chat_template 'Subile más luz al living que está muy '
+  [22] exact=False lat=54.44s modo=chat_template 'Apagá todas las luces de la casa.'
+  [23] exact=False lat=56.26s modo=chat_template 'Prendé todos los aires acondicionados.'
+  [24] exact=False lat=54.26s modo=chat_template 'Bajá todas las persianas de la casa.'
+  [25] exact=True lat=55.11s modo=chat_template 'Apagá todo antes de dormir.'
+  [26] exact=True lat=53.84s modo=chat_template '¿Está prendida la luz del living?'
+  [27] exact=False lat=56.55s modo=chat_template '¿A cuántos grados está el aire del dor'
+  [28] exact=False lat=54.77s modo=chat_template '¿Quedó cerrada la cerradura de la entr'
+  [29] exact=False lat=56.60s modo=chat_template 'No dejes prendida la luz de la cocina,'
+  [30] exact=False lat=54.91s modo=chat_template 'Che, la tele del living quedó prendida'
+  [31] exact=False lat=54.39s modo=chat_template 'Antes me olvidé, prendé la luz del bañ'
+Listo: 32 filas en /app/data/2026/detalle/smollm2-1-7b-instruct.csv | exactas 16/32
+`torch_dtype` is deprecated! Use `dtype` instead!
+
+=== Qwen2.5-1.5B-Instruct (Qwen/Qwen2.5-1.5B-Instruct) | transformers 4.57.6 ===
+  [ 0] exact=True lat=54.87s modo=chat_template 'Prendé la luz del living.'
+  [ 1] exact=True lat=39.40s modo=chat_template 'Apagá la luz de la cocina.'
+  [ 2] exact=True lat=37.60s modo=chat_template 'Encendé el aire acondicionado del dorm'
+  [ 3] exact=False lat=35.13s modo=chat_template 'Apagá la tele del living.'
+  [ 4] exact=True lat=38.74s modo=chat_template 'Prendé el ventilador del garage.'
+  [ 5] exact=True lat=37.42s modo=chat_template 'Apagá la calefacción del baño.'
+  [ 6] exact=True lat=35.63s modo=chat_template 'Encendé el parlante de la cocina.'
+  [ 7] exact=False lat=38.28s modo=chat_template 'Cerrá la cerradura de la entrada.'
+  [ 8] exact=True lat=39.77s modo=chat_template 'Poné el aire del dormitorio en 22 grad'
+  [ 9] exact=True lat=37.93s modo=chat_template 'Bajá la persiana del living al 50%.'
+  [10] exact=True lat=37.81s modo=chat_template 'Poné la luz del dormitorio al 30% de b'
+  [11] exact=True lat=38.49s modo=chat_template 'Configurá la calefacción de la cocina '
+  [12] exact=True lat=37.85s modo=chat_template 'Subí la cortina del patio al 100%.'
+  [13] exact=True lat=37.74s modo=chat_template 'Poné el volumen del parlante del livin'
+  [14] exact=True lat=37.75s modo=chat_template 'Dejá la luz del baño al 10%.'
+  [15] exact=True lat=38.80s modo=chat_template 'Poné el aire del living en 19 grados.'
+  [16] exact=True lat=37.27s modo=chat_template 'Bajale un poco a la luz del living.'
+  [17] exact=False lat=38.20s modo=chat_template 'Hace un poco más de calor en el dormit'
+  [18] exact=False lat=38.55s modo=chat_template 'Está muy fuerte el aire de la cocina, '
+  [19] exact=True lat=37.86s modo=chat_template 'Subí un poco el volumen del parlante d'
+  [20] exact=False lat=37.82s modo=chat_template 'La persiana del baño no cerró del todo'
+  [21] exact=False lat=37.79s modo=chat_template 'Subile más luz al living que está muy '
+  [22] exact=False lat=36.44s modo=chat_template 'Apagá todas las luces de la casa.'
+  [23] exact=True lat=38.23s modo=chat_template 'Prendé todos los aires acondicionados.'
+  [24] exact=False lat=36.79s modo=chat_template 'Bajá todas las persianas de la casa.'
+  [25] exact=False lat=35.89s modo=chat_template 'Apagá todo antes de dormir.'
+  [26] exact=False lat=36.91s modo=chat_template '¿Está prendida la luz del living?'
+  [27] exact=True lat=37.93s modo=chat_template '¿A cuántos grados está el aire del dor'
+  [28] exact=True lat=36.96s modo=chat_template '¿Quedó cerrada la cerradura de la entr'
+  [29] exact=True lat=36.62s modo=chat_template 'No dejes prendida la luz de la cocina,'
+  [30] exact=False lat=36.45s modo=chat_template 'Che, la tele del living quedó prendida'
+  [31] exact=True lat=37.15s modo=chat_template 'Antes me olvidé, prendé la luz del bañ'
+Listo: 32 filas en /app/data/2026/detalle/qwen2-5-1-5b-instruct.csv | exactas 21/32
+`torch_dtype` is deprecated! Use `dtype` instead!
+The following generation flags are not valid and may be ignored: ['top_k']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+
+
+=== [1/12] LFM2.5-230M (sub-1B) ===
+docker run --rm --memory=8g --cpus=2 --cpuset-cpus=0-1 -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\data:/app/data -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\.hf_cache:/app/.hf_cache slm-domotica-2026:lfm2-5-230m python src/run_sweep_2026.py --modelo LFM2.5-230M
+
+=== [2/12] LFM2.5-350M (sub-1B) ===
+docker run --rm --memory=8g --cpus=2 --cpuset-cpus=0-1 -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\data:/app/data -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\.hf_cache:/app/.hf_cache slm-domotica-2026:lfm2-5-350m python src/run_sweep_2026.py --modelo LFM2.5-350M
+
+=== [3/12] granite-4.0-350m (sub-1B) ===
+docker run --rm --memory=8g --cpus=2 --cpuset-cpus=0-1 -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\data:/app/data -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\.hf_cache:/app/.hf_cache slm-domotica-2026:granite-4-0-350m python src/run_sweep_2026.py --modelo granite-4.0-350m
+
+=== [4/12] granite-4.0-h-350m (sub-1B) ===
+docker run --rm --memory=8g --cpus=2 --cpuset-cpus=0-1 -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\data:/app/data -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\.hf_cache:/app/.hf_cache slm-domotica-2026:granite-4-0-h-350m python src/run_sweep_2026.py --modelo granite-4.0-h-350m
+
+=== [5/12] Qwen3.5-0.8B (sub-1B) ===
+docker run --rm --memory=8g --cpus=2 --cpuset-cpus=0-1 -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\data:/app/data -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\.hf_cache:/app/.hf_cache slm-domotica-2026:qwen3-5-0-8b python src/run_sweep_2026.py --modelo Qwen3.5-0.8B
+
+=== [6/12] SmolLM2-360M-Instruct (sub-1B) ===
+docker run --rm --memory=8g --cpus=2 --cpuset-cpus=0-1 -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\data:/app/data -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\.hf_cache:/app/.hf_cache slm-domotica-2026:smollm2-360m-instruct python src/run_sweep_2026.py --modelo SmolLM2-360M-Instruct
+
+=== [7/12] LFM2.5-1.2B-Instruct (1-2B) ===
+docker run --rm --memory=8g --cpus=2 --cpuset-cpus=0-1 -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\data:/app/data -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\.hf_cache:/app/.hf_cache slm-domotica-2026:lfm2-5-1-2b-instruct python src/run_sweep_2026.py --modelo LFM2.5-1.2B-Instruct
+
+=== [8/12] granite-4.0-1b (1-2B) ===
+docker run --rm --memory=8g --cpus=2 --cpuset-cpus=0-1 -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\data:/app/data -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\.hf_cache:/app/.hf_cache slm-domotica-2026:granite-4-0-1b python src/run_sweep_2026.py --modelo granite-4.0-1b
+
+=== [9/12] granite-4.0-h-1b (1-2B) ===
+docker run --rm --memory=8g --cpus=2 --cpuset-cpus=0-1 -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\data:/app/data -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\.hf_cache:/app/.hf_cache slm-domotica-2026:granite-4-0-h-1b python src/run_sweep_2026.py --modelo granite-4.0-h-1b
+
+=== [10/12] OLMo-2-0425-1B-Instruct (1-2B) ===
+docker run --rm --memory=8g --cpus=2 --cpuset-cpus=0-1 -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\data:/app/data -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\.hf_cache:/app/.hf_cache slm-domotica-2026:olmo-2-0425-1b-instruct python src/run_sweep_2026.py --modelo OLMo-2-0425-1B-Instruct
+
+=== [11/12] SmolLM2-1.7B-Instruct (1-2B) ===
+docker run --rm --memory=8g --cpus=2 --cpuset-cpus=0-1 -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\data:/app/data -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\.hf_cache:/app/.hf_cache slm-domotica-2026:smollm2-1-7b-instruct python src/run_sweep_2026.py --modelo SmolLM2-1.7B-Instruct
+
+=== [12/12] Qwen2.5-1.5B-Instruct (1-2B) ===
+docker run --rm --memory=8g --cpus=2 --cpuset-cpus=0-1 -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\data:/app/data -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\.hf_cache:/app/.hf_cache slm-domotica-2026:qwen2-5-1-5b-instruct python src/run_sweep_2026.py --modelo Qwen2.5-1.5B-Instruct
+
+Barrido completo, sin fallos.
