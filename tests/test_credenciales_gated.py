@@ -58,11 +58,11 @@ def test_un_solo_modelo_gated_ya_dispara_el_aborto(run_sweep, tmp_path, nombre):
 
 
 def test_los_no_gated_corren_sin_credenciales(run_sweep, tmp_path):
-    """13 tras el Delta 2026-08-04: los 12 del roster activo mas Qwen3.5-2B,
-    que esta excluido pero NO es gated. El conteo de gated es del registro y no
-    cambio (siguen siendo 2)."""
+    """14 tras el Delta 05: los 12 del roster activo mas Qwen3.5-2B (excluido,
+    no gated) mas Qwen2.5-0.5B-Instruct (baseline-completion, no gated). El
+    conteo de gated es del registro y no cambio (siguen siendo 2)."""
     no_gated = [m for m in MODELOS_2026 if not m.gated]
-    assert len(no_gated) == 13
+    assert len(no_gated) == 14
     assert run_sweep.validar_credenciales(no_gated, tmp_path) is None
 
 

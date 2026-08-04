@@ -15,7 +15,7 @@ Dos grupos de version, no doce pines distintos. Evidencia por modelo, nunca infe
 (ver `.claude-scratch/logs/probe.log`, `.claude-scratch/logs/probe5x.log`,
 `.claude-scratch/logs/sweep2.log` -- sondeos de compatibilidad, nunca datos de latencia).
 
-### Grupo A -- `BASELINE_TRANSFORMERS = "transformers>=4.57.0,<5.0.0"`, resuelve 4.57.6 (9 modelos)
+### Grupo A -- `BASELINE_TRANSFORMERS = "transformers>=4.57.0,<5.0.0"`, resuelve 4.57.6 (10 modelos: 9 del roster activo + 1 baseline-completion excluida)
 
 | Modelo | ¿Necesario? | Evidencia |
 |---|---|---|
@@ -28,6 +28,7 @@ Dos grupos de version, no doce pines distintos. Evidencia por modelo, nunca infe
 | `LFM2.5-1.2B-Instruct` | heredado | idem. |
 | `OLMo-2-0425-1B-Instruct` | heredado | idem. |
 | `Qwen2.5-1.5B-Instruct` | heredado | `PROBE_OK` en 4.57.6 (`PROBE_OK\|Qwen2.5-1.5B-Instruct\|4.57.6\|chat_template`, `.claude-scratch/logs/probe_qwen25_15b_groupA.log`); 5.x no probado. Grupo determinado por sonda propia, nunca por inferencia de familia: Qwen3.5 resuelve a grupo B. |
+| `Qwen2.5-0.5B-Instruct` | heredado | **Baseline-completion (Delta 05, 2026-08-04), excluida del roster activo, no gated.** `PROBE_OK` en 4.57.6 (`PROBE_OK\|Qwen2.5-0.5B-Instruct\|4.57.6\|chat_template`, `.claude-scratch/logs/probe_qwen25_05b_groupA.log`), sondeada dentro de la misma imagen de grupo A ya construida (`slm-domotica-2026:granite-4-0-350m`); 5.x no probado. Es el 4to modelo del paper original (`baseline_original=True`): completa el baseline re-medido bajo el harness/prompt 2026 sin entrar al roster de 12. |
 
 ### Grupo B -- `TRANSFORMERS_5X = "transformers>=5.0.0"`, resuelve 5.14.1 (3 modelos activos + 1 registrado y excluido)
 
@@ -52,6 +53,7 @@ en Amenazas a la Validez del paper, no se descarta.
 | `google/gemma-3-270m-it` | acceso de descarga no otorgado | 403 en `/google/gemma-3-270m-it/resolve/main/config.json` con `$HF_TOKEN` valido (repo `gated: "manual"`) | 2026-08-03 |
 | `meta-llama/Llama-3.2-1B-Instruct` | acceso de descarga no otorgado | 403 en `/meta-llama/Llama-3.2-1B-Instruct/resolve/main/config.json` con `$HF_TOKEN` valido (repo `gated: "manual"`) | 2026-08-03 |
 | `Qwen/Qwen3.5-2B` | compatibilidad de version **no verificada** | Falla bajo 4.57.6 (evidencia propia). Su sonda bajo 5.14.1 nunca corrio: el almacenamiento del daemon de Docker quedo en solo lectura. **No** hay evidencia de que falle bajo 5.14.1. Decision del usuario: excluirlo en lugar de perseguir la confirmacion. **No es gated**: su invocacion no lleva `--env-file`. | 2026-08-04 |
+| `Qwen/Qwen2.5-0.5B-Instruct` | **baseline-completion**, no es un modelo nuevo del roster 2026 | Cuarto modelo de `roster_baseline_original()` (Delta 05): completa la medicion de los 4 modelos del paper original bajo el harness/prompt 2026, motivada porque un control con el prompt original NO reprodujo la Tabla 2 publicada. `activo=False` sin condicion -- el roster activo de 12 no se revisita. `PROBE_OK` en 4.57.6, **no gated** (su invocacion tampoco lleva `--env-file`); a diferencia de los otros tres excluidos, esta exclusion es de alcance del roster, no de acceso ni de version. Se construye igual, explicitamente, via `docker/build_all.py --modelo "Qwen2.5-0.5B-Instruct"` y corre bajo `docker/run_baseline.py`, no bajo `docker/run_sweep.py`. | 2026-08-04 |
 
 Los dos primeros repos estan marcados `gated: "manual"`: el token es valido (verificado con
 `whoami-v2` y con `/api/models/<id>`, ambos 200), pero el unico endpoint que prueba acceso de
@@ -59,6 +61,9 @@ DESCARGA es `/<id>/resolve/<rev>/<archivo>`, y ese devuelve 403 para los dos. Pe
 `MODELOS_2026` (`gated=True`, `activo=False`) para que reactivarlos, si la aprobacion llega, sea un
 cambio de flag y no una reescritura de codigo. `Qwen3.5-2B` es un caso distinto: no es gated, y su
 exclusion es por compatibilidad de version no verificada bajo 5.14.1, no por acceso denegado.
+`Qwen2.5-0.5B-Instruct` es un tercer caso distinto de los dos anteriores: tampoco es gated y su
+version SI esta verificada (`PROBE_OK` en 4.57.6); su exclusion es de alcance de roster
+(baseline-completion, Delta 05), no de acceso ni de version.
 
 ## Credenciales de los modelos gated
 

@@ -39,6 +39,34 @@ REGISTRO pasa de 14 a 15 filas, a conteo de roster activo constante (12):
    correcto es `Qwen/Qwen2.5-1.5B-Instruct`. El reingreso de este modelo
    sostiene la línea de continuidad con la Tabla 2 publicada (RF19): los
    modelos presentes en los dos estudios pasan de 2 a 3.
+
+Delta 05 (2026-08-04). Un control re-corrió los tres anclajes de continuidad
+bajo el prompt ORIGINAL (`SYSTEM_PROMPT_PAPER`) y NO reprodujo la Tabla 2
+publicada (Qwen2.5-1.5B-Instruct 50.0% publicado vs 56.2% en control;
+SmolLM2-1.7B-Instruct 59.4% vs 50.0%; SmolLM2-360M-Instruct 18.8% vs 0.0%).
+La causa, con evidencia: `requirements.txt` legacy fija `transformers>=4.46.0`
+SIN cota superior y `data/resultados_experimento_detalle.csv` no tiene columna
+`transformers_version` -- el entorno de la corrida original nunca quedó
+fijado ni registrado, así que es irrecuperable. Es irreproducibilidad del
+trabajo original, no un defecto de `tests/test_metricas.py` (que sigue verde
+y recalcula los porcentajes publicados desde los outputs crudos publicados:
+la ruta de scoring es fiel).
+
+Consecuencia: las cifras publicadas dejan de ser baseline validado y pasan a
+referencia histórica no reproducida. El paper compara en cambio contra un
+baseline RE-MEDIDO e internamente consistente: los 4 modelos del paper
+original, medidos bajo el harness/prompt 2026, misma máquina, temperatura 0.
+4. `Qwen/Qwen2.5-0.5B-Instruct` se agrega al REGISTRO (15 → 16) para
+   completar ese baseline: sonda propia confirma grupo A
+   (`PROBE_OK|Qwen2.5-0.5B-Instruct|4.57.6|chat_template`, ver
+   `.claude-scratch/logs/probe_qwen25_05b_groupA.log`), pin HEREDADO (no se
+   probó 5.14.1, mismo estándar que `Qwen2.5-1.5B-Instruct`). Es
+   `baseline_original=True` pero `activo=False`: el roster activo de 12 NO
+   se revisita (decisión del usuario). Los otros 3 modelos de
+   `baseline_original` (`SmolLM2-360M-Instruct`, `SmolLM2-1.7B-Instruct`,
+   `Qwen2.5-1.5B-Instruct`) ya son parte del roster activo; `activo` y
+   `baseline_original` son ejes ortogonales, igual que `activo` y
+   `motivo_pin` (F3 (g)). Ver `roster_baseline_original()`.
 """
 
 import re
@@ -88,6 +116,15 @@ _MOTIVO_EXCLUSION_GATED = (
     "$HF_TOKEN valido (repo gated:manual, aprobacion pendiente al 2026-08-03). "
     "Reactivar es poner activo=True y vaciar este campo, sin reescribir codigo."
 )
+_MOTIVO_EXCLUSION_BASELINE_ORIGINAL = (
+    "No es un modelo nuevo del roster 2026: es el cuarto y ultimo modelo del paper original "
+    "que faltaba medir bajo el harness/prompt 2026 para completar un baseline internamente "
+    "consistente de los 4 modelos originales (Delta 05, 2026-08-04, motivado por el control que "
+    "NO reprodujo la Tabla 2 publicada). Los otros 3 modelos del baseline original "
+    "(SmolLM2-360M-Instruct, SmolLM2-1.7B-Instruct, Qwen2.5-1.5B-Instruct) ya estan en el roster "
+    "activo. Este NO entra al roster activo de 12: esa decision del usuario no se revisita. Ver "
+    "roster_baseline_original() y data/2026/baseline_original/."
+)
 _MOTIVO_EXCLUSION_QWEN35_2B = (
     "Fuera del roster activo por decision del usuario (2026-08-04): su pin del grupo B es "
     "necesario (falla bajo 4.57.6 con ValueError que pide 'pip install --upgrade "
@@ -114,6 +151,11 @@ class ModeloEvaluado2026:
     motivo_pin: str  # "" si el pin es heredado; el porqué si el pin es NECESARIO
     activo: bool  # True <=> forma parte del roster activo del barrido
     motivo_exclusion: str  # "" si activo; el porqué si no
+    # Delta 05: True <=> uno de los 4 modelos del paper original (Tabla 2 publicada).
+    # Eje ORTOGONAL a `activo`: 3 de los 4 ya están en el roster activo; el cuarto
+    # (Qwen2.5-0.5B-Instruct) es baseline_original=True con activo=False. Default
+    # False para no tocar ninguna de las filas que no son del paper original.
+    baseline_original: bool = False
 
 
 MODELOS_2026: list[ModeloEvaluado2026] = [
@@ -188,6 +230,7 @@ MODELOS_2026: list[ModeloEvaluado2026] = [
         motivo_pin="",
         activo=True,
         motivo_exclusion="",
+        baseline_original=True,  # anclaje de continuidad RF19, uno de los 4 del paper original
     ),
     ModeloEvaluado2026(
         nombre="gemma-3-270m-it",
@@ -272,6 +315,7 @@ MODELOS_2026: list[ModeloEvaluado2026] = [
         motivo_pin="",
         activo=True,
         motivo_exclusion="",
+        baseline_original=True,  # anclaje de continuidad RF19, uno de los 4 del paper original
     ),
     ModeloEvaluado2026(
         nombre="Llama-3.2-1B-Instruct",
@@ -302,6 +346,26 @@ MODELOS_2026: list[ModeloEvaluado2026] = [
         motivo_pin="",
         activo=True,
         motivo_exclusion="",
+        baseline_original=True,  # anclaje de continuidad RF19, uno de los 4 del paper original
+    ),
+    ModeloEvaluado2026(
+        nombre="Qwen2.5-0.5B-Instruct",
+        hf_repo_id="Qwen/Qwen2.5-0.5B-Instruct",
+        params_b=0.494,
+        tier="sub-1B",
+        transformers_pin=BASELINE_TRANSFORMERS,
+        trust_remote_code=False,
+        gated=False,
+        # Pin HEREDADO: la sonda del 2026-08-04 confirma que 4.57.6 funciona
+        # (PROBE_OK|Qwen2.5-0.5B-Instruct|4.57.6|chat_template, ver
+        # .claude-scratch/logs/probe_qwen25_05b_groupA.log), corrida dentro de la
+        # misma imagen ya construida del grupo A (slm-domotica-2026:granite-4-0-350m)
+        # que se usó para sondear a Qwen2.5-1.5B-Instruct. NO se probó 5.14.1, así
+        # que no hay evidencia de necesidad: mismo estándar que el resto del grupo A.
+        motivo_pin="",
+        activo=False,  # baseline-completion: no entra al roster activo de 12 (Delta 05)
+        motivo_exclusion=_MOTIVO_EXCLUSION_BASELINE_ORIGINAL,
+        baseline_original=True,  # el 4to modelo del paper original; completa el baseline
     ),
 ]
 
@@ -324,6 +388,15 @@ def por_nombre(nombre: str) -> ModeloEvaluado2026:
 def roster_activo() -> list[ModeloEvaluado2026]:
     """Los 12 modelos con activo=True, en orden de registro."""
     return [m for m in MODELOS_2026 if m.activo]
+
+
+def roster_baseline_original() -> list[ModeloEvaluado2026]:
+    """Los 4 modelos del paper original (Tabla 2 publicada), en orden de registro
+    (Delta 05). Eje ORTOGONAL a `roster_activo()`: 3 de los 4 ya están adentro
+    (son también las anclas de continuidad de RF19); el cuarto,
+    `Qwen2.5-0.5B-Instruct`, es `baseline_original=True` con `activo=False` --
+    completa la medición bajo el harness/prompt 2026 sin entrar al roster de 12."""
+    return [m for m in MODELOS_2026 if m.baseline_original]
 
 
 def por_tier(tier: Tier) -> list[ModeloEvaluado2026]:

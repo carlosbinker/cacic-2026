@@ -16,12 +16,15 @@ from models_2026 import (  # noqa: E402
     por_nombre,
     por_tier,
     roster_activo,
+    roster_baseline_original,
     slug,
 )
 
-DESCARTADOS = {
-    "Qwen/Qwen2.5-0.5B-Instruct",   # superado por Qwen3.5-0.8B
-}
+# Qwen/Qwen2.5-0.5B-Instruct YA NO esta descartado: el Delta 05 (2026-08-04) lo
+# agrega al registro como baseline_original=True, activo=False (completa el
+# baseline de los 4 modelos del paper original bajo el harness 2026; no entra
+# al roster activo de 12, decision del usuario no revisitada).
+DESCARTADOS: set[str] = set()
 # Qwen/Qwen2.5-1.5B-Instruct YA NO esta descartado: el Delta 2026-08-04 lo
 # reincorporo al roster activo (indice §2.1, RF19).
 INEXISTENTES = {
@@ -29,8 +32,8 @@ INEXISTENTES = {
 }
 
 
-def test_el_registro_tiene_quince_modelos():
-    assert len(MODELOS_2026) == 15
+def test_el_registro_tiene_dieciseis_modelos():
+    assert len(MODELOS_2026) == 16
 
 
 def test_no_hay_modelos_descartados_ni_inexistentes():
@@ -49,8 +52,8 @@ def test_exactamente_dos_modelos_gated():
 
 
 def test_nombres_y_repos_son_unicos():
-    assert len({m.nombre for m in MODELOS_2026}) == 15
-    assert len({m.hf_repo_id for m in MODELOS_2026}) == 15
+    assert len({m.nombre for m in MODELOS_2026}) == 16
+    assert len({m.hf_repo_id for m in MODELOS_2026}) == 16
 
 
 def test_seis_por_tier_en_el_roster_activo():
@@ -68,7 +71,7 @@ def test_smollm2_aporta_los_dos_tamanos_del_paper_original():
 
 def test_los_slugs_son_unicos_y_aptos_para_nombre_de_archivo():
     slugs = [slug(m.nombre) for m in MODELOS_2026]
-    assert len(set(slugs)) == 15
+    assert len(set(slugs)) == 16
     for s in slugs:
         assert s and all(c.isalnum() or c == "-" for c in s)
         assert not s.startswith("-") and not s.endswith("-")
@@ -119,25 +122,27 @@ def test_dos_grupos_de_version_nueve_y_tres_en_el_roster_activo():
     assert len(grupo_a) + len(grupo_b) == len(activos) == 12
 
 
-def test_dos_grupos_de_version_once_y_cuatro_en_el_registro():
-    """F3 (b): sobre el REGISTRO son 11 en A (9 activos + 2 gated) y 4 en B."""
+def test_dos_grupos_de_version_doce_y_cuatro_en_el_registro():
+    """F3 (b), amendado por el Delta 05: sobre el REGISTRO son 12 en A (9 activos +
+    2 gated + Qwen2.5-0.5B-Instruct, baseline_original) y 4 en B."""
     grupo_a = [m for m in MODELOS_2026 if m.transformers_pin == BASELINE_TRANSFORMERS]
     grupo_b = [m for m in MODELOS_2026 if m.transformers_pin == TRANSFORMERS_5X]
-    assert len(grupo_a) == 11
+    assert len(grupo_a) == 12
     assert len(grupo_b) == 4
 
 
-def test_el_registro_completo_tiene_quince_y_dos_gated():
-    """F3 (c): el conteo de gated es del REGISTRO y NO cambio con el Delta 03."""
-    assert len(MODELOS_2026) == 15
+def test_el_registro_completo_tiene_dieciseis_y_dos_gated():
+    """F3 (c): el conteo de gated es del REGISTRO y NO cambio con el Delta 03 ni con el 05."""
+    assert len(MODELOS_2026) == 16
     gateados = {m.hf_repo_id for m in MODELOS_2026 if m.gated}
     assert gateados == {"google/gemma-3-270m-it", "meta-llama/Llama-3.2-1B-Instruct"}
     assert {m.hf_repo_id for m in gated()} == gateados
 
 
-def test_trece_no_gated_en_el_registro():
-    """12 activos + Qwen3.5-2B (excluido, no gated)."""
-    assert len([m for m in MODELOS_2026 if not m.gated]) == 13
+def test_catorce_no_gated_en_el_registro():
+    """12 activos + Qwen3.5-2B (excluido, no gated) + Qwen2.5-0.5B-Instruct
+    (baseline_original, no gated) = 14 (Delta 05)."""
+    assert len([m for m in MODELOS_2026 if not m.gated]) == 14
 
 
 def test_roster_activo_sigue_en_doce_seis_por_tier_y_cero_gated():
@@ -187,14 +192,25 @@ def test_qwen35_2b_esta_excluido_con_motivo_y_conserva_su_pin_necesario():
     assert "falla bajo transformers 5" not in bajo
 
 
-def test_los_tres_excluidos_y_sus_dos_causas():
+def test_los_cuatro_excluidos_y_sus_tres_causas():
+    """Delta 05: el intercambio no toco esta cuenta, pero se suma un cuarto excluido
+    (Qwen2.5-0.5B-Instruct) por una TERCERA causa distinta de las dos ya existentes
+    (403 de acceso gated; version 5.14.1 no verificada): es baseline-completion, no
+    un modelo nuevo evaluado ni un bloqueo de acceso/version."""
     excluidos = {m.nombre for m in MODELOS_2026 if not m.activo}
-    assert excluidos == {"gemma-3-270m-it", "Llama-3.2-1B-Instruct", "Qwen3.5-2B"}
+    assert excluidos == {
+        "gemma-3-270m-it", "Llama-3.2-1B-Instruct", "Qwen3.5-2B", "Qwen2.5-0.5B-Instruct",
+    }
     for m in MODELOS_2026:
         if not m.activo and m.gated:
             assert "403" in m.motivo_exclusion or "resolve" in m.motivo_exclusion
-        if not m.activo and not m.gated:
+        if not m.activo and not m.gated and not m.baseline_original:
             assert "5.14.1" in m.motivo_exclusion
+        if m.baseline_original and not m.activo:
+            bajo = m.motivo_exclusion.lower()
+            assert "baseline" in bajo
+            assert "5.14.1" not in m.motivo_exclusion, "no es una exclusion por version"
+            assert "403" not in m.motivo_exclusion, "no es una exclusion por acceso"
 
 
 def test_pines_necesarios_cinco_en_el_registro_cuatro_en_el_roster():
@@ -238,3 +254,56 @@ def test_por_nombre_encuentra_y_falla_bien():
     assert por_nombre("Qwen3.5-2B").hf_repo_id == "Qwen/Qwen3.5-2B"
     with pytest.raises(ValueError, match="inexistente"):
         por_nombre("inexistente")
+
+
+# --------------------------------------------------------------------------
+# Delta 05 (2026-08-04): baseline de los 4 modelos del paper original
+# --------------------------------------------------------------------------
+
+def test_roster_baseline_original_tiene_los_cuatro_modelos_del_paper():
+    baseline = roster_baseline_original()
+    assert {m.nombre for m in baseline} == {
+        "SmolLM2-360M-Instruct", "SmolLM2-1.7B-Instruct",
+        "Qwen2.5-1.5B-Instruct", "Qwen2.5-0.5B-Instruct",
+    }
+    assert len(baseline) == 4
+
+
+def test_roster_baseline_original_es_subconjunto_ordenado_del_registro():
+    baseline = roster_baseline_original()
+    indices = [MODELOS_2026.index(m) for m in baseline]
+    assert indices == sorted(indices)
+
+
+def test_tres_de_los_cuatro_baseline_original_ya_estan_en_el_roster_activo():
+    """Solo Qwen2.5-0.5B-Instruct falta: los otros 3 son tambien anclas de RF19 y
+    ya corren en el barrido principal (activo=True)."""
+    baseline = roster_baseline_original()
+    activos = {m.nombre for m in baseline if m.activo}
+    inactivos = {m.nombre for m in baseline if not m.activo}
+    assert activos == {"SmolLM2-360M-Instruct", "SmolLM2-1.7B-Instruct", "Qwen2.5-1.5B-Instruct"}
+    assert inactivos == {"Qwen2.5-0.5B-Instruct"}
+
+
+def test_qwen25_05b_instruct_es_baseline_completion_no_activo_grupo_a():
+    """Sonda propia bajo grupo A (PROBE_OK|Qwen2.5-0.5B-Instruct|4.57.6|chat_template,
+    .claude-scratch/logs/probe_qwen25_05b_groupA.log). Pin heredado (no se probo 5.14.1).
+    activo=False: no entra al roster de 12 (decision del usuario, no revisitada)."""
+    m = por_nombre("Qwen2.5-0.5B-Instruct")
+    assert m.hf_repo_id == "Qwen/Qwen2.5-0.5B-Instruct"
+    assert m.params_b == 0.494          # igual que la Tabla 1 publicada
+    assert m.tier == "sub-1B"
+    assert m.transformers_pin == BASELINE_TRANSFORMERS
+    assert m.gated is False
+    assert m.trust_remote_code is False
+    assert m.baseline_original is True
+    assert m.activo is False
+    assert m.motivo_pin == "", "su pin es heredado, no necesario: la sonda 5.14.1 no se corrio"
+    assert m.motivo_exclusion, "activo=False exige motivo_exclusion no vacio"
+
+
+def test_baseline_original_por_defecto_es_false():
+    """El campo tiene default False: las filas que no son del paper original no
+    necesitan tocarse para adoptarlo."""
+    m = por_nombre("LFM2.5-230M")
+    assert m.baseline_original is False
