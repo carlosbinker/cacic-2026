@@ -57,10 +57,21 @@ def test_un_solo_modelo_gated_ya_dispara_el_aborto(run_sweep, tmp_path, nombre):
         run_sweep.validar_credenciales([por_nombre(nombre)], tmp_path)
 
 
-def test_los_doce_no_gated_corren_sin_credenciales(run_sweep, tmp_path):
+def test_los_no_gated_corren_sin_credenciales(run_sweep, tmp_path):
+    """13 tras el Delta 2026-08-04: los 12 del roster activo mas Qwen3.5-2B,
+    que esta excluido pero NO es gated. El conteo de gated es del registro y no
+    cambio (siguen siendo 2)."""
     no_gated = [m for m in MODELOS_2026 if not m.gated]
-    assert len(no_gated) == 12
+    assert len(no_gated) == 13
     assert run_sweep.validar_credenciales(no_gated, tmp_path) is None
+
+
+def test_un_excluido_no_gated_no_dispara_el_fail_fast(run_sweep, tmp_path):
+    """Qwen3.5-2B esta excluido, pero no necesita token: si alguien lo reactiva,
+    el barrido tiene que seguir corriendo sin .env."""
+    qwen = por_nombre("Qwen3.5-2B")
+    assert qwen.activo is False and qwen.gated is False
+    assert run_sweep.validar_credenciales([qwen], tmp_path) is None
 
 
 def test_no_aborta_con_el_token_presente(run_sweep, tmp_path):
