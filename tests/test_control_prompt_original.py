@@ -164,15 +164,21 @@ def test_ruta_control_usa_el_slug_bajo_control_prompt_original():
     assert ruta.parent.parent.name == "2026"
 
 
-def test_verificar_es_ancla_rechaza_un_modelo_fuera_de_los_tres():
+def test_verificar_es_baseline_original_rechaza_un_modelo_fuera_del_roster():
     otro = por_nombre("LFM2.5-230M")
-    with pytest.raises(ValueError, match="no es uno de los tres anclajes"):
-        rcpo.verificar_es_ancla(otro)
+    with pytest.raises(ValueError, match="no es uno de los 4 modelos de roster_baseline_original"):
+        rcpo.verificar_es_baseline_original(otro)
 
 
-def test_verificar_es_ancla_acepta_los_tres_anclajes():
-    for nombre in rcpo.ANCLAS_CONTROL:
-        rcpo.verificar_es_ancla(por_nombre(nombre))  # no debe lanzar
+def test_verificar_es_baseline_original_acepta_los_cuatro_modelos():
+    """Delta 06: la validación se amplía a los 4 de `roster_baseline_original()`,
+    no solo los tres anclajes de continuidad -- incluye `Qwen2.5-0.5B-Instruct`."""
+    from models_2026 import roster_baseline_original
+    nombres = [m.nombre for m in roster_baseline_original()]
+    assert len(nombres) == 4
+    assert "Qwen2.5-0.5B-Instruct" in nombres
+    for nombre in nombres:
+        rcpo.verificar_es_baseline_original(por_nombre(nombre))  # no debe lanzar
 
 
 def test_construir_entrada_original_usa_el_prompt_del_paper_no_el_2026():
@@ -220,12 +226,46 @@ def test_main_escribe_el_csv_de_control_con_las_columnas_congeladas(monkeypatch,
     assert sorted(df["idx"]) == list(range(run_sweep_2026.N_COMANDOS_ESPERADO))
 
 
-def test_main_rechaza_un_modelo_fuera_de_los_tres_anclajes(monkeypatch):
+def test_main_rechaza_un_modelo_fuera_del_baseline_original(monkeypatch):
     monkeypatch.setattr(sys, "argv", [
         "run_control_prompt_original.py", "--modelo", "LFM2.5-230M",
     ])
-    with pytest.raises(ValueError, match="no es uno de los tres anclajes"):
+    with pytest.raises(ValueError, match="no es uno de los 4 modelos de roster_baseline_original"):
         rcpo.main()
+
+
+def test_main_acepta_qwen25_05b_instruct_el_cuarto_modelo(monkeypatch, tmp_path):
+    """Delta 06: el 4to modelo del baseline original, que antes `verificar_es_ancla`
+    rechazaba, ahora corre por el mismo entrypoint sin ningún otro cambio de código."""
+    ruta_tmp = tmp_path / "qwen2-5-0-5b-instruct.csv"
+    monkeypatch.setattr(rcpo, "ruta_control", lambda nombre: ruta_tmp)
+
+    dataset = run_sweep_2026.cargar_dataset()
+
+    def fake_evaluar_modelo(modelo_, dataset_, construir_entrada=None):
+        assert construir_entrada is rcpo.construir_entrada_original
+        filas = []
+        for idx, fila_ds in dataset_.iterrows():
+            filas.append(run_sweep_2026.armar_fila(
+                modelo=modelo_, idx=int(idx), comando=fila_ds["comando"],
+                gt={"intent": "encender", "dispositivo": "luz", "ubicacion": "living",
+                    "valor": None, "unidad": None},
+                texto_generado='{"intent": "encender", "dispositivo": "luz", '
+                               '"ubicacion": "living", "valor": null, "unidad": null}',
+                latencia_s=0.01, modo="chat_template", transformers_version="4.57.6",
+            ))
+        return filas
+
+    monkeypatch.setattr(rcpo, "evaluar_modelo", fake_evaluar_modelo)
+    monkeypatch.setattr(rcpo, "cargar_dataset", lambda: dataset)
+    monkeypatch.setattr(sys, "argv", [
+        "run_control_prompt_original.py", "--modelo", "Qwen2.5-0.5B-Instruct",
+    ])
+
+    assert rcpo.main() == 0
+    df = pd.read_csv(ruta_tmp)
+    assert list(df.columns) == run_sweep_2026.COLUMNAS_DETALLE
+    assert len(df) == run_sweep_2026.N_COMANDOS_ESPERADO
 
 
 def test_main_saltea_si_el_csv_de_control_ya_esta_completo(monkeypatch, tmp_path):
@@ -261,6 +301,35 @@ def test_el_modulo_de_control_se_importa_sin_torch_ni_transformers():
 def test_modelos_control_son_los_tres_anclajes_en_orden_fijo():
     nombres = [m.nombre for m in run_control.modelos_control()]
     assert nombres == list(rcpo.ANCLAS_CONTROL)
+
+
+def test_modelos_para_ejecutar_sin_filtro_no_cambia_el_barrido_por_defecto():
+    """Delta 06: sin `--modelo`, el comportamiento es idéntico al de antes --
+    los tres CSV de control ya existentes no se recomputan de más."""
+    assert run_control.modelos_para_ejecutar(None) == run_control.modelos_control()
+
+
+def test_modelos_para_ejecutar_con_filtro_devuelve_solo_ese_modelo():
+    modelos = run_control.modelos_para_ejecutar("Qwen2.5-0.5B-Instruct")
+    assert [m.nombre for m in modelos] == ["Qwen2.5-0.5B-Instruct"]
+
+
+def test_modelos_para_ejecutar_rechaza_un_modelo_fuera_del_baseline_original():
+    with pytest.raises(ValueError, match="no es uno de los 4 modelos de roster_baseline_original"):
+        run_control.modelos_para_ejecutar("LFM2.5-230M")
+
+
+def test_dry_run_con_modelo_filtra_a_un_solo_comando(capsys):
+    """`--modelo` limita el dry-run a un único `docker run`, sin tocar los
+    comandos de los tres anclajes existentes."""
+    modelos = run_control.modelos_para_ejecutar("Qwen2.5-0.5B-Instruct")
+    codigo = run_control.ejecutar_control(modelos, force=False, dry_run=True)
+    assert codigo == 0
+    lineas_comando = [
+        linea for linea in capsys.readouterr().out.splitlines() if linea.startswith("docker run")
+    ]
+    assert len(lineas_comando) == 1
+    assert "slm-domotica-2026:qwen2-5-0-5b-instruct" in lineas_comando[0]
 
 
 def test_comando_run_control_respeta_el_mismo_envolvente_de_recursos():

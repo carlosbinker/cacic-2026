@@ -25,20 +25,33 @@ constructor de entrada distinto (`construir_entrada_original`, que sustituye
 algo más para que esto corra, hay que PARAR: no es un ajuste, es que el
 invariante se rompió.
 
-Restringido a los tres anclajes (`ANCLAS_CONTROL`): son los únicos con una
-cifra publicada contra la que comparar el efecto del prompt, y son además
-los únicos tres cuyas imágenes Docker del barrido principal (grupo A,
-`transformers==4.57.6`) se reusan sin reconstruir.
+Restringido, en su origen, a los tres anclajes de continuidad
+(`ANCLAS_CONTROL`): son los que tienen una cifra publicada contra la que
+comparar el efecto del prompt, y además los únicos tres cuyas imágenes
+Docker del barrido principal (grupo A, `transformers==4.57.6`) se reusaban
+sin reconstruir.
+
+Delta 06 (2026-08-04) amplía la validación de este entrypoint a los
+**cuatro** modelos de `roster_baseline_original()`: falta medir
+`Qwen2.5-0.5B-Instruct` bajo el prompt ORIGINAL para completar la matriz
+4×2 (4 modelos × {prompt original, prompt 2026}) del brazo de generación
+anterior -- su imagen ya existe (`slm-domotica-2026:qwen2-5-0-5b-instruct`,
+construida en el Delta 05 para la baseline-completion bajo el prompt 2026) y
+tampoco se reconstruye. `ANCLAS_CONTROL` se mantiene tal cual (los tres
+anclajes con imagen ya reusada por `docker/run_control.py` en su barrido por
+defecto); la validación de este módulo pasa a apoyarse en
+`roster_baseline_original()`, no en una segunda lista hardcodeada.
 
 Uso:
     python src/run_control_prompt_original.py --modelo "SmolLM2-360M-Instruct" [--force]
+    python src/run_control_prompt_original.py --modelo "Qwen2.5-0.5B-Instruct" [--force]
 """
 
 import argparse
 import sys
 from pathlib import Path
 
-from models_2026 import ModeloEvaluado2026, por_nombre, slug
+from models_2026 import ModeloEvaluado2026, por_nombre, roster_baseline_original, slug
 from prompt import SYSTEM_PROMPT_PAPER
 from prompt_2026 import ModoPrompting, construir_entrada_con_prompt
 from run_sweep_2026 import cargar_dataset, debe_saltear, escribir_detalle, evaluar_modelo
@@ -46,10 +59,11 @@ from run_sweep_2026 import cargar_dataset, debe_saltear, escribir_detalle, evalu
 RAIZ = Path(__file__).resolve().parent.parent
 DIR_CONTROL = RAIZ / "data" / "2026" / "control_prompt_original"
 
-# Los tres modelos que también aparecen en la Tabla 2 publicada (RF19): son
-# los únicos con una cifra publicada contra la que comparar, así que la
-# corrida de control no tiene sentido -- ni imagen Docker construida -- para
-# ningún otro modelo del roster.
+# Los tres modelos que también aparecen en la Tabla 2 publicada y ya están en
+# el roster activo (RF19): son el barrido por defecto de `docker/run_control.py`.
+# NO es la validación de este módulo (ver `verificar_es_baseline_original`,
+# Delta 06): esa se apoya en `roster_baseline_original()`, que agrega el cuarto
+# modelo (`Qwen2.5-0.5B-Instruct`, baseline-completion, `activo=False`).
 ANCLAS_CONTROL: tuple[str, ...] = (
     "SmolLM2-360M-Instruct",
     "Qwen2.5-1.5B-Instruct",
@@ -58,16 +72,22 @@ ANCLAS_CONTROL: tuple[str, ...] = (
 
 
 def ruta_control(nombre_modelo: str) -> Path:
-    """CSV de control que le corresponde a un anclaje."""
+    """CSV de control que le corresponde a un modelo del baseline original."""
     return DIR_CONTROL / f"{slug(nombre_modelo)}.csv"
 
 
-def verificar_es_ancla(modelo: ModeloEvaluado2026) -> None:
-    """La corrida de control está restringida a los tres anclajes de continuidad."""
-    if modelo.nombre not in ANCLAS_CONTROL:
+def verificar_es_baseline_original(modelo: ModeloEvaluado2026) -> None:
+    """La corrida de control está restringida a los 4 modelos de
+    `roster_baseline_original()` (Delta 06): los tres anclajes de continuidad
+    más `Qwen2.5-0.5B-Instruct`, que completa la matriz 4×2 bajo el prompt
+    original. El conjunto permitido se deriva de esa función -- nunca de una
+    segunda lista hardcodeada -- para que agregar o quitar un modelo del
+    baseline original no requiera tocar dos lugares."""
+    nombres_validos = {m.nombre for m in roster_baseline_original()}
+    if modelo.nombre not in nombres_validos:
         raise ValueError(
-            f"{modelo.nombre} no es uno de los tres anclajes de continuidad "
-            f"({', '.join(ANCLAS_CONTROL)}); la corrida de control con el "
+            f"{modelo.nombre} no es uno de los 4 modelos de roster_baseline_original() "
+            f"({', '.join(sorted(nombres_validos))}); la corrida de control con el "
             f"prompt original está restringida a ellos."
         )
 
@@ -81,11 +101,13 @@ def construir_entrada_original(tokenizer, comando: str) -> tuple[dict, ModoPromp
 
 
 def _parsear_argumentos() -> argparse.Namespace:
+    nombres_validos = [m.nombre for m in roster_baseline_original()]
     parser = argparse.ArgumentParser(
-        description="Corrida de control: prompt original del paper sobre un anclaje"
+        description="Corrida de control: prompt original del paper sobre el baseline original"
     )
     parser.add_argument("--modelo", required=True,
-                        help=f"uno de los tres anclajes: {', '.join(ANCLAS_CONTROL)}")
+                        help=f"uno de los 4 modelos de roster_baseline_original(): "
+                             f"{', '.join(nombres_validos)}")
     parser.add_argument("--force", action="store_true",
                         help="rehacer aunque el CSV de control ya esté completo")
     return parser.parse_args()
@@ -94,7 +116,7 @@ def _parsear_argumentos() -> argparse.Namespace:
 def main() -> int:
     args = _parsear_argumentos()
     modelo = por_nombre(args.modelo)
-    verificar_es_ancla(modelo)
+    verificar_es_baseline_original(modelo)
 
     salida = ruta_control(modelo.nombre)
     if debe_saltear(salida, args.force):

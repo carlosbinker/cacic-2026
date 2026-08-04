@@ -32,7 +32,7 @@ sys.path.insert(0, str(RAIZ / "src"))
 sys.path.insert(0, str(AQUI))
 
 from build_all import tag_imagen  # noqa: E402
-from models_2026 import ModeloEvaluado2026, por_nombre  # noqa: E402
+from models_2026 import ModeloEvaluado2026, por_nombre, roster_baseline_original  # noqa: E402
 from run_control_prompt_original import ANCLAS_CONTROL, ruta_control  # noqa: E402
 
 CPUSET_POR_DEFECTO = "0-1"
@@ -43,6 +43,25 @@ FALLOS_PATH = DIR_CONTROL / "fallos_control.json"
 def modelos_control() -> list[ModeloEvaluado2026]:
     """Los tres anclajes de continuidad, en el orden fijo de `ANCLAS_CONTROL`."""
     return [por_nombre(nombre) for nombre in ANCLAS_CONTROL]
+
+
+def modelos_para_ejecutar(nombre_filtro: str | None) -> list[ModeloEvaluado2026]:
+    """Delta 06: sin `--modelo`, el barrido por defecto de los tres anclajes
+    no cambia (`modelos_control()`, los tres CSV ya completos se saltean por
+    `_csv_ya_completo` de todos modos). Con `--modelo`, corre SOLO ese modelo
+    -- validado contra `roster_baseline_original()`, nunca una segunda lista
+    hardcodeada -- para completar la matriz 4×2 (hoy, `Qwen2.5-0.5B-Instruct`
+    bajo el prompt original) sin volver a tocar ni recomputar los tres CSV de
+    control ya existentes."""
+    if nombre_filtro is None:
+        return modelos_control()
+    nombres_validos = {m.nombre for m in roster_baseline_original()}
+    if nombre_filtro not in nombres_validos:
+        raise ValueError(
+            f"{nombre_filtro} no es uno de los 4 modelos de roster_baseline_original() "
+            f"({', '.join(sorted(nombres_validos))})."
+        )
+    return [por_nombre(nombre_filtro)]
 
 
 def comando_run_control(modelo: ModeloEvaluado2026, raiz: Path, force: bool = False,
@@ -169,10 +188,14 @@ def ejecutar_control(modelos: list[ModeloEvaluado2026], force: bool, dry_run: bo
 
 def _parsear_argumentos() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Corrida de control: prompt original del paper sobre los 3 anclajes"
+        description="Corrida de control: prompt original del paper sobre el baseline original"
     )
+    parser.add_argument("--modelo", default=None,
+                        help="opcional: correr SOLO este modelo (uno de "
+                             "roster_baseline_original()) en vez del barrido por defecto "
+                             "de los tres anclajes; no toca ni recomputa los otros CSV")
     parser.add_argument("--force", action="store_true",
-                        help="rehacer aunque el CSV del anclaje ya esté completo")
+                        help="rehacer aunque el CSV ya esté completo")
     parser.add_argument("--dry-run", action="store_true",
                         help="imprimir los comandos sin ejecutarlos")
     parser.add_argument("--cpuset", default=CPUSET_POR_DEFECTO,
@@ -183,7 +206,8 @@ def _parsear_argumentos() -> argparse.Namespace:
 
 def main() -> int:
     args = _parsear_argumentos()
-    return ejecutar_control(modelos_control(), args.force, args.dry_run, args.cpuset)
+    modelos = modelos_para_ejecutar(args.modelo)
+    return ejecutar_control(modelos, args.force, args.dry_run, args.cpuset)
 
 
 if __name__ == "__main__":
