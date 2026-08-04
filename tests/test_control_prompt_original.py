@@ -33,6 +33,7 @@ from prompt_2026 import SYSTEM_PROMPT_2026, construir_entrada_con_prompt  # noqa
 import run_sweep_2026  # noqa: E402
 import run_control_prompt_original as rcpo  # noqa: E402
 import run_control  # noqa: E402
+import comparar_control as cc  # noqa: E402
 
 RAIZ = Path(__file__).resolve().parent.parent
 
@@ -388,3 +389,140 @@ def test_no_hay_credenciales_en_run_control():
     fuente = (RAIZ / "docker" / "run_control.py").read_text(encoding="utf-8")
     assert not re.search(r"hf_[A-Za-z0-9]{20,}", fuente)
     assert "ARG HF_TOKEN" not in fuente and "ENV HF_TOKEN" not in fuente
+
+
+# --------------------------------------------------------------------------
+# Task 3: src/comparar_control.py
+# --------------------------------------------------------------------------
+
+def test_cargar_publicado_indexa_por_modelo(tmp_path):
+    ruta = tmp_path / "resumen.json"
+    ruta.write_text(json.dumps([
+        {"modelo": "SmolLM2-360M-Instruct", "exact_match_pct": 18.8,
+         "json_valido_pct": 100.0, "avg_latencia_s": 15.617},
+    ]), encoding="utf-8")
+    publicado = cc.cargar_publicado(ruta)
+    assert publicado["SmolLM2-360M-Instruct"]["exact_match_pct"] == 18.8
+
+
+def test_cargar_publicado_usa_el_f0_real_por_defecto():
+    """La fuente única de las cifras publicadas es el F0 real
+    (data/resultados_experimento_resumen.json); nunca un número hardcodeado."""
+    publicado = cc.cargar_publicado()
+    assert publicado["SmolLM2-360M-Instruct"]["exact_match_pct"] == 18.8
+    assert publicado["Qwen2.5-1.5B-Instruct"]["exact_match_pct"] == 50.0
+    assert publicado["SmolLM2-1.7B-Instruct"]["exact_match_pct"] == 59.4
+    for fila in publicado.values():
+        assert fila["json_valido_pct"] == 100.0
+
+
+def _df_control(n_exactos: int, n_json_validos: int, n: int = 4) -> pd.DataFrame:
+    return pd.DataFrame([
+        {
+            "match_exact": i < n_exactos,
+            "json_valido": i < n_json_validos,
+            "latencia_s": 1.0 + i,
+        }
+        for i in range(n)
+    ])
+
+
+def test_metricas_de_detalle_calcula_los_tres_porcentajes():
+    m = cc.metricas_de_detalle(_df_control(n_exactos=1, n_json_validos=2, n=4))
+    assert m["n"] == 4
+    assert m["exact_match_pct"] == 25.0
+    assert m["json_valido_pct"] == 50.0
+    assert m["avg_latencia_s"] == 2.5
+
+
+def test_cargar_banda_devuelve_none_si_no_existe(tmp_path):
+    assert cc.cargar_banda(tmp_path, "SmolLM2-360M-Instruct") is None
+
+
+def test_cargar_banda_lee_el_csv_del_slug(tmp_path):
+    ruta = tmp_path / f"{slug('SmolLM2-360M-Instruct')}.csv"
+    _df_control(2, 3, 4).to_csv(ruta, index=False)
+    m = cc.cargar_banda(tmp_path, "SmolLM2-360M-Instruct")
+    assert m["n"] == 4
+
+
+def test_comparar_anclaje_rechaza_un_modelo_sin_cifra_publicada():
+    with pytest.raises(ValueError):
+        cc.comparar_anclaje("LFM2.5-230M", cc.cargar_publicado())
+
+
+def test_comparar_anclaje_calcula_los_tres_deltas(tmp_path, monkeypatch):
+    monkeypatch.setattr(cc, "DIR_CONTROL", tmp_path / "control")
+    monkeypatch.setattr(cc, "DIR_DETALLE_NUEVO", tmp_path / "nuevo")
+    (tmp_path / "control").mkdir()
+    (tmp_path / "nuevo").mkdir()
+    slug_m = slug("SmolLM2-360M-Instruct")
+    _df_control(n_exactos=8, n_json_validos=32, n=32).to_csv(
+        tmp_path / "control" / f"{slug_m}.csv", index=False)
+    _df_control(n_exactos=8, n_json_validos=8, n=32).to_csv(
+        tmp_path / "nuevo" / f"{slug_m}.csv", index=False)
+
+    publicado = cc.cargar_publicado()
+    resultado = cc.comparar_anclaje("SmolLM2-360M-Instruct", publicado)
+    assert resultado["control_prompt_original"]["exact_match_pct"] == 25.0
+    assert resultado["nuevo_prompt_2026"]["exact_match_pct"] == 25.0
+    d = resultado["deltas_exact_match_pp"]
+    assert d["control_vs_publicado"] == round(25.0 - 18.8, 1)
+    assert d["nuevo_vs_publicado"] == round(25.0 - 18.8, 1)
+    assert d["nuevo_vs_control"] == 0.0
+
+
+def test_comparar_anclaje_con_datos_reales_nuevo_control_ausente():
+    """Sin monkeypatch: usa el CSV real de data/2026/detalle/ (commiteado, de
+    solo lectura) y confirma que la banda de control -- que todavía no corrió
+    -- da `None` en vez de crashear."""
+    publicado = cc.cargar_publicado()
+    resultado = cc.comparar_anclaje("SmolLM2-360M-Instruct", publicado)
+    assert resultado["nuevo_prompt_2026"] is not None
+    assert resultado["nuevo_prompt_2026"]["n"] == 32
+    assert resultado["control_prompt_original"] is None
+    assert resultado["deltas_exact_match_pp"]["control_vs_publicado"] is None
+
+
+def test_escribir_comparacion_escribe_json_indentado(tmp_path):
+    comparacion = {"anclajes": [], "nota_latencia": "x"}
+    salida = tmp_path / "out.json"
+    cc.escribir_comparacion(comparacion, salida)
+    assert json.loads(salida.read_text(encoding="utf-8")) == comparacion
+
+
+def test_imprimir_tabla_no_crashea_con_bandas_faltantes(capsys):
+    comparacion = {
+        "anclajes": [{
+            "modelo": "X", "publicado": {"exact_match_pct": 10.0},
+            "control_prompt_original": None, "nuevo_prompt_2026": None,
+            "deltas_exact_match_pp": {
+                "control_vs_publicado": None, "nuevo_vs_publicado": None, "nuevo_vs_control": None,
+            },
+        }],
+        "nota_latencia": "nota de prueba",
+    }
+    cc.imprimir_tabla(comparacion)
+    assert "nota de prueba" in capsys.readouterr().out
+
+
+def test_nota_latencia_advierte_sobre_no_comparabilidad():
+    texto = cc.NOTA_LATENCIA.lower()
+    assert "latencia" in texto
+    assert "no" in texto
+    assert "ocios" in texto  # ocioso/ociosa
+
+
+def test_main_escribe_y_no_toca_el_repo(monkeypatch, tmp_path, capsys):
+    monkeypatch.setattr(cc, "SALIDA_PATH", tmp_path / "comparacion.json")
+    codigo = cc.main()
+    assert codigo == 0
+    assert (tmp_path / "comparacion.json").exists()
+    assert "modelo" in capsys.readouterr().out.lower()
+
+
+def test_el_modulo_de_comparacion_se_importa_sin_torch_ni_transformers():
+    fuente = (RAIZ / "src" / "comparar_control.py").read_text(encoding="utf-8")
+    for linea in fuente.splitlines():
+        if linea.startswith(("import ", "from ")):
+            assert "torch" not in linea and "transformers" not in linea, linea
