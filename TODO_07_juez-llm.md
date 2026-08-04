@@ -18,6 +18,20 @@ Salida cerrada, nunca abierta: la respuesta del juez se parsea contra el vocabul
 
 Este subtask escribe el **código**; el subtask 08 lo **ejecuta**. Todo lo testeable aquí se testea con un juez falso, sin descargar pesos.
 
+**F12.3 — persistencia incremental.** `etiquetar_errores` y `etiquetar_categorias` ganan un parámetro
+`persistir: Callable[[pd.DataFrame], None] | None = None`. Cuando no es `None` se lo invoca con el
+DataFrame **acumulado hasta ese punto** (columnas ya en el orden de `COLUMNAS_ETIQUETAS` /
+`COLUMNAS_CATEGORIAS`): en `etiquetar_errores`, al terminar cada **modelo** (agrupando `incorrectas`
+por `modelo` en el orden del roster, para que "al terminar cada modelo" esté bien definido); en
+`etiquetar_categorias`, al terminar cada **comando**. `persistir is None` reproduce exactamente el
+comportamiento de antes de este contrato, así que los tests ya escritos en este archivo siguen
+valiendo sin cambios. El `main()` pasa un persistidor que escribe el CSV **atómicamente**
+(`<archivo>.tmp` + `rename`), de modo que el archivo en disco es siempre parseable. Dos flags nuevos
+en la CLI: `--reanudar` (opt-in: salta los `(modelo, idx)` / `idx` ya presentes en el CSV en disco) y
+el default sin flag, que recalcula todo — a propósito, para que el chequeo de determinismo (AC5 del
+subtask 06 / C12 del plan de test) siga midiendo determinismo real y no la trivialidad de saltear
+todo.
+
 ## Implementation plan
 
 ### Tarea 1 — Prompts del juez y parseo con fallback (TDD)
@@ -128,6 +142,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from typing import Callable
 
 import pandas as pd
 
@@ -151,6 +166,9 @@ PATH_CATEGORIAS = DIR_2026 / "categorias_comandos.csv"
 
 COLUMNAS_ETIQUETAS = ["modelo", "idx", "etiquetas", "juez_raw", "juez_parse_ok"]
 COLUMNAS_CATEGORIAS = ["idx", "comando", "categoria", "juez_raw", "juez_parse_ok"]
+
+Persistidor = Callable[[pd.DataFrame], None]
+"""F12.3: recibe el DataFrame acumulado hasta el punto en que se lo invoca."""
 
 MAX_NEW_TOKENS_JUEZ = 48
 
@@ -300,6 +318,42 @@ def test_categoria_con_dos_valores_no_parsea():
     )
     assert out.iloc[0]["categoria"] == "consulta_de_estado"
     assert bool(out.iloc[0]["juez_parse_ok"]) is True
+
+
+def test_etiquetar_errores_invoca_persistir_una_vez_por_modelo_con_acumulado_creciente():
+    """F12.3: una llamada por modelo, cada una con más filas que la anterior."""
+    df = pd.DataFrame([
+        _fila(idx=0, modelo="A"),
+        _fila(idx=1, modelo="A"),
+        _fila(idx=0, modelo="B"),
+    ])
+    juez = JuezFalso(["confusion_dispositivo"] * 3)
+    llamados = []
+    etiquetar_errores(df, juez, persistir=lambda acc: llamados.append(acc.copy()))
+    assert len(llamados) == 2
+    assert len(llamados[0]) == 2 and llamados[0]["modelo"].tolist() == ["A", "A"]
+    assert len(llamados[1]) == 3
+    assert all(list(acc.columns) == COLUMNAS_ETIQUETAS for acc in llamados)
+
+
+def test_etiquetar_categorias_invoca_persistir_una_vez_por_comando():
+    df = pd.DataFrame([
+        _fila(idx=0, comando="Prendé la luz."),
+        _fila(idx=1, comando="Poné el aire en 20."),
+    ])
+    juez = JuezFalso(["encendido_apagado_simple", "ajuste_con_valor_numerico"])
+    llamados = []
+    etiquetar_categorias(df, juez, persistir=lambda acc: llamados.append(acc.copy()))
+    assert len(llamados) == 2
+    assert len(llamados[0]) == 1 and len(llamados[1]) == 2
+    assert all(list(acc.columns) == COLUMNAS_CATEGORIAS for acc in llamados)
+
+
+def test_persistir_none_reproduce_el_resultado_de_antes_del_contrato():
+    df = pd.DataFrame([_fila(idx=0, modelo="A"), _fila(idx=1, modelo="B")])
+    sin_callback = etiquetar_errores(df, JuezFalso(["confusion_dispositivo"] * 2))
+    con_persistir_none = etiquetar_errores(df, JuezFalso(["confusion_dispositivo"] * 2), persistir=None)
+    pd.testing.assert_frame_equal(sin_callback, con_persistir_none)
 ```
 
 - [ ] Correr y confirmar que **falla**: `pytest -q tests/test_judge_2026.py`
@@ -318,30 +372,47 @@ def _consultar(juez, prompt: str, parsear, respaldo):
     return respaldo(), crudo, False
 
 
-def etiquetar_errores(df_detalle: pd.DataFrame, juez) -> pd.DataFrame:
-    """Trabajo A: una fila por respuesta incorrecta (RF8)."""
+def etiquetar_errores(df_detalle: pd.DataFrame, juez,
+                      persistir: Persistidor | None = None) -> pd.DataFrame:
+    """Trabajo A: una fila por respuesta incorrecta (RF8).
+
+    F12.3: si se pasa `persistir`, se lo invoca con el acumulado al terminar
+    cada **modelo** -- agrupando `incorrectas` por `modelo` en el orden en
+    que aparece en `df_detalle` (orden de roster, el que deja el subtask 06),
+    para que "al terminar cada modelo" quede bien definido. `persistir is
+    None` reproduce exactamente el comportamiento anterior a este contrato.
+    """
     filas = []
     incorrectas = df_detalle[~df_detalle["match_exact"].astype(bool)]
-    for _, fila in incorrectas.iterrows():
-        d = fila.to_dict()
-        etiquetas, crudo, ok = _consultar(
-            juez,
-            prompt_error(d),
-            parsear_etiquetas,
-            lambda d=d: [etiqueta_de_respaldo(d)],
-        )
-        filas.append({
-            "modelo": d["modelo"],
-            "idx": int(d["idx"]),
-            "etiquetas": SEP_ETIQUETAS.join(etiquetas),
-            "juez_raw": crudo,
-            "juez_parse_ok": ok,
-        })
+    for _, grupo in incorrectas.groupby("modelo", sort=False):
+        for _, fila in grupo.iterrows():
+            d = fila.to_dict()
+            etiquetas, crudo, ok = _consultar(
+                juez,
+                prompt_error(d),
+                parsear_etiquetas,
+                lambda d=d: [etiqueta_de_respaldo(d)],
+            )
+            filas.append({
+                "modelo": d["modelo"],
+                "idx": int(d["idx"]),
+                "etiquetas": SEP_ETIQUETAS.join(etiquetas),
+                "juez_raw": crudo,
+                "juez_parse_ok": ok,
+            })
+        if persistir is not None:
+            persistir(pd.DataFrame(filas, columns=COLUMNAS_ETIQUETAS))
     return pd.DataFrame(filas, columns=COLUMNAS_ETIQUETAS)
 
 
-def etiquetar_categorias(df_detalle: pd.DataFrame, juez) -> pd.DataFrame:
-    """Trabajo B: una fila por comando del dataset, no por corrida (RF9)."""
+def etiquetar_categorias(df_detalle: pd.DataFrame, juez,
+                         persistir: Persistidor | None = None) -> pd.DataFrame:
+    """Trabajo B: una fila por comando del dataset, no por corrida (RF9).
+
+    F12.3: si se pasa `persistir`, se lo invoca con el acumulado al terminar
+    cada **comando**. `persistir is None` reproduce el comportamiento
+    anterior a este contrato.
+    """
     comandos = (
         df_detalle[["idx", "comando"]]
         .drop_duplicates(subset="idx")
@@ -362,12 +433,93 @@ def etiquetar_categorias(df_detalle: pd.DataFrame, juez) -> pd.DataFrame:
             "juez_raw": crudo,
             "juez_parse_ok": ok,
         })
+        if persistir is not None:
+            persistir(pd.DataFrame(filas, columns=COLUMNAS_CATEGORIAS))
     return pd.DataFrame(filas, columns=COLUMNAS_CATEGORIAS)
 ```
 
 - [ ] Correr y confirmar **verde**: `pytest -q tests/test_judge_2026.py`
 
-### Tarea 3 — Juez real y CLI
+### Tarea 3 — Escritor atómico y filtrado de `--reanudar` (F12.3, TDD)
+
+- [ ] Agregar a `tests/test_judge_2026.py`:
+
+```python
+from judge_2026 import (  # noqa: E402
+    construir_persistidor_atomico,
+    filtrar_pendientes_categorias,
+    filtrar_pendientes_errores,
+)
+
+
+def test_escritor_atomico_no_deja_tmp_y_el_csv_parsea_tras_cada_llamada(tmp_path):
+    destino = tmp_path / "salida.csv"
+    escribir = construir_persistidor_atomico(destino)
+    for n in (1, 2, 3):
+        escribir(pd.DataFrame({"idx": range(n), "valor": range(n)}))
+        assert destino.exists()
+        assert not (tmp_path / "salida.csv.tmp").exists()
+        assert len(pd.read_csv(destino)) == n
+
+
+def test_escritor_atomico_con_base_antepone_lo_ya_persistido(tmp_path):
+    destino = tmp_path / "salida.csv"
+    base = pd.DataFrame({"idx": [0, 1], "valor": [10, 11]})
+    escribir = construir_persistidor_atomico(destino, base=base)
+    escribir(pd.DataFrame({"idx": [2], "valor": [12]}))
+    assert pd.read_csv(destino)["idx"].tolist() == [0, 1, 2]
+
+
+def test_reanudar_salta_los_pares_modelo_idx_ya_presentes():
+    df = pd.DataFrame([
+        _fila(idx=0, modelo="A"), _fila(idx=1, modelo="A"), _fila(idx=0, modelo="B"),
+    ])
+    incorrectas = df[~df["match_exact"].astype(bool)]
+    pendientes = filtrar_pendientes_errores(incorrectas, ya_hechos={("A", 0)})
+    assert sorted(map(tuple, pendientes[["modelo", "idx"]].values)) == [("A", 1), ("B", 0)]
+
+
+def test_reanudar_categorias_salta_los_idx_ya_presentes():
+    df = pd.DataFrame([_fila(idx=i, comando=f"c{i}") for i in range(4)])
+    comandos = df[["idx", "comando"]].drop_duplicates(subset="idx").sort_values("idx")
+    pendientes = filtrar_pendientes_categorias(comandos, ya_hechos={0, 2})
+    assert pendientes["idx"].tolist() == [1, 3]
+```
+
+- [ ] Correr y confirmar que **falla**: `pytest -q tests/test_judge_2026.py`
+- [ ] Implementar en `src/judge_2026.py`:
+
+```python
+def construir_persistidor_atomico(destino: Path, base: pd.DataFrame | None = None) -> Persistidor:
+    """F12.3: escribe `<destino>.tmp` y hace `rename`, para que el archivo en
+    disco sea siempre parseable. Si `base` no es `None` (modo `--reanudar`),
+    cada llamada persiste `base` concatenado con lo nuevo del lote."""
+    tmp = destino.with_suffix(destino.suffix + ".tmp")
+
+    def persistir(acumulado: pd.DataFrame) -> None:
+        completo = (
+            pd.concat([base, acumulado], ignore_index=True) if base is not None else acumulado
+        )
+        completo.to_csv(tmp, index=False)
+        tmp.replace(destino)
+
+    return persistir
+
+
+def filtrar_pendientes_errores(incorrectas: pd.DataFrame, ya_hechos: set[tuple]) -> pd.DataFrame:
+    """`--reanudar`: descarta pares (modelo, idx) ya presentes en el CSV en disco."""
+    hecho = incorrectas.apply(lambda f: (f["modelo"], int(f["idx"])) in ya_hechos, axis=1)
+    return incorrectas[~hecho]
+
+
+def filtrar_pendientes_categorias(comandos: pd.DataFrame, ya_hechos: set[int]) -> pd.DataFrame:
+    """`--reanudar`: descarta los `idx` de comando ya presentes en el CSV en disco."""
+    return comandos[~comandos["idx"].isin(ya_hechos)]
+```
+
+- [ ] Correr y confirmar **verde**: `pytest -q tests/test_judge_2026.py`
+
+### Tarea 4 — Juez real y CLI
 
 > Exención de TDD: la carga del modelo real no es testeable unitariamente; su comportamiento se ejerce en el subtask 08. La lógica que lo rodea ya está cubierta.
 
@@ -416,6 +568,13 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Etapa 2: etiquetado con juez LLM")
     parser.add_argument("--detalle", default=str(PATH_CONSOLIDADO))
     parser.add_argument("--juez-json", default=str(PATH_JUEZ))
+    parser.add_argument(
+        "--reanudar", action="store_true",
+        help="Opt-in (F12.3): salta (modelo, idx) / idx ya presentes en los CSV en "
+             "disco. El default, sin este flag, recalcula todo, para que el chequeo "
+             "de determinismo (subtask 06 AC5 / TEST_PLAN C12) siga midiendo "
+             "determinismo real y no la trivialidad de saltear todo.",
+    )
     args = parser.parse_args()
 
     info = json.loads(Path(args.juez_json).read_text(encoding="utf-8"))
@@ -426,12 +585,41 @@ def main() -> int:
     df = pd.read_csv(args.detalle)
     juez = construir_juez_real(modelo.hf_repo_id, modelo.trust_remote_code)
 
-    df_etiquetas = etiquetar_errores(df, juez)
-    df_categorias = etiquetar_categorias(df, juez)
-
     PATH_ETIQUETAS.parent.mkdir(parents=True, exist_ok=True)
-    df_etiquetas.to_csv(PATH_ETIQUETAS, index=False)
-    df_categorias.to_csv(PATH_CATEGORIAS, index=False)
+    base_etiquetas = pd.read_csv(PATH_ETIQUETAS) if args.reanudar and PATH_ETIQUETAS.exists() else None
+    base_categorias = pd.read_csv(PATH_CATEGORIAS) if args.reanudar and PATH_CATEGORIAS.exists() else None
+
+    df_para_errores = df
+    if base_etiquetas is not None:
+        ya_hechos = set(map(tuple, base_etiquetas[["modelo", "idx"]].values))
+        incorrectas = df[~df["match_exact"].astype(bool)]
+        pendientes = filtrar_pendientes_errores(incorrectas, ya_hechos)
+        correctas = df[df["match_exact"].astype(bool)]
+        df_para_errores = pd.concat([correctas, pendientes], ignore_index=True)
+
+    df_para_categorias = df
+    if base_categorias is not None:
+        comandos = df[["idx", "comando"]].drop_duplicates(subset="idx").sort_values("idx")
+        pendientes_c = filtrar_pendientes_categorias(comandos, set(base_categorias["idx"]))
+        df_para_categorias = df[df["idx"].isin(pendientes_c["idx"])]
+
+    df_etiquetas_nuevas = etiquetar_errores(
+        df_para_errores, juez,
+        persistir=construir_persistidor_atomico(PATH_ETIQUETAS, base=base_etiquetas),
+    )
+    df_categorias_nuevas = etiquetar_categorias(
+        df_para_categorias, juez,
+        persistir=construir_persistidor_atomico(PATH_CATEGORIAS, base=base_categorias),
+    )
+
+    df_etiquetas = (
+        pd.concat([base_etiquetas, df_etiquetas_nuevas], ignore_index=True)
+        if base_etiquetas is not None else df_etiquetas_nuevas
+    )
+    df_categorias = (
+        pd.concat([base_categorias, df_categorias_nuevas], ignore_index=True)
+        if base_categorias is not None else df_categorias_nuevas
+    )
 
     fallidas = int((~df_etiquetas["juez_parse_ok"]).sum())
     fallidas_c = int((~df_categorias["juez_parse_ok"]).sum())
@@ -448,7 +636,7 @@ if __name__ == "__main__":
 - [ ] Confirmar que el módulo se importa sin `torch`:
   `python -c "import sys; sys.path.insert(0,'src'); import judge_2026; assert 'torch' not in sys.modules; print('ok')"`
 
-### Tarea 4 — commit
+### Tarea 5 — commit
 
 - [ ] `pytest -q`
 - [ ] `git add src/judge_2026.py tests/test_judge_2026.py`
@@ -518,7 +706,11 @@ git diff --exit-code main -- data/dataset_comandos_domotica.csv && echo "dataset
 - **Dado** una primera salida no parseable, **entonces** se reintenta **exactamente una** vez con el doble de `max_new_tokens`; si el reintento parsea, `juez_parse_ok` es `True`.
 - **Dado** dos salidas no parseables seguidas, **entonces** se usa la etiqueta de respaldo determinista (primer `confusion_*` cuyo campo no coincide, en orden `intent, dispositivo, ubicacion`; si los tres coinciden, `valor_numerico_incorrecto`), `juez_parse_ok` es `False`, y `juez_raw` guarda la última salida cruda.
 - **Dado** un juez que nunca produce salida válida, **entonces** **toda** fila incorrecta igualmente termina con al menos una etiqueta perteneciente a `ETIQUETAS_ERROR`: el pipeline no deja huecos.
-- **Dado** un detalle con 14 modelos, **cuando** se corre `etiquetar_categorias`, **entonces** produce una fila por **comando** (`idx` único), no por corrida, ordenadas por `idx`, y consulta al juez una sola vez por comando.
+- **Dado** un detalle con los 12 modelos del roster activo, **cuando** se corre `etiquetar_categorias`, **entonces** produce una fila por **comando** (`idx` único), no por corrida, ordenadas por `idx`, y consulta al juez una sola vez por comando.
 - **Dado** una respuesta del juez con dos categorías, **entonces** no parsea y se reintenta; si el reintento da una sola válida, se acepta con `juez_parse_ok=True`.
 - **Dado** `src/judge_2026.py`, **cuando** se lo importa, **entonces** no carga `torch` ni `transformers` (viven dentro de `construir_juez_real`), y el juez real usa `do_sample=False`, `temperature=None`, `top_p=None`.
+- **Dado** un `persistir` no nulo, **cuando** se corre `etiquetar_errores`, **entonces** se lo invoca exactamente una vez por modelo (agrupado en el orden en que aparece en `df_detalle`) con el DataFrame acumulado hasta ese punto, de tamaño monótonamente creciente y con columnas siempre iguales a `COLUMNAS_ETIQUETAS`; **dado** `etiquetar_categorias`, se lo invoca una vez por comando con columnas siempre `COLUMNAS_CATEGORIAS`.
+- **Dado** `persistir=None` en cualquiera de los dos etiquetadores, **entonces** el resultado es byte-idéntico (mismas filas, mismo orden, mismas columnas) al de antes de introducir F12.3.
+- **Dado** `construir_persistidor_atomico`, **entonces** cada llamada deja el archivo destino parseable por `pandas.read_csv` y **nunca** deja un `<archivo>.tmp` residual; con `base` no nulo, el CSV resultante antepone `base` a lo nuevo del lote.
+- **Dado** `--reanudar`, **entonces** `filtrar_pendientes_errores` descarta los pares `(modelo, idx)` ya presentes en el CSV en disco y `filtrar_pendientes_categorias` descarta los `idx` ya presentes; **dado** el default (sin `--reanudar`), **entonces** se recalcula todo el detalle sin filtrar nada, para que el chequeo de determinismo (subtask 06 AC5 / TEST_PLAN C12) siga midiendo determinismo real y no la trivialidad de saltear todo.
 - **Dado** el commit, **entonces** `pytest -q` pasa y `data/dataset_comandos_domotica.csv` sigue intacto.

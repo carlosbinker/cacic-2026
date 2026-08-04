@@ -1,13 +1,13 @@
 # Test plan — Reejecución del experimento con roster 2026, verificación automática en dos etapas y reescritura del paper en LaTeX
 
 **Source TODO:** `TODO.md`
-**Goal:** Probar que el DAG completo (subtasks 01–16 + G1/G2, tras el Delta 2026-08-03) produce un barrido de 12 modelos del roster activo coherente de punta a punta, dos papers LaTeX que compilan y pasan el filtro de envío ciego, y un árbol versionado sin secretos ni regresiones sobre el material congelado de F0.
+**Goal:** Probar que el DAG completo (subtasks 01–17 + G1/G2, tras el Delta 2026-08-04) produce un barrido de 12 modelos del roster activo coherente de punta a punta, dos papers LaTeX que compilan y pasan el filtro de envío ciego, y un árbol versionado sin secretos ni regresiones sobre el material congelado de F0.
 
-**Scope:** Solo checks **globales / cross-task**: los criterios de §5 *Cross-task acceptance* del índice (ya extendido a 14 puntos por el Delta 02), más los invariantes del *Delta 01* y del *Delta 02* (roster activo de 12 con cero gated, dos de 14 excluidos por acceso no otorgado, dos grupos de versión de `transformers` mutuamente excluyentes, plomería de `$HF_TOKEN` conservada pero no exigida por el roster activo, y cero secretos versionados). Fuera de alcance acá: todo lo que sea atribuible a un único subtask — vive en el bloque `Verify` de su `TODO_<NN>_<slug>.md` y **no** se reproduce en este archivo. También fuera de alcance lo que el índice declara *out of scope* en §2.4 (login interactivo, modelos `Qwen2.5-*`, abstract en inglés, chequeo del límite de 10 páginas, GPU/cuantización, juez externo por API).
+**Scope:** Solo checks **globales / cross-task**: los criterios de §5 *Cross-task acceptance* del índice (extendido a **17** puntos por el Delta 2026-08-04), más los invariantes de los tres deltas: roster activo de **12** con cero gated sobre un registro de **15**; **3** excluidos con **dos causas distintas** (2 por acceso de descarga no otorgado, 1 por compatibilidad de versión **no verificada**); dos grupos de versión de `transformers` mutuamente excluyentes, repartidos **9 / 3** sobre el roster activo; plomería de `$HF_TOKEN` conservada pero no exigida por el roster activo; envelope de recursos con **pinning de núcleos** idéntico en las 12 corridas; **persistencia incremental** con un commit por modelo y **continuación ante fallo**; **continuidad con la Tabla 2 publicada** sobre los 3 modelos presentes en ambos estudios; y cero secretos versionados. Fuera de alcance acá: todo lo que sea atribuible a un único subtask — vive en el bloque `Verify` de su `TODO_<NN>_<slug>.md` y **no** se reproduce en este archivo. También fuera de alcance lo que el índice declara *out of scope* en §2.4 (login interactivo, `Qwen2.5-0.5B-Instruct`, sondear `Qwen3.5-2B` bajo 5.14.1, ejecución concurrente de varios modelos, abstract en inglés, chequeo del límite de 10 páginas, GPU/cuantización, juez externo por API). **Ojo:** `Qwen2.5-1.5B-Instruct` **sí** está en alcance — el Delta 2026-08-04 lo reincorporó al roster activo.
 
 Nota deliberada sobre solape: los criterios AC1–AC14 están declarados por el índice como *"se verifica al final del ciclo (`create-test-plan` / `run-test-plan`), no dentro de ningún subtask"*. Algunos subtasks hacen un *smoke check* del mismo hecho en el momento de su propio commit (p. ej. 15 compila los papers). Este plan los reejecuta como **compuerta de regresión sobre el estado final del árbol**, que es un hecho distinto del smoke check puntual: un fix posterior puede romperlos.
 
-**Estructura de costo — leer antes de correr nada.** El tier caro de este proyecto **no es una API paga**: es el barrido de los 12 modelos del roster activo en Docker, CPU-only, `--memory=8g --cpus=2`, secuencial, estimado y escalado de las 5–9 h originales, más las descargas, y la reejecución del juez. La distinción que gobierna todo el plan es:
+**Estructura de costo — leer antes de correr nada.** El tier caro de este proyecto **no es una API paga**: es el barrido de los 12 modelos del roster activo en Docker, CPU-only, `--memory=8g --cpus=2 --cpuset-cpus=0-1`, **estrictamente secuencial** (~7 h de reloj, ver RNF6), más las descargas, y la reejecución del juez. La distinción que gobierna todo el plan es:
 
 - **Producir** `data/2026/**` es caro (E1, E2 de §6).
 - **Verificar** `data/2026/**` es barato: son lecturas de CSV/JSON con pandas, segundos. Los checks AC2/AC3/AC4 son `cheap` aunque dependan de artefactos que costó 9 h generar.
@@ -34,7 +34,19 @@ Expected: exit 0 e imprime la versión de latexmk. Si no está, los checks C7/C8
 
 **P4 — Compuerta del tier caro (solo antes de E1/E2/C12; omitir en `--scope=cheap`)**
 Run: `docker info --format '{{.ServerVersion}}' && echo "docker: OK"`
-Expected: imprime la versión del server de Docker y `docker: OK`. Tras el Delta 02, el roster activo (12) tiene **cero** modelos *gated*, así que E1/E2 **no** requieren `.env` ni `HF_TOKEN`. Esa plomería sigue existiendo (T2 la sigue verificando como mecanismo) pero solo se ejerce si el barrido incluye explícitamente uno de los dos modelos excluidos — en ese caso, sí hace falta `.env` con `HF_TOKEN` no vacío antes de arrancar.
+Expected: imprime la versión del server de Docker y `docker: OK`. Tras el Delta 02, el roster activo (12) tiene **cero** modelos *gated*, así que E1/E2 **no** requieren `.env` ni `HF_TOKEN`. Esa plomería sigue existiendo (T2 la sigue verificando como mecanismo) pero solo se ejerce si el barrido incluye explícitamente uno de los **dos** modelos excluidos **por acceso** — en ese caso sí hace falta `.env` con `HF_TOKEN` no vacío antes de arrancar. El tercer excluido, `Qwen3.5-2B`, no necesita credenciales (no es *gated*).
+
+Dos condiciones más antes de E1/E2, agregadas por el Delta 2026-08-04:
+
+```bash
+# El almacenamiento del daemon esta en modo escritura (el 2026-08-03 quedo en solo lectura
+# a mitad de ronda de sondeo y ningun build ni run pudo correr).
+docker run --rm slm-domotica-2026:granite-4-0-350m python -c "print('escritura y run OK')"
+```
+
+Expected: imprime `escritura y run OK`. Si reaparece `read-only file system`, **parar**: reparar Docker Desktop es una decisión del usuario, que está usando la máquina, y no se intenta desde el plan.
+
+Y **host ocioso** (RNF1, RNF6): nada más consumiendo CPU mientras corre E2, ni siquiera otro check del tier `cheap` que use Docker. La latencia es el resultado que esta condición protege, y contaminarla es invisible en la tabla final.
 
 ---
 
@@ -51,7 +63,7 @@ Expected: imprime la versión del server de Docker y `docker: OK`. Tras el Delta
 **Covers AC:** RF17 / F11 *"Fallo temprano (congelado)"* y el cierre del Delta 01. Es un check **cross-task**: cruza `src/models_2026.py` (subtask 01, flag `gated`) con `docker/run_sweep.py` (subtask 04, `validar_credenciales`). Ningún subtask lo testea hoy — lo crea la tarea global **G1**.
 **Cost:** `cheap`
 **Run:** `pytest -q tests/test_credenciales_gated.py`
-**Expected:** exit 0, todos los tests `passed`. En particular: con una raíz temporal sin `.env`, `validar_credenciales(gated(), tmp)` levanta `ValueError`; con `HF_TOKEN` vacío también; con la lista de los 12 no-gated (o, tras el subtask 16, con `roster_activo()`) **no** levanta nada aunque falte `.env`; y `_hf_token_de_env` no escribe nada en stdout.
+**Expected:** exit 0, todos los tests `passed`. En particular: con una raíz temporal sin `.env`, `validar_credenciales(gated(), tmp)` levanta `ValueError`; con `HF_TOKEN` vacío también; con la lista de los **13** no-gated del registro (12 activos + `Qwen3.5-2B`, excluido pero **no** gated) o con `roster_activo()` (12) **no** levanta nada aunque falte `.env`; y `_hf_token_de_env` no escribe nada en stdout. El conteo de no-gated pasó de 12 a **13** con el subtask 17: antes de que 17 cierre, este test **falla** con `assert 13 == 12`, y eso es lo esperado — el arreglo es cerrar 17, no relajar el conteo.
 **On failure indicates:** un barrido que incluyera un modelo *gated* reactivado podría abortar a mitad de la descarga en vez de fallar en el segundo 0 — exactamente el modo de fallo caro que el Delta 01 vino a cerrar. O peor: el mensaje de error filtra el token.
 
 ### Test 3 — Integridad de los artefactos del barrido y de la etapa 2
@@ -72,8 +84,8 @@ Expected: imprime la versión del server de Docker y `docker: OK`. Tras el Delta
 1. Abrir `figures/2026/fig1_exactitud_latencia_2026.png` con un visor de imágenes al 100 % de zoom.
 2. Leer las 12 etiquetas del eje Y de arriba a abajo.
 3. Abrir `figures/2026/fig2_exactitud_por_campo_2026.png` y repetir.
-**Expected observation:** los 12 nombres del roster activo (`LFM2.5-230M` … `SmolLM2-1.7B-Instruct`) se leen completos, sin truncado con `…` ni superposición entre etiquetas vecinas; el bloque `sub-1B` (6 barras) está visualmente separado del bloque `1-2B` (6 barras); en el panel izquierdo de fig1 se distinguen dos series superpuestas (estricta y laxa) con leyenda; ninguno de los dos modelos excluidos (`gemma-3-270m-it`, `Llama-3.2-1B-Instruct`) aparece.
-**On failure indicates:** el layout de `generate_figures_2026.py` no escaló de 8 a 12 modelos, o un modelo excluido se coló en el gráfico — la figura no es publicable aunque el script salga con exit 0.
+**Expected observation:** los 12 nombres del roster activo (`LFM2.5-230M` … `Qwen2.5-1.5B-Instruct`, en orden de registro) se leen completos, sin truncado con `…` ni superposición entre etiquetas vecinas; el bloque `sub-1B` (6 barras) está visualmente separado del bloque `1-2B` (6 barras); en el panel izquierdo de fig1 se distinguen dos series superpuestas (estricta y laxa) con leyenda; **ninguno de los tres modelos excluidos** (`gemma-3-270m-it`, `Llama-3.2-1B-Instruct`, `Qwen3.5-2B`) aparece, y **sí** aparece `Qwen2.5-1.5B-Instruct`, que es el nombre más largo del roster y por lo tanto el peor caso de legibilidad del eje Y.
+**On failure indicates:** el layout de `generate_figures_2026.py` no escaló de 8 a 12 modelos, o un modelo excluido se coló en el gráfico — la figura no es publicable aunque el script salga con exit 0. Si falta `Qwen2.5-1.5B-Instruct`, la figura se generó contra el roster previo al subtask 17 y hay que regenerarla.
 
 ### Check 2 — El PDF reescrito renderiza tablas y figuras
 **Covers AC:** AC7 (*los dos papers compilan*) y AC9 (*números del paper == números de los datos*) en su dimensión visual: `latexmk` puede salir con 0 y aun así producir tablas desbordadas o `??` en las referencias cruzadas.
@@ -82,8 +94,8 @@ Expected: imprime la versión del server de Docker y `docker: OK`. Tras el Delta
 1. Abrir `paper/02_reescrito/main.pdf`.
 2. Localizar las cinco tablas (`tab:modelos`, `tab:globales`, `tab:categorias`, `tab:taxonomia`, `tab:versiones`) y las dos figuras.
 3. Buscar en el texto la cadena `??`.
-**Expected observation:** las cinco tablas y las dos figuras aparecen, ninguna se sale del margen de la caja de texto LNCS, la tabla 1 lista 12 filas de modelos (el roster activo, sin los 2 excluidos), y no hay ninguna ocurrencia de `??` (referencia cruzada rota) en todo el PDF.
-**On failure indicates:** un fragmento `.tex` generado por `generate_tex_tables.py` es demasiado ancho para el formato LNCS, o un `\label`/`\ref` quedó desparejado entre secciones.
+**Expected observation:** las **cinco** tablas y las dos figuras aparecen, ninguna se sale del margen de la caja de texto LNCS, la tabla 1 lista 12 filas de modelos (el roster activo, sin los **3** excluidos), y no hay ninguna ocurrencia de `??` (referencia cruzada rota) en todo el PDF. **Prestar atención especial a la Tabla 2**, que pasó de 5 a **7** columnas con las dos de continuidad 2025 (F8): es la más ancha del paper y la primera candidata a desbordar la caja LNCS. Sus dos últimas columnas deben mostrar valores solo en **3** de las 12 filas y `--` en las otras 9.
+**On failure indicates:** un fragmento `.tex` generado por `generate_tex_tables.py` es demasiado ancho para el formato LNCS —muy probablemente la Tabla 2 de 7 columnas—, o un `\label`/`\ref` quedó desparejado entre secciones. Si la Tabla 2 desborda, el arreglo es acortar los encabezados o el `spec` de columnas en `generate_tex_tables.py`, **nunca** quitar las columnas de continuidad: son el mecanismo de RF19 y de C15. Siguen siendo cinco tablas: no se agregó una sexta.
 
 ---
 
@@ -119,8 +131,9 @@ git log --oneline main..HEAD -- \
   figures/fig1_exactitud_latencia.png figures/fig2_exactitud_por_campo.png
 git rev-list --count main..HEAD
 ```
-**Expected:** el `git log` da salida **vacía**; el `git rev-list --count` da **≥ 17** (los 15 subtasks del DAG + G1 + G2 de §6 del índice, un commit cada uno).
-**On failure indicates:** si el `git log` no está vacío, un subtask tocó F0 y otro lo revirtió — el árbol final miente sobre lo que pasó. Si el conteo es < 17, algún subtask no dejó su propio commit y se violó RNF5 (*un commit por subtask*), lo que rompe la trazabilidad que pide AC11.
+**Expected:** el `git log` da salida **vacía**; el `git rev-list --count` da **≥ 19** (los **17** subtasks del DAG + G1 + G2 de §6 del índice, un commit cada uno como mínimo).
+**On failure indicates:** si el `git log` no está vacío, un subtask tocó F0 y otro lo revirtió — el árbol final miente sobre lo que pasó. Si el conteo es < 19, algún subtask no dejó su propio commit y se violó RNF5 (*un commit por subtask*), lo que rompe la trazabilidad que pide AC11.
+**Nota sobre el umbral (Delta 2026-08-04).** Es una **cota inferior**, no un conteo exacto, y el número real queda bastante por encima: subtasks de alcance amplio (04, 16) aportaron varios commits, y el subtask **05** aporta ahora **un commit por modelo** (RF20a / F12.2, hasta 12 más su commit de cierre) y el **08** uno por lote. Antes del Delta 2026-08-04 el umbral era 18 (16 nodos + G1 + G2); el nodo 17 lo sube a 19. Nunca convertir esto en una igualdad.
 
 ### Check C3 — Ningún token de HuggingFace versionado (árbol completo)
 **Covers AC:** AC12 (*Ningún secreto versionado*) y punto 4 del Delta 01.
@@ -159,23 +172,27 @@ git check-ignore -v .env paper_cacic_LNCS_word.docx
 **On failure indicates:** el token o el fuente del paper entraron al índice de git. Si es `.env`, es un incidente: rotar el token.
 
 ### Check C6 — el barrido corre sin `--env-file`; pedir un excluido falla con el motivo
-**Covers AC:** RF4 / RF17 / F11 tras el Delta 02 (*el plan por defecto son 12 invocaciones sobre el roster activo, ninguna con `--env-file`; pedir explícitamente un modelo excluido falla con su `motivo_exclusion`; la receta con `--env-file` sigue existiendo y se aplica solo a `gated()` cuando se la fuerza*), y RNF1 (*`--memory=8g --cpus=2` en las 12 invocaciones*).
+**Covers AC:** RF4 / RF17 / F11 tras los Deltas 02 y 2026-08-04 (*el plan por defecto son 12 invocaciones sobre el roster activo de un registro de 15, ninguna con `--env-file`; pedir explícitamente cualquiera de los **3** modelos excluidos falla con su `motivo_exclusion`; la receta con `--env-file` sigue existiendo y se aplica solo a `gated()` cuando se la fuerza*), y RNF1 (*`--memory=8g --cpus=2 --cpuset-cpus` en las 12 invocaciones*).
 **Cost:** `cheap` — `--dry-run` solo imprime los comandos; no arranca ningún contenedor ni descarga nada.
 **Run:**
 ```bash
 # Secuencia base (alimenta la fila 4 de la tabla de regresion junto con NF1):
+python -c "import sys; sys.path.insert(0,'src'); from models_2026 import MODELOS_2026; print(len(MODELOS_2026))"
 python -c "import sys; sys.path.insert(0,'src'); from models_2026 import gated; print(len(gated()))"
 python -c "import sys; sys.path.insert(0,'src'); from models_2026 import roster_activo; print(len(roster_activo()))"
+python -c "import sys; sys.path.insert(0,'src'); from models_2026 import MODELOS_2026; print(len([m for m in MODELOS_2026 if not m.activo]))"
 python docker/run_sweep.py --dry-run | grep -c '^==='
 python docker/run_sweep.py --dry-run | grep -c -- '--env-file'
 ```
-**Expected:** `2` (gated en el registro), `12` (roster activo), `12` (invocaciones planeadas), `0` (ninguna con `--env-file`).
-**On failure indicates:** si el conteo de `--env-file` es mayor que 0, algo reactivó un modelo gated sin que el índice lo sepa (el token se expondría a un contenedor sin necesitarlo). Si los conteos de gated/activo no son 2/12, el registro o el roster activo se desalinearon del contrato de F3.
+**Expected:** `15` (registro completo), `2` (gated en el registro), `12` (roster activo), `3` (excluidos), `12` (invocaciones planeadas), `0` (ninguna con `--env-file`).
+**On failure indicates:** si el conteo de `--env-file` es mayor que 0, algo reactivó un modelo gated sin que el índice lo sepa (el token se expondría a un contenedor sin necesitarlo). Si los conteos de registro/gated/activo/excluidos no son 15/2/12/3, el registro o el roster activo se desalinearon del contrato de F3 — en particular, `2` excluidos en vez de `3` significa que el intercambio de roster del subtask 17 no se aplicó y `Qwen3.5-2B` sigue en el barrido.
 
 **Verificaciones adicionales (mismo check, no entran en la fila 4 de la tabla de regresión):**
 ```bash
-# Pedir explicitamente un modelo excluido falla con el motivo
-python docker/run_sweep.py --desde "gemma-3-270m-it" --dry-run ; echo "exit=$?"
+# Pedir explicitamente cualquiera de los 3 excluidos falla con el motivo
+for m in "gemma-3-270m-it" "Llama-3.2-1B-Instruct" "Qwen3.5-2B"; do
+  python docker/run_sweep.py --desde "$m" --dry-run >/dev/null 2>&1 ; echo "$m exit=$?"
+done
 
 # La receta con --env-file sigue definida y se aplica solo si se fuerza sobre un gated
 python - <<'PY'
@@ -190,8 +207,8 @@ for m in gated():
 print("receta --env-file conservada para los 2 gated OK")
 PY
 ```
-**Expected (adicional):** exit distinto de 0 al pedir un excluido, con un mensaje que nombra el `motivo_exclusion` (403/acceso no otorgado); `receta --env-file conservada para los 2 gated OK`.
-**On failure indicates (adicional):** si pedir un excluido no falla, el barrido podría intentar descargar un modelo sin acceso y romper a mitad de camino. Si la receta con `--env-file` desapareció, se perdió la plomería de credenciales que el Delta 01 introdujo — necesaria si algún modelo se reactiva en el futuro.
+**Expected (adicional):** `exit=1` para los **tres** excluidos, cada uno con un mensaje que nombra su `motivo_exclusion` (403/acceso no otorgado para los dos gated; compatibilidad no verificada para `Qwen3.5-2B`); `receta --env-file conservada para los 2 gated OK`.
+**On failure indicates (adicional):** si pedir un excluido no falla, el barrido podría intentar descargar un modelo sin acceso —o correr `Qwen3.5-2B`, cuya compatibilidad no está verificada— y romper a mitad de camino. Si la receta con `--env-file` desapareció, se perdió la plomería de credenciales que el Delta 01 introdujo — necesaria si algún modelo se reactiva en el futuro. Ojo con el caso mixto: `Qwen3.5-2B` está excluido y **no** es gated, así que tiene que fallar por `motivo_exclusion` **sin** que aparezca `--env-file` en ninguna parte.
 
 ### Check C7 — Trazabilidad de versiones (dos grupos, roster activo)
 **Covers AC:** AC6 tras el Delta 02 (*los 12 modelos del roster activo aparecen en la matriz de `docker/README.md` **y** en `tabla5_versiones.tex` con su pin, su versión resuelta y si es necesario o heredado, **y** los dos grupos se mencionan en `03_metodologia.tex` y en `06_amenazas.tex`*), RF5.
@@ -233,6 +250,7 @@ PY
 ```
 **Expected:** imprime `trazabilidad OK para los 12 modelos del roster activo, 2 grupos`. Exit 0.
 **On failure indicates:** un modelo del roster activo o su motivo quedó sin documentar en la matriz, o el paper no declara los dos grupos de versión. Es un confusor directo de la tabla de latencia y una de las tres amenazas de RF16 — si no está escrita, el paper afirma una comparación que no puede sostener.
+**Nota (Delta 2026-08-04).** El bloque de arriba es agnóstico del reparto por grupo porque itera `roster_activo()` y usa el `motivo_pin` de cada fila: sirve igual con el reparto **9 / 3** vigente. Dos consecuencias que sí cambiaron y hay que tener presentes al leer un fallo: (i) `Qwen2.5-1.5B-Instruct` es un modelo **nuevo** del roster activo, así que si falta en `docker/README.md` o en `tabla5_versiones.tex` este check lo va a marcar y el arreglo es documentarlo, no relajar el check; (ii) `Qwen3.5-2B` **ya no** está en `roster_activo()`, así que este check dejó de exigirlo — su presencia en el árbol la cubren C14 (tabla de exclusiones) y el subtask 17.
 
 ### Check C8 — Regeneración idempotente de los fragmentos `.tex`
 **Covers AC:** AC9 (*cada valor de las Tablas 2/3/4 proviene de los fragmentos generados por `src/generate_tex_tables.py`; regenerar los fragmentos no produce diff*).
@@ -274,26 +292,43 @@ python - <<'PY'
 import re
 from pathlib import Path
 texto = Path("paper/02_reescrito/secciones/06_amenazas.tex").read_text(encoding="utf-8").lower()
+# EXACTAMENTE TRES amenazas nuevas, no cuatro: el Delta 2026-08-04 no agrego una
+# cuarta, sino que amplio la (2) y la (3).
 amenazas = {
     "auto-favorecimiento del juez": (("juez",), ("favorec", "sesgo")),
+    # (2) ahora tiene que mencionar tambien la exclusion por compatibilidad no
+    # verificada, como evidencia de que el confusor de versiones no es teorico.
     "versiones de libreria como confusor de latencia": (("versi",), ("latencia",)),
-    "exclusion por acceso restringido no otorgado": (("acceso restringido", "gated"), ("metodologica",)),
+    # (3) ahora cubre DOS causas de exclusion: acceso no otorgado y compatibilidad
+    # no verificada, 3 de 15 en total.
+    "exclusion por causas ajenas al metodo": (("acceso restringido", "gated"), ("metodologica",)),
 }
 faltan = [
     nombre
     for nombre, (anclas, extras) in amenazas.items()
     if not any(a in texto for a in anclas) or not any(e in texto for e in extras)
 ]
+if "no verificada" not in texto:
+    faltan.append("la exclusion por compatibilidad de version no verificada (Qwen3.5-2B)")
 assert not faltan, f"amenazas ausentes o incompletas: {faltan}"
 # Verificacion NEGATIVA (Delta 02): no puede quedar ninguna afirmacion de que un
 # modelo del roster se prompteo por raw completion; esa amenaza fue ELIMINADA.
 prohibido = re.search(r"(lfm2\.5-230m|lfm2\.5-350m|modelos base)[^.]{0,80}raw completion", texto)
 assert not prohibido, "sobrevive la amenaza eliminada de incomparabilidad por raw completion"
-print("las 3 amenazas de RF16 estan presentes, sin afirmacion de raw completion")
+# Verificacion NEGATIVA (Delta 2026-08-04): no se puede sobreafirmar sobre Qwen3.5-2B.
+# Su sonda bajo 5.14.1 nunca corrio, asi que no hay evidencia de que falle ahi.
+for sobreafirmacion in ("falla bajo 5.14.1", "incompatible con 5.14.1",
+                        "no corre bajo ninguna", "falla en las dos versiones"):
+    assert sobreafirmacion not in texto, (
+        f"sobreafirmacion sobre Qwen3.5-2B: {sobreafirmacion!r}. Su compatibilidad "
+        f"bajo 5.14.1 es NO VERIFICADA, no demostradamente mala."
+    )
+print("las 3 amenazas de RF16 estan presentes (con las dos causas de exclusion), "
+      "sin afirmacion de raw completion y sin sobreafirmar sobre Qwen3.5-2B")
 PY
 ```
-**Expected:** imprime `las 3 amenazas de RF16 estan presentes, sin afirmacion de raw completion`, exit 0.
-**On failure indicates:** el paper omite una limitación conocida del diseño, o resucitó la amenaza de incomparabilidad por raw completion que el Delta 02 eliminó porque los 12 del roster activo usan `chat_template`. La tercera (exclusión por acceso restringido) es la que introdujo el Delta 02 y es la más fácil de olvidar.
+**Expected:** imprime `las 3 amenazas de RF16 estan presentes (con las dos causas de exclusion), sin afirmacion de raw completion y sin sobreafirmar sobre Qwen3.5-2B`, exit 0.
+**On failure indicates:** el paper omite una limitación conocida del diseño, o resucitó la amenaza de incomparabilidad por raw completion que el Delta 02 eliminó porque los 12 del roster activo usan `chat_template`, o **sobreafirma** sobre `Qwen3.5-2B`. La tercera amenaza (exclusión por causas ajenas al método) es la más fácil de dejar incompleta: el Delta 02 la introdujo con **2** modelos por acceso no otorgado, y el Delta 2026-08-04 le sumó un **tercero** por compatibilidad **no verificada** — son **3 de 15**, con dos causas distintas que hay que atribuir bien. Y siguen siendo **tres** amenazas nuevas: si alguien agrega una cuarta, este check y RF16 dejan de coincidir.
 
 ### Check C12 — Determinismo del juez
 **Covers AC:** AC5 (*reejecutar la etapa 2 sobre el mismo `detalle_2026.csv` reproduce `etiquetas_errores.csv` y `categorias_comandos.csv` byte a byte*).
@@ -342,11 +377,11 @@ assert not fallas, fallas
 print(f"correspondencia version-pin OK para {len(rutas)} CSV")
 PY
 ```
-**Expected:** `sin CSV todavia: C13 no aplica (requiere el subtask 05)` antes del barrido, o `correspondencia version-pin OK para N CSV` después. Exit 0 en ambos casos.
-**On failure indicates:** un CSV se produjo bajo una versión de `transformers` distinta de la fijada para ese modelo — por ejemplo, `granite-4.0-350m` corrido bajo 5.x por error. Ese CSV es inválido y debe rehacerse (ver protocolo de fallo del subtask 05).
+**Expected:** `sin CSV todavia: C13 no aplica (requiere el subtask 05)` antes del barrido, o `correspondencia version-pin OK para 12 CSV` después: **9** con `4.57.*` (grupo A) y **3** con `5.*` (grupo B), tras el reparto del subtask 17. Exit 0 en ambos casos.
+**On failure indicates:** un CSV se produjo bajo una versión de `transformers` distinta de la fijada para ese modelo — por ejemplo, `granite-4.0-350m` corrido bajo 5.x por error. Ese CSV es inválido y debe rehacerse (ver protocolo de fallo del subtask 05). Un caso concreto a vigilar tras el Delta 2026-08-04: `data/2026/detalle/qwen2-5-1-5b-instruct.csv` es el CSV del modelo que entró, y su `transformers_version` **tiene que** empezar con `4.57.` — su pin es del grupo A, sondeado (`PROBE_OK|Qwen2.5-1.5B-Instruct|4.57.6|chat_template`), no inferido de la familia Qwen (que resuelve a grupo B en Qwen3.5).
 
-### Check C14 — Exclusiones declaradas (Delta 02)
-**Covers AC:** el punto nuevo de §5 (*los dos modelos excluidos no aparecen en ninguna tabla ni figura de resultados, y sí aparecen en la tabla de exclusiones de `docker/README.md` y en el texto del paper como limitación*).
+### Check C14 — Exclusiones declaradas, con sus dos causas (Deltas 02 y 2026-08-04)
+**Covers AC:** AC13 (*los **tres** modelos excluidos no aparecen en ninguna tabla ni figura de resultados, y sí aparecen en la tabla de exclusiones de `docker/README.md` y en el texto del paper como limitación, con sus **dos causas distintas** correctamente atribuidas*), RF18.
 **Cost:** `cheap`
 **Run:**
 ```bash
@@ -357,13 +392,24 @@ sys.path.insert(0, "src")
 from models_2026 import MODELOS_2026
 
 excluidos = [m for m in MODELOS_2026 if not m.activo]
-assert len(excluidos) == 2
+assert len(excluidos) == 3, [m.nombre for m in excluidos]
+assert {m.nombre for m in excluidos} == {
+    "gemma-3-270m-it", "Llama-3.2-1B-Instruct", "Qwen3.5-2B",
+}, [m.nombre for m in excluidos]
+# Dos causas distintas: 2 por acceso no otorgado (gated), 1 por compatibilidad no verificada.
+assert len([m for m in excluidos if m.gated]) == 2
+assert len([m for m in excluidos if not m.gated]) == 1
 
 readme = Path("docker/README.md").read_text(encoding="utf-8")
 fallas = [f"{m.nombre}: falta en la tabla de exclusiones de docker/README.md"
           for m in excluidos if m.nombre not in readme]
+if "403" not in readme:
+    fallas.append("docker/README.md: falta el 403 de los dos excluidos gated")
+if "no verificada" not in readme.lower():
+    fallas.append("docker/README.md: falta la causa 'compatibilidad no verificada' de Qwen3.5-2B")
 
 for archivo in ("paper/02_reescrito/tablas/tabla1_modelos.tex",
+                "paper/02_reescrito/tablas/tabla2_resultados_globales.tex",
                 "paper/02_reescrito/tablas/tabla5_versiones.tex"):
     ruta = Path(archivo)
     if not ruta.exists():
@@ -378,21 +424,97 @@ for seccion in ("03_metodologia.tex", "06_amenazas.tex"):
         continue
     texto = ruta.read_text(encoding="utf-8").lower()
     if "acceso restringido" not in texto and "gated" not in texto:
-        fallas.append(f"{seccion}: no declara la exclusion como limitacion")
+        fallas.append(f"{seccion}: no declara la exclusion por acceso como limitacion")
+    if "no verificada" not in texto:
+        fallas.append(f"{seccion}: no declara la exclusion por compatibilidad no verificada")
+    # Verificacion NEGATIVA: no se puede afirmar que Qwen3.5-2B falle bajo 5.14.1.
+    # No hay evidencia de eso: la sonda nunca corrio. Solo ausencia de evidencia.
+    for sobreafirmacion in ("falla bajo 5.14.1", "incompatible con 5.14.1",
+                            "no corre bajo ninguna", "falla en las dos versiones"):
+        if sobreafirmacion in texto:
+            fallas.append(f"{seccion}: sobreafirma sobre Qwen3.5-2B ({sobreafirmacion!r})")
 
 assert not fallas, fallas
-print("exclusiones declaradas OK: 2 excluidos, fuera de tablas, dentro de exclusiones/limitacion")
+print("exclusiones declaradas OK: 3 excluidos (2 por acceso, 1 por compatibilidad no "
+      "verificada), fuera de tablas, dentro de exclusiones/limitacion, sin sobreafirmar")
 PY
 ```
-**Expected:** imprime `exclusiones declaradas OK: 2 excluidos, fuera de tablas, dentro de exclusiones/limitacion`, exit 0.
-**On failure indicates:** o bien un modelo excluido se coló en una tabla de resultados (contaminando una comparación que no corrió), o bien la exclusión no está documentada como limitación — ambos son errores de integridad del reporte.
+**Expected:** imprime `exclusiones declaradas OK: 3 excluidos (2 por acceso, 1 por compatibilidad no verificada), fuera de tablas, dentro de exclusiones/limitacion, sin sobreafirmar`, exit 0.
+**On failure indicates:** o bien un modelo excluido se coló en una tabla de resultados (contaminando una comparación que no corrió), o bien la exclusión no está documentada como limitación, o bien el paper **sobreafirma** sobre `Qwen3.5-2B`. Esto último es el error más fácil de cometer y el más caro: su sonda bajo 5.14.1 **nunca corrió** por un bloqueo de infraestructura de Docker, así que no hay evidencia de que falle bajo esa versión — solo ausencia de evidencia de que funcione. Escribir "incompatible con las dos versiones mayores" sería una afirmación empírica sin respaldo en un paper.
+
+### Check C15 — Continuidad con la Tabla 2 publicada (RF19, Delta 2026-08-04)
+**Covers AC:** AC15 (*las dos columnas de continuidad de la Tabla 2 existen, sus valores coinciden dígito a dígito con `data/resultados_experimento_resumen.json` para los **3** modelos presentes en ambos estudios y son `--` para los otros **9**; §4 reporta la comparación y §5 la interpreta, incluida cualquier divergencia; y el texto declara que no es una réplica*), RF19.
+**Cost:** `cheap`
+**Run:**
+```bash
+python - <<'PY'
+import json
+import sys
+from pathlib import Path
+sys.path.insert(0, "src")
+from models_2026 import por_nombre, roster_activo
+
+# 1. Los 3 anclas, derivados del cruce entre el registro y el resumen publicado (F0).
+publicado = json.loads(
+    Path("data/resultados_experimento_resumen.json").read_text(encoding="utf-8")
+)
+por_pub = {f["modelo"]: f for f in publicado}
+anclas = sorted({m.nombre for m in roster_activo()} & set(por_pub))
+assert anclas == ["Qwen2.5-1.5B-Instruct", "SmolLM2-1.7B-Instruct",
+                  "SmolLM2-360M-Instruct"], anclas
+for n in anclas:
+    assert por_nombre(n).params_b == por_pub[n]["params_b"], n
+
+fallas = []
+
+# 2. La Tabla 2 trae las dos columnas y los valores publicados salen del JSON de F0.
+tabla2 = Path("paper/02_reescrito/tablas/tabla2_resultados_globales.tex")
+if tabla2.exists():
+    tex = tabla2.read_text(encoding="utf-8")
+    for etiqueta in ("Estricta 2025", "Latencia 2025"):
+        if etiqueta not in tex:
+            fallas.append(f"tabla2: falta la columna {etiqueta!r}")
+    for n in anclas:
+        estricta = f"{por_pub[n]['exact_match_pct']:.1f}"
+        if estricta not in tex and estricta.replace(".", ",") not in tex:
+            fallas.append(f"tabla2: falta la estricta publicada de {n} ({estricta})")
+    # 9 de las 12 filas no tienen ancla publicada: sus dos celdas son '--'.
+    sin_ancla = [m.nombre for m in roster_activo() if m.nombre not in por_pub]
+    assert len(sin_ancla) == 9, sin_ancla
+    if tex.count("--") < 2 * len(sin_ancla):
+        fallas.append("tabla2: faltan celdas '--' para los 9 modelos sin ancla publicada")
+
+# 3. §4 reporta la comparacion nombrando los 3 anclas; §5 la interpreta y aclara
+#    que NO es una replica.
+res = Path("paper/02_reescrito/secciones/04_resultados.tex")
+if res.exists():
+    t = res.read_text(encoding="utf-8")
+    for n in anclas:
+        if n not in t:
+            fallas.append(f"04_resultados.tex: no nombra el ancla {n}")
+
+dis = Path("paper/02_reescrito/secciones/05_discusion.tex")
+if dis.exists():
+    t = dis.read_text(encoding="utf-8").lower()
+    if not any(k in t for k in ("divergenc", "diferencia con el estudio", "respecto de lo publicado")):
+        fallas.append("05_discusion.tex: no discute la comparacion contra lo publicado")
+    if not any(k in t for k in ("no es una replica", "no es una réplica",
+                                "no es directamente comparable")):
+        fallas.append("05_discusion.tex: no declara la salvedad de que no es una replica")
+
+assert not fallas, fallas
+print("continuidad OK: 3 anclas publicadas, 9 filas con '--', comparacion reportada y discutida")
+PY
+```
+**Expected:** imprime `continuidad OK: 3 anclas publicadas, 9 filas con '--', comparacion reportada y discutida`, exit 0. Antes del subtask 11 los bloques 2 y 3 se saltean porque los archivos no existen todavía; el bloque 1 aplica desde el subtask 17.
+**On failure indicates:** se perdió el único mecanismo de **validación cruzada del harness nuevo contra un resultado publicado**. Si faltan las columnas, la comparación quedó como prosa a mano (viola AC9: los números del paper vienen de fragmentos generados). Si falta la salvedad de §5, el paper presenta como réplica algo que no lo es: el prompt se endureció (RF1), así que la exactitud estricta no es directamente comparable, y la latencia arrastra además el confusor de los dos grupos de versión.
 
 ---
 
 ## 5. Non-functional checks
 
 ### NF1 — Envelope de recursos del barrido (comparabilidad de la latencia)
-**Covers AC:** RNF1 (*misma máquina, CPU-only, `--memory=8g --cpus=2`, sin GPU, para preservar la comparabilidad de la tabla de latencia con el paper original*).
+**Covers AC:** RNF1 (*misma máquina, CPU-only, `--memory=8g --cpus=2 --cpuset-cpus`, sin GPU, para preservar la comparabilidad de la tabla de latencia con el paper original*), RNF6 (*pinning de núcleos y ejecución secuencial*), AC17.
 **Cost:** `cheap`
 **Measurement / threshold:**
 ```bash
@@ -402,9 +524,95 @@ python docker/run_sweep.py --dry-run | grep -cE 'gpus|--device|nvidia' ; test $?
 # mencionan el tag da 24, no 12. Se cuentan tags DISTINTOS para que el numero refleje
 # imagenes de verdad, no apariciones de texto.
 python docker/build_all.py --dry-run | grep -oE 'slm-domotica-2026:[A-Za-z0-9._-]+' | sort -u | wc -l
+# Reparto por grupo de version en el plan de build: 9 del grupo A, 3 del grupo B.
+python docker/build_all.py --dry-run | grep -c 'transformers>=4.57.0,<5.0.0'
+python docker/build_all.py --dry-run | grep -c 'transformers>=5.0.0'
+# Pinning de nucleos (Delta 2026-08-04): presente en las 12 y con UN SOLO valor.
+python docker/run_sweep.py --dry-run | grep -c -- '--cpuset-cpus'
+python docker/run_sweep.py --dry-run | grep -oE -- '--cpuset-cpus=[^ ]+' | sort -u | wc -l
+python docker/run_sweep.py --dry-run | grep -c -- '--memory=8g'
+python docker/run_sweep.py --dry-run | grep -c -- '--cpus=2'
+# El valor efectivo queda registrado en la documentacion, no solo en el codigo.
+python - <<'PY'
+import sys
+from pathlib import Path
+sys.path.insert(0, "docker"); sys.path.insert(0, "src")
+from run_sweep import CPUSET_POR_DEFECTO
+readme = Path("docker/README.md").read_text(encoding="utf-8")
+assert f"--cpuset-cpus={CPUSET_POR_DEFECTO}" in readme, (
+    f"docker/README.md no registra el --cpuset-cpus usado ({CPUSET_POR_DEFECTO})"
+)
+print(f"cpuset registrado en docker/README.md OK: {CPUSET_POR_DEFECTO}")
+PY
 ```
-**Expected:** `sin GPU OK` (cero menciones de GPU en las invocaciones) y `12` imágenes **distintas** en el plan de build (roster activo). Combinado con C6 (`12` × `--memory=8g`, `12` × `--cpus=2`), esto fija el envelope de las 12 corridas.
-**On failure indicates:** una corrida con recursos distintos hace que su latencia no sea comparable ni con las otras 11 ni con el paper original — rompe el eje derecho de fig1 y la columna de latencia de la Tabla 2.
+**Expected:** `sin GPU OK` (cero menciones de GPU en las invocaciones), `12` imágenes **distintas** en el plan de build (roster activo), `9` y `3` para los dos pines, `12` invocaciones con `--cpuset-cpus`, **`1`** valor distinto de `--cpuset-cpus` (el mismo par de núcleos en las doce), `12` × `--memory=8g`, `12` × `--cpus=2`, y `cpuset registrado en docker/README.md OK: 0-1`. Esto fija el envelope completo de las 12 corridas.
+**On failure indicates:** una corrida con recursos distintos hace que su latencia no sea comparable ni con las otras 11 ni con el paper original — rompe el eje derecho de fig1, la columna de latencia de la Tabla 2 y, con ella, la comparación de continuidad de C15. Si el conteo de valores distintos de `--cpuset-cpus` es mayor que 1, la comparabilidad se pierde de la peor forma posible: silenciosamente. Si el reparto no es 9/3, el intercambio de roster del subtask 17 no se aplicó. **Por qué el flag no es redundante con `--cpus=2`:** `--cpus` es una **cuota** del planificador CFS —permite migración entre núcleos y no reserva nada— mientras que `--cpuset-cpus` fija los núcleos y elimina la variabilidad por migración. Lo que ningún flag puede hacer es particionar la caché L3 ni el bus de memoria, y por eso la ejecución es **secuencial** (RNF6): correr 4 modelos en paralelo habría inflado los tiempos por comando de forma invisible en la tabla final.
+
+### NF4 — Persistencia incremental y continuación ante fallo (RF20, F12)
+**Covers AC:** AC16 (*un commit por modelo con el nombre y la versión efectiva de `transformers` en el asunto; `data/2026/fallos_barrido.json` existe, `[]` si no hubo fallos; ningún CSV parcial truncado*).
+**Cost:** `cheap` — son lecturas de git y de CSV. **No** reejecuta el barrido.
+**Measurement / threshold:**
+```bash
+python - <<'PY'
+import glob
+import json
+import re
+import subprocess
+import sys
+from pathlib import Path
+sys.path.insert(0, "src")
+import pandas as pd
+from models_2026 import roster_activo, slug
+
+csvs = sorted(glob.glob("data/2026/detalle/*.csv"))
+if not csvs:
+    print("sin CSV todavia: NF4 no aplica (requiere el subtask 05)")
+    raise SystemExit(0)
+
+fallas = []
+
+# 1. Un commit por modelo, con la version efectiva en el asunto (F12.2).
+asuntos = subprocess.run(
+    ["git", "log", "--format=%s", "main..HEAD", "--grep=^data(2026): barrido de"],
+    capture_output=True, text=True,
+).stdout.splitlines()
+if len(asuntos) != len(csvs):
+    fallas.append(f"{len(asuntos)} commits por modelo para {len(csvs)} CSV")
+for asunto in asuntos:
+    if not re.match(r"^data\(2026\): barrido de .+ \(transformers \S+\)$", asunto):
+        fallas.append(f"asunto sin la version efectiva: {asunto!r}")
+
+# 2. El registro de fallos existe y tiene el esquema de F5.
+ruta_fallos = Path("data/2026/fallos_barrido.json")
+if not ruta_fallos.exists():
+    fallas.append("falta data/2026/fallos_barrido.json (tiene que existir, [] si no hubo fallos)")
+else:
+    fallos = json.loads(ruta_fallos.read_text(encoding="utf-8"))
+    assert isinstance(fallos, list)
+    claves = {"modelo", "hf_repo_id", "transformers_pin",
+              "codigo_salida", "error_textual", "momento_iso"}
+    for f in fallos:
+        if set(f) != claves:
+            fallas.append(f"fallos_barrido.json: claves inesperadas {sorted(set(f))}")
+    # F12.4: si hubo fallos, el conteo esperado ya no es 384.
+    esperado = (len(roster_activo()) - len(fallos)) * 32
+    print(f"fallos registrados: {len(fallos)} | filas esperadas del consolidado: {esperado}")
+
+# 3. Ningun CSV parcial truncado: todos parsean y ninguno deja .tmp atras.
+for ruta in csvs:
+    try:
+        pd.read_csv(ruta)
+    except Exception as e:
+        fallas.append(f"{ruta}: no parsea ({e})")
+if glob.glob("data/2026/**/*.tmp", recursive=True):
+    fallas.append("quedaron archivos .tmp: la escritura atomica no limpio")
+
+assert not fallas, fallas
+print(f"persistencia incremental OK: {len(csvs)} CSV, {len(asuntos)} commits por modelo")
+PY
+```
+**Expected:** antes del subtask 05, `sin CSV todavia: NF4 no aplica (requiere el subtask 05)` y exit 0. Después: `fallos registrados: 0 | filas esperadas del consolidado: 384` y `persistencia incremental OK: 12 CSV, 12 commits por modelo`.
+**On failure indicates:** si los commits por modelo son menos que los CSV, se acumularon resultados sin versionar y una caída del host habría costado horas de barrido — el modo de fallo concreto que RF20 vino a cerrar (esta sesión ya perdió trabajo tres veces: reinicio del backend de Docker, salida del proceso, error 529). Si falta `fallos_barrido.json`, no se puede distinguir "no hubo fallos" de "no se registró", y el paper no podría documentar una exclusión por fallo con su error textual. Si un CSV no parsea, la escritura no fue atómica y hay un parcial truncado haciéndose pasar por dato.
 
 ### NF2 — Reanudabilidad del barrido completo
 **Covers AC:** RF3 / RNF2 (*barrido reanudable por modelo; reejecutar salta los modelos ya completos salvo `--force`; debe tolerar interrupciones*). Es cross-task: el subtask 03 verifica la reanudación de **un** modelo; acá se verifica que los **12** CSV del roster activo producidos por el subtask 05 sean reconocidos como completos.
@@ -454,7 +662,7 @@ Ninguno de estos comandos arranca un contenedor de modelo, descarga pesos ni hac
 | 1 | `pytest -q` | exit 0, cero `failed` / `error` | `cheap` |
 | 2 | C1 + C2 (inmutabilidad de F0, árbol e historial) | ambas salidas vacías | `cheap` |
 | 3 | C3 + C4 + C5 (secretos, capas, untracked) | los cuatro mensajes `... OK` | `cheap` |
-| 4 | C6 + NF1 (plomería del token y envelope de recursos, vía `--dry-run`) | `2`, `12`, `12`, `0`, `sin GPU OK`, `12` (dos gated en el registro, doce activos, doce invocaciones, cero `--env-file`, doce imágenes **distintas** en el plan de build) | `cheap` |
+| 4 | C6 + NF1 (plomería del token y envelope de recursos, vía `--dry-run`) | `15`, `2`, `12`, `3`, `12`, `0`, `sin GPU OK`, `12`, `9`, `3`, `12`, `1`, `12`, `12`, `cpuset registrado ... 0-1` (registro de quince, dos gated, doce activos, tres excluidos, doce invocaciones, cero `--env-file`, doce imágenes **distintas** en el plan de build, reparto 9/3, pinning en las doce con **un solo** valor, y ese valor documentado) | `cheap` |
 | 5 | NF3 (decodificación determinista) | `sin muestreo estocastico OK` | `cheap` |
 | 6 | C7 (trazabilidad de versiones) | `... OK` | `cheap` |
 | 7 | C8 (regeneración idempotente de tablas `.tex`) | `regeneracion idempotente OK` | `cheap` |
@@ -464,9 +672,11 @@ Ninguno de estos comandos arranca un contenedor de modelo, descarga pesos ni hac
 | 11 | NF2 (reanudabilidad de los 12) | `barrido reanudable OK` | `cheap` |
 | 12 | Manual Check 1 + Check 2 (figuras y PDF) | ver §3 | `cheap` |
 | 13 | C13 (correspondencia versión↔CSV) | ver §4 | `cheap` |
-| 14 | C14 (exclusiones declaradas) | ver §4 | `cheap` |
+| 14 | C14 (exclusiones declaradas, 3 con dos causas, sin sobreafirmar) | ver §4 | `cheap` |
+| 15 | C15 (continuidad con la Tabla 2 publicada) | ver §4 | `cheap` |
+| 16 | NF4 (persistencia incremental y registro de fallos) | ver §5 | `cheap` |
 
-Los ítems 7–14 requieren que el DAG haya llegado al subtask 15 y que `data/2026/` exista. Antes de eso, `/run-test-plan --scope=cheap` debe reportarlos como *no aplicables todavía*, no como fallos; los ítems 1–6 aplican desde el primer commit de la rama.
+Los ítems 7–15 requieren que el DAG haya llegado al subtask 15 y que `data/2026/` exista; el ítem 16 requiere el subtask 05. Antes de eso, `/run-test-plan --scope=cheap` debe reportarlos como *no aplicables todavía*, no como fallos; los ítems 1–6 aplican desde el primer commit de la rama. **El ítem 4 aplica desde el primer commit pero sus números cambian con el subtask 17**: antes de que 17 esté cerrado, el registro es de 14, los excluidos son 2 y el reparto es 8/4, y **no hay** `--cpuset-cpus` — eso es esperado, no un fallo, hasta que 17 cierre. Después de 17, los valores de la tabla son los definitivos y cualquier desvío sí es un fallo.
 
 ### Tier `expensive` — solo en la **pasada confirmatoria**
 
@@ -474,13 +684,17 @@ Nunca en una iteración de fix. Requiere P4 (Docker up).
 
 | # | Run | Expected | Cost |
 |---|-----|----------|------|
-| E1 | `python docker/build_all.py` | 12 imágenes `slm-domotica-2026:<slug>` del roster activo; verificar con `docker images --format '{{.Repository}}:{{.Tag}}' \| grep -c '^slm-domotica-2026:'` → `>= 12` | `expensive` (descargas de torch/transformers por imagen) |
-| E2 | `python docker/run_sweep.py 2>&1 \| tee data/2026/log_barrido.txt` | 12 archivos en `data/2026/detalle/`, 384 filas en total | `expensive` — secuencial, `--memory=8g --cpus=2`, CPU-only |
+| E1 | `python docker/build_all.py` | 12 imágenes `slm-domotica-2026:<slug>` del roster activo, **incluida** `slm-domotica-2026:qwen2-5-1-5b-instruct`; verificar con `comm -23` entre el plan (`build_all.py --dry-run`) y `docker images`, que debe dar vacío. **No** debe existir `slm-domotica-2026:qwen3-5-2b`: ese modelo está excluido | `expensive` (descargas de torch/transformers por imagen) |
+| E2 | `python docker/run_sweep.py 2>&1 \| tee data/2026/log_barrido.txt` | 12 archivos en `data/2026/detalle/`, 384 filas en total, `fallos_barrido.json` = `[]`, y **un commit por modelo** (NF4). Si hubo fallos: `(12 − \|fallos\|) × 32` filas y los modelos fallidos documentados como limitación | `expensive` — **secuencial**, `--memory=8g --cpus=2 --cpuset-cpus=0-1`, CPU-only, ~7 h, host ocioso |
 | E3 | C12 (determinismo del juez) | `juez determinista OK` | `expensive` (decenas de minutos de inferencia en CPU) |
 | E4 | Rerun del tier `cheap` completo, sobre el estado post-E1/E2/E3 | todo verde, y en particular `pytest -q -rs tests/test_integracion_2026.py` con **cero** `skipped` | `cheap` |
 
-Nota: como el roster activo tiene cero modelos *gated*, P4/E1/E2 ya **no** requieren `.env` ni `HF_TOKEN` para el roster de 12; esa plomería solo se ejercita si alguien reactiva explícitamente uno de los dos modelos excluidos.
+Nota: como el roster activo tiene cero modelos *gated*, P4/E1/E2 ya **no** requieren `.env` ni `HF_TOKEN` para el roster de 12; esa plomería solo se ejercita si alguien reactiva explícitamente uno de los dos modelos excluidos **por acceso**. Reactivar `Qwen3.5-2B`, el tercer excluido, no requiere credenciales (no es *gated*) sino su sonda positiva bajo 5.14.1, que nunca se obtuvo.
 
-**Regla de oro del tier.** E2 **produce** los datos; AC2/AC3/AC4 los **verifican** y son `cheap`. Nunca reejecutar E1/E2 para revalidar un criterio de datos: si `data/2026/detalle_2026.csv` está en disco, el Test 3 lo verifica en segundos. La única razón legítima para volver a correr E2 es que el barrido en sí haya cambiado (roster, prompt, harness o imágenes).
+**Nada en paralelo durante E2 (RNF6).** E2 corre **un modelo a la vez** y sobre **host ocioso**: no lanzar E1 de otras imágenes, ni E3, ni ningún check `cheap` que use Docker mientras E2 avanza. `--cpus=2` es una cuota de CFS y `--memory=8g` un techo, no reservas; `--cpuset-cpus` fija los núcleos pero ni la caché L3 ni el bus de memoria se pueden particionar por contenedor, y la inferencia de LLM en CPU está limitada por ancho de banda de memoria. Cualquier carga concurrente infla los tiempos por comando de forma **invisible** en la tabla final y contamina la columna de latencia, la comparación de continuidad de C15 y el eje derecho de fig1.
+
+**E2 es reanudable y no se bloquea.** Si se interrumpe, `python docker/run_sweep.py --desde "<modelo>"` retoma y los modelos ya completos se saltean. Si un modelo falla, E2 **no corta**: registra el fallo en `data/2026/fallos_barrido.json` y sigue (F12.1). La única excepción es un 401/403, que corta inmediato (AUTH-STOP) y no se reintenta.
+
+**Regla de oro del tier.** E2 **produce** los datos; AC2/AC3/AC4 los **verifican** y son `cheap`. Nunca reejecutar E1/E2 para revalidar un criterio de datos: si `data/2026/detalle_2026.csv` está en disco, el Test 3 lo verifica en segundos. La única razón legítima para volver a correr E2 es que el barrido en sí haya cambiado (roster, prompt, harness o imágenes) — y el intercambio de roster del subtask 17 **es** una de esas razones para cualquier CSV producido antes de él, salvo `data/2026/detalle/granite-4-0-350m.csv`, cuyo pin no cambió (F5).
 
 **Precaución con `E2` + `tee`.** `data/2026/log_barrido.txt` es un archivo de log. Antes de commitearlo, C3 debe estar verde: un log de descarga puede contener el token en una URL firmada o en un traceback. Si C3 falla sobre el log, el remedio es no versionar el log **y rotar el token**.

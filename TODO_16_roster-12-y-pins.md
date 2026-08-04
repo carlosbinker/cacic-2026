@@ -554,44 +554,34 @@ Diseña estrictamente contra los contratos re-congelados del índice: **F3** (`s
 - [x] `git add tests/test_credenciales_gated.py` *(consolidado en el commit único final)*
 - [x] `git commit -m "test(2026): el roster activo de 12 corre sin \$HF_TOKEN"` *(consolidado, ver Cierre)*
 
-### Tarea 6 — Reconstruir las 4 imágenes del grupo B con el pin nuevo
+### Tarea 6 — Cola de imágenes Docker: **TRASLADADA al subtask 17** (Delta 2026-08-04)
 
-> Exención de TDD: es una operación de build, no comportamiento nuevo. La cache de pip para
-> `transformers>=5.0.0` ya está poblada (sonda de confirmación de Phase 3), así que es rápido.
+> Exención de TDD: son operaciones de build, no comportamiento nuevo.
 
-> **Bloqueada por infraestructura.** El almacenamiento del daemon de Docker está en modo solo
-> lectura (ver "Bloqueo de infraestructura" en la Spec de arriba): ningún `docker build` puede
-> correr hasta que Docker Desktop se repare. Esta tarea queda pendiente hasta entonces; no afecta a
-> las Tareas 1–5 ni 7, que son independientes de Docker.
+**Estado al 2026-08-04: esta tarea ya no se ejecuta acá.** Sus tres casillas quedaron abiertas por el
+bloqueo de infraestructura de Docker del 2026-08-03, y el **Delta 2026-08-04** las dejó además
+**numéricamente incorrectas**: el intercambio de roster (sale `Qwen3.5-2B`, entra
+`Qwen2.5-1.5B-Instruct`) cambia el reparto por grupo de versión del roster activo de **8 A / 4 B** a
+**9 A / 3 B**.
 
-**Bloqueado: almacenamiento de Docker en solo lectura.** No se ejecutó ningún comando `docker` en
-esta corrida (instrucción explícita del orquestador, además del bloqueo de infraestructura ya
-documentado). Los tres puntos de abajo quedan sin marcar hasta que Docker Desktop se repare.
+Conteos corregidos, que son los que se ejecutan:
 
-- [ ] Reconstruir las 4 imágenes del grupo B, una por una:
+- Imágenes del grupo B a reconstruir: **3** (`LFM2.5-230M`, `LFM2.5-350M`, `Qwen3.5-0.8B`) — **no 4**.
+  La de `Qwen3.5-2B` **no se construye**: ese modelo quedó excluido del roster activo, y pedirla debe
+  fallar con `ValueError`.
+- Imágenes del grupo A a **construir**: **1**, la de `Qwen2.5-1.5B-Instruct`
+  (`slm-domotica-2026:qwen2-5-1-5b-instruct`), que **no existe** en este host.
+- Imágenes del grupo A que **no** se reconstruyen: **8**, las que ya existen y cuyo pin
+  (`BASELINE_TRANSFORMERS`) no cambió. 8 + 1 = **9** del grupo A, más **3** del grupo B = las **12** del
+  roster activo.
 
-  ```bash
-  python docker/build_all.py --modelo "LFM2.5-230M"
-  python docker/build_all.py --modelo "LFM2.5-350M"
-  python docker/build_all.py --modelo "Qwen3.5-0.8B"
-  python docker/build_all.py --modelo "Qwen3.5-2B"
-  ```
+**Por qué se trasladó y no se editó en su lugar.** Estas casillas dependen del roster **posterior** al
+intercambio, o sea del subtask **17**; y el 17 es correctivo de este subtask, así que
+`17.depends_on ∋ 16`. Dejarlas acá habría exigido `16.depends_on ∋ 17` a la vez: un **ciclo** en el DAG.
+Se ejecutan en **`TODO_17_intercambio-roster-y-ejecucion.md`, Tarea 7**, con los conteos de arriba.
 
-- [ ] Confirmar la versión efectiva dentro de al menos una imagen de cada grupo:
-
-  ```bash
-  docker run --rm slm-domotica-2026:lfm2-5-230m python -c "import transformers; print(transformers.__version__)"
-  # -> 5.x
-
-  docker run --rm slm-domotica-2026:granite-4-0-350m python -c "import transformers; print(transformers.__version__)"
-  # -> 4.57.x (ya construida en el subtask 04; no hace falta reconstruirla)
-  ```
-
-  Si `slm-domotica-2026:granite-4-0-350m` no existe todavía en este host, reconstruirla también:
-  `python docker/build_all.py --modelo "granite-4.0-350m"`.
-
-- [ ] No reconstruir las 8 imágenes restantes del grupo A: su pin (`BASELINE_TRANSFORMERS`) no
-  cambió, y reconstruir sin necesidad viola el alcance de esta tarea (no arrancar el barrido).
+El núcleo de código de este subtask está **commiteado e inmutable** (`864c694`); esta nota es
+documentación forward-only y no reescribe historia.
 
 ### Tarea 7 — Cierre
 
@@ -648,7 +638,9 @@ python docker/build_all.py --modelo "gemma-3-270m-it" --dry-run ; echo "exit=$?"
 python docker/run_sweep.py --dry-run | grep -c '^==='            # -> 12
 python docker/run_sweep.py --dry-run | grep -c -- '--env-file'   # -> 0
 
-# 7. transformers efectivo por grupo, en al menos una imagen de cada uno
+# 7. transformers efectivo por grupo -- SUPERSEDIDO por TODO_17, Tarea 7 y Verify 8.
+#    Los conteos de este bloque (12 builds, 4 del grupo B, 8 del grupo A) valen para el
+#    roster PREVIO al Delta 2026-08-04; el reparto vigente es 9 A / 3 B. Ver TODO_17.
 docker run --rm slm-domotica-2026:lfm2-5-230m python -c "import transformers; print(transformers.__version__)"
 docker run --rm slm-domotica-2026:granite-4-0-350m python -c "import transformers; print(transformers.__version__)"
 
@@ -666,6 +658,22 @@ git diff --stat main -- data/resultados_experimento_detalle.csv \
 ```
 
 ## Acceptance criteria
+
+> **Nota post-Delta 03 (2026-08-04), forward-only.** Los criterios de abajo se evaluaron y se
+> cumplieron contra el roster **previo** al intercambio, y su código está commiteado en
+> `864c694`. Tres de ellos quedaron numéricamente superados por el Delta 2026-08-04 y **los reemplaza
+> `TODO_17_intercambio-roster-y-ejecucion.md`**, que es la única fuente vigente para esos números:
+>
+> - "`MODELOS_2026` sigue teniendo exactamente 14 elementos" → **15**.
+> - "`transformers_pin` toma dos valores, con 8 y 4 modelos" → **9 y 3** sobre el roster activo
+>   (**11 y 4** sobre el registro).
+> - "`motivo_pin != ""` … ese conjunto es exactamente `{LFM2.5-230M, LFM2.5-350M, Qwen3.5-0.8B,
+>   Qwen3.5-2B, granite-4.0-350m}`" → sigue siendo ese conjunto sobre el **registro**, pero sobre el
+>   **roster activo** son **4** (sin `Qwen3.5-2B`, que quedó excluido conservando su `motivo_pin`).
+> - "las 4 imágenes del grupo B reconstruidas" → **3** reconstrucciones del grupo B más **1**
+>   construcción nueva del grupo A (ver Tarea 6 de este archivo y Tarea 7 del subtask 17).
+>
+> El resto de los criterios sigue vigente sin cambios. Este texto no se reescribe: se anota.
 
 - **Dado** `src/models_2026.py`, **entonces** declara `TRANSFORMERS_5X = "transformers>=5.0.0"`,
   el dataclass `ModeloEvaluado2026` tiene los campos `activo: bool` y `motivo_exclusion: str`, y

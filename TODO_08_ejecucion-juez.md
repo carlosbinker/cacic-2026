@@ -31,7 +31,7 @@ j = json.load(open('data/2026/juez_seleccionado.json', encoding='utf-8'))
 print('Juez:', j['modelo'], '|', j['hf_repo_id'], '|', j['exact_match_pct'], '%')
 print('Empatados:', j['empatados'])
 "
-wc -l data/2026/detalle_2026.csv     # -> 449 (448 + encabezado)
+wc -l data/2026/detalle_2026.csv     # -> 385 (384 + encabezado); menos si hubo exclusiones F12.4
 ```
 
 - [ ] Calcular cuántas consultas va a hacer, para dimensionar la corrida:
@@ -51,19 +51,47 @@ print(f'total minimo: {incorrectas + df[\"idx\"].nunique()} (mas reintentos)')
 
 ### Tarea 2 — Ejecución
 
-- [ ] Correr la etapa 2 dentro de la imagen del juez, con log persistente:
+- [ ] Resolver el juez y su imagen:
 
 ```bash
 JUEZ=$(python -c "import json;print(json.load(open('data/2026/juez_seleccionado.json',encoding='utf-8'))['modelo'])")
 SLUG=$(python -c "import sys;sys.path.insert(0,'src');from models_2026 import slug;print(slug('$JUEZ'))")
+```
 
-docker run --rm --memory=8g --cpus=2 \
+- [ ] **RF20b — commitear los lotes a medida que salen, no al final.** El juez persiste
+  `etiquetas_errores.csv` y `categorias_comandos.csv` por lote (**F12.3**: al terminar cada modelo y
+  cada comando, respectivamente), escritos atómicamente en el volumen montado, así que ya son legibles
+  desde el host mientras el contenedor sigue corriendo. Motivo registrado: esta sesión ya perdió
+  trabajo tres veces (reinicio del backend de Docker, salida del proceso, error 529) — lo que solo
+  vive en el working tree es exactamente lo que cuesta una caída. Correr el juez en segundo plano y
+  commitear cada vez que cambien los CSV:
+
+```bash
+# --cpuset-cpus=0-1 es el mismo valor que usan las 12 corridas del barrido (F11
+# amendado): las dos etapas comparten un único envelope de recursos.
+docker run --rm --memory=8g --cpus=2 --cpuset-cpus=0-1 \
   -v "$(pwd)/data:/app/data" \
   -v "$(pwd)/.hf_cache:/app/.hf_cache" \
   "slm-domotica-2026:${SLUG}" \
-  python src/judge_2026.py 2>&1 | tee data/2026/log_juez.txt
+  python src/judge_2026.py > data/2026/log_juez.txt 2>&1 &
+PID_JUEZ=$!
+
+HASH_PREVIO=""
+while kill -0 "$PID_JUEZ" 2>/dev/null; do
+  sleep 60
+  HASH_ACTUAL=$(md5sum data/2026/etiquetas_errores.csv data/2026/categorias_comandos.csv 2>/dev/null)
+  if [ -n "$HASH_ACTUAL" ] && [ "$HASH_ACTUAL" != "$HASH_PREVIO" ]; then
+    git add data/2026/etiquetas_errores.csv data/2026/categorias_comandos.csv
+    git commit -m "data(2026): avance parcial de la etapa 2 (lote persistido por el juez)"
+    HASH_PREVIO="$HASH_ACTUAL"
+  fi
+done
+wait "$PID_JUEZ"
 ```
 
+  Mensaje de commit parcial congelado: `data(2026): avance parcial de la etapa 2 (lote persistido por
+  el juez)`. El commit de cierre de la Tarea 4 (`data(2026): etapa 2 ejecutada, ...`) se hace igual al
+  final, sobre el estado ya completo — los commits parciales no lo reemplazan.
 - [ ] Revisar en el log el conteo de fallos de parseo que imprime el script. Un número alto (> 20 % de las consultas) es señal de que el juez es demasiado débil para la tarea: **no se lo maquilla**, se reporta en el paper y se discute como limitación en §6.
 
 ### Tarea 3 — Validación de los artefactos
@@ -118,11 +146,14 @@ assert sum(obt.values()) == 32
 "
 ```
 
-- [ ] Verificar el determinismo reejecutando la etapa 2 y comparando hashes (**RNF3**):
+- [ ] Verificar el determinismo reejecutando la etapa 2 y comparando hashes (**RNF3**). Se corre en
+  **modo default, sin `--reanudar`**: `--reanudar` es opt-in (F12.3) y saltearía todas las filas ya
+  presentes, dejando el CSV reescrito sin volver a consultar al juez — el chequeo de byte-identidad
+  quedaría vacío en vez de medir determinismo real:
 
 ```bash
 md5sum data/2026/etiquetas_errores.csv data/2026/categorias_comandos.csv > /tmp/juez_antes.txt
-docker run --rm --memory=8g --cpus=2 \
+docker run --rm --memory=8g --cpus=2 --cpuset-cpus=0-1 \
   -v "$(pwd)/data:/app/data" -v "$(pwd)/.hf_cache:/app/.hf_cache" \
   "slm-domotica-2026:${SLUG}" python src/judge_2026.py >/dev/null
 md5sum -c /tmp/juez_antes.txt && echo "juez deterministico OK"
@@ -191,4 +222,7 @@ git diff --exit-code main -- data/dataset_comandos_domotica.csv \
 - **Dado** que se reejecuta `src/judge_2026.py` sobre el mismo `detalle_2026.csv`, **entonces** ambos CSV quedan byte-idénticos (determinismo por decodificación greedy, RNF3).
 - **Dado** la distribución de categorías, **entonces** suma 32 y fue comparada contra la referencia 8/8/6/4/3/3 del paper original; cualquier diferencia quedó registrada para discutirla, no corregida a mano.
 - **Dado** el juez, **entonces** es exactamente el modelo indicado en `juez_seleccionado.json`, ejecutado dentro de su propia imagen Docker con su `transformers_pin`; no se sustituyó por otro modelo aunque su tasa de parseo fuera baja.
+- **Dado** cualquier invocación de `docker run` de este subtask (ejecución de la Tarea 2 y re-corrida de determinismo de la Tarea 3), **entonces** lleva `--cpuset-cpus=0-1` junto con `--cpus=2 --memory=8g`, el mismo valor que usan las 12 corridas del barrido (F11 amendado).
+- **Dado** RF20b, **entonces** hubo al menos un commit parcial con el mensaje `data(2026): avance parcial de la etapa 2 (lote persistido por el juez)` antes del commit de cierre de la Tarea 4, evidenciando que los CSV se versionaron a medida que el juez los persistía por lote (F12.3) y no solo al final.
+- **Dado** la re-corrida de determinismo de la Tarea 3, **entonces** se ejecuta en modo default (sin `--reanudar`); usar `--reanudar` ahí volvería vacío el chequeo de byte-identidad, porque saltearía todas las filas ya presentes en vez de volver a consultar al juez.
 - **Dado** el commit, **entonces** `pytest -q` pasa, los archivos de F0 siguen intactos, y no se ejecutó ningún comando de autenticación en ningún momento.

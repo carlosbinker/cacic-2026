@@ -12,11 +12,19 @@ files:
 
 ## Spec
 
-Cerrar la etapa 1: consolidar los 14 CSV por modelo en `data/2026/detalle_2026.csv`, calcular el resumen de etapa 1 y **elegir el juez de forma determinista** según **RF7** — mayor `exact_match_pct`; empate → mayor `params_b`; empate persistente → orden del roster.
+Cerrar la etapa 1: consolidar los 12 CSV del roster activo (`roster_activo()`) en `data/2026/detalle_2026.csv`, calcular el resumen de etapa 1 y **elegir el juez de forma determinista** según **RF7** — mayor `exact_match_pct`; empate → mayor `params_b`; empate persistente → orden del roster.
 
 Produce los tres artefactos de **F5**: `detalle_2026.csv`, `resumen_etapa1.json` y `juez_seleccionado.json`. Este último es el contrato de entrada del subtask 07: el juez no se elige a mano ni se hardcodea en ningún lado.
 
 La reproducibilidad del pipeline **no** depende de fijar el ID del juez, sino de la decodificación greedy (RNF3); registrar el ganador es documentación, no garantía. Aun así la selección debe ser una función pura y total del resumen de etapa 1, para que dos corridas sobre los mismos datos elijan siempre lo mismo.
+
+**F12.4 — exclusión por fallo del barrido, documentada.** Antes de consolidar hay que leer
+`data/2026/fallos_barrido.json` (subtask 05; `[]` si no hubo fallos). Si no está vacío, cada modelo
+que figura ahí queda fuera del consolidado y de toda tabla/figura, y el invariante de 384 filas se
+**rompe a propósito**: el conteo esperado pasa a `(12 - len(fallos)) * 32`. La consolidación nunca deja
+pasar en silencio un archivo más corto que lo esperado — reporta explícitamente qué modelos faltan y
+por qué (su `error_textual`), y ese número real (no 384) es el que va en el mensaje de commit y el que
+alimenta la sección de limitaciones del paper (subtasks 14/15).
 
 ## Implementation plan
 
@@ -115,7 +123,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from models_2026 import MODELOS_2026, por_nombre, slug
+from models_2026 import MODELOS_2026, por_nombre, roster_activo, slug
 from run_sweep_2026 import COLUMNAS_DETALLE, N_COMANDOS_ESPERADO
 
 RAIZ = Path(__file__).resolve().parent.parent
@@ -167,7 +175,74 @@ def resumen_etapa1(df: pd.DataFrame, params_por_modelo: dict[str, float]) -> lis
 
 - [ ] Correr y confirmar **verde** la primera parte: `pytest -q tests/test_stage1_2026.py`
 
-### Tarea 2 — Selección determinista del juez (TDD)
+### Tarea 2 — Exclusión por fallo del barrido (F12.4, TDD)
+
+- [ ] Agregar a `tests/test_stage1_2026.py`:
+
+```python
+from stage1_2026 import calcular_filas_esperadas, nombres_disponibles
+
+
+def test_calcula_384_filas_cuando_no_hubo_fallos():
+    assert calcular_filas_esperadas([]) == 384
+
+
+def test_descuenta_32_filas_por_cada_modelo_fallido():
+    fallos = [
+        {"modelo": "m1", "hf_repo_id": "x", "transformers_pin": "y",
+         "codigo_salida": 1, "error_textual": "boom", "momento_iso": "2026-08-04T00:00:00"},
+    ]
+    assert calcular_filas_esperadas(fallos) == 352
+
+
+def test_nombres_disponibles_excluye_a_los_modelos_fallidos():
+    roster = [m.nombre for m in MODELOS_2026[:5]]
+    fallos = [{"modelo": roster[2], "hf_repo_id": "x", "transformers_pin": "y",
+               "codigo_salida": 1, "error_textual": "boom", "momento_iso": "t"}]
+    disponibles = nombres_disponibles(roster, fallos)
+    assert roster[2] not in disponibles
+    assert len(disponibles) == len(roster) - 1
+
+
+def test_nombres_disponibles_sin_fallos_devuelve_el_roster_completo():
+    roster = [m.nombre for m in MODELOS_2026[:4]]
+    assert nombres_disponibles(roster, []) == roster
+```
+
+- [ ] Correr y confirmar que **falla**: `pytest -q tests/test_stage1_2026.py`
+- [ ] Implementar en `src/stage1_2026.py`:
+
+```python
+N_ROSTER_ACTIVO = 12
+PATH_FALLOS = DIR_2026 / "fallos_barrido.json"
+
+
+def calcular_filas_esperadas(fallos: list[dict], n_roster: int = N_ROSTER_ACTIVO,
+                              n_comandos: int = N_COMANDOS_ESPERADO) -> int:
+    """F12.4: cada modelo fallido en el barrido resta sus 32 filas del total."""
+    return (n_roster - len(fallos)) * n_comandos
+
+
+def nombres_disponibles(nombres_roster: list[str], fallos: list[dict]) -> list[str]:
+    """Roster (activo) menos los modelos que fallaron el barrido (F12.4)."""
+    fallidos = {f["modelo"] for f in fallos}
+    return [n for n in nombres_roster if n not in fallidos]
+
+
+def reportar_fallos(fallos: list[dict]) -> None:
+    """F12.4: nunca deja pasar en silencio un consolidado corto."""
+    if not fallos:
+        return
+    print(f"\nATENCION: {len(fallos)} modelo(s) fuera del consolidado (F12.4):")
+    for f in fallos:
+        print(f"  {f['modelo']} (codigo_salida={f['codigo_salida']}): {f['error_textual']}")
+    print("  Quedan excluidos de toda tabla/figura y deben reportarse como limitacion "
+          "en el paper (subtasks 14/15).")
+```
+
+- [ ] Correr y confirmar **verde**: `pytest -q tests/test_stage1_2026.py`
+
+### Tarea 3 — Selección determinista del juez (TDD)
 
 - [ ] Agregar a `tests/test_stage1_2026.py`:
 
@@ -264,12 +339,24 @@ def main() -> int:
     parser.add_argument("--dir-detalle", default=str(DIR_DETALLE))
     args = parser.parse_args()
 
-    nombres = [m.nombre for m in MODELOS_2026]
+    fallos = (
+        json.loads(PATH_FALLOS.read_text(encoding="utf-8")) if PATH_FALLOS.exists() else []
+    )
+    reportar_fallos(fallos)
+    nombres = nombres_disponibles([m.nombre for m in roster_activo()], fallos)
+
     df = consolidar_detalle(Path(args.dir_detalle), nombres)
+    esperadas = calcular_filas_esperadas(fallos)
+    if len(df) != esperadas:
+        raise ValueError(
+            f"consolidado con {len(df)} filas, se esperaban {esperadas} "
+            f"({N_ROSTER_ACTIVO - len(fallos)} modelos activos x {N_COMANDOS_ESPERADO} comandos)"
+        )
     PATH_CONSOLIDADO.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(PATH_CONSOLIDADO, index=False)
 
-    resumen = resumen_etapa1(df, {m.nombre: m.params_b for m in MODELOS_2026})
+    params_por_modelo = {m.nombre: m.params_b for m in roster_activo() if m.nombre in nombres}
+    resumen = resumen_etapa1(df, params_por_modelo)
     PATH_RESUMEN_E1.write_text(
         json.dumps(resumen, indent=2, ensure_ascii=False), encoding="utf-8"
     )
@@ -277,7 +364,8 @@ def main() -> int:
     juez = elegir_juez(resumen)
     PATH_JUEZ.write_text(json.dumps(juez, indent=2, ensure_ascii=False), encoding="utf-8")
 
-    print(f"Consolidado: {len(df)} filas en {PATH_CONSOLIDADO}")
+    print(f"Consolidado: {len(df)} filas ({len(nombres)} modelos, "
+          f"{len(fallos)} excluidos por fallo de barrido) en {PATH_CONSOLIDADO}")
     for f in sorted(resumen, key=lambda x: -x["exact_match_pct"]):
         print(f"  {f['modelo']:26s} exact={f['exact_match_pct']:5.1f}%  "
               f"lat={f['avg_latencia_s']:7.2f}s")
@@ -292,13 +380,15 @@ if __name__ == "__main__":
 
 - [ ] Correr y confirmar **verde**: `pytest -q tests/test_stage1_2026.py`
 
-### Tarea 3 — Ejecutar sobre los datos reales y commitear
+### Tarea 4 — Ejecutar sobre los datos reales y commitear
 
 - [ ] `python src/stage1_2026.py`
 - [ ] Revisar a ojo el ranking impreso: ¿el ganador es plausible (suele ser de los más grandes)? Si ganara un sub-1B, no es un error — es un resultado y se discute en el paper.
+- [ ] Si `data/2026/fallos_barrido.json` no está vacío, confirmar que la salida impresa nombra cada modelo excluido con su `error_textual`, y que el conteo final de filas coincide con `(12 - len(fallos)) * 32`, no con 384.
 - [ ] `pytest -q`
 - [ ] `git add src/stage1_2026.py tests/test_stage1_2026.py data/2026/detalle_2026.csv data/2026/resumen_etapa1.json data/2026/juez_seleccionado.json`
-- [ ] `git commit -m "feat(2026): consolidacion de etapa 1 y seleccion determinista del juez"`
+- [ ] Mensaje de commit con el conteo real (384 si no hubo fallos; `(12 - len(fallos)) * 32` si los hubo):
+  `git commit -m "feat(2026): consolidacion de etapa 1 (<N> filas) y seleccion determinista del juez"`
 
 ## Verify
 
@@ -306,18 +396,25 @@ if __name__ == "__main__":
 # 1. Suite verde
 pytest -q
 
-# 2. El consolidado tiene las 448 filas, en orden de roster
+# 2. El consolidado tiene 384 filas (o (12 - fallos)*32 si hubo exclusiones F12.4),
+#    en orden de roster activo
 python -c "
 import sys, json; sys.path.insert(0,'src')
 import pandas as pd
-from models_2026 import MODELOS_2026
+from models_2026 import roster_activo
 from run_sweep_2026 import COLUMNAS_DETALLE
+from stage1_2026 import calcular_filas_esperadas, PATH_FALLOS
+fallos = json.loads(PATH_FALLOS.read_text(encoding='utf-8')) if PATH_FALLOS.exists() else []
 df = pd.read_csv('data/2026/detalle_2026.csv')
-assert len(df) == 448, len(df)
+esperadas = calcular_filas_esperadas(fallos)
+assert len(df) == esperadas, (len(df), esperadas)
 assert list(df.columns) == COLUMNAS_DETALLE
-assert df['modelo'].drop_duplicates().tolist() == [m.nombre for m in MODELOS_2026]
+fallidos = {f['modelo'] for f in fallos}
+assert df['modelo'].drop_duplicates().tolist() == [
+    m.nombre for m in roster_activo() if m.nombre not in fallidos
+]
 assert not df.duplicated(['modelo','idx']).any()
-print('consolidado OK')
+print('consolidado OK', '-', len(df), 'filas', '-', len(fallos), 'exclusiones F12.4')
 "
 
 # 3. El juez elegido cumple el criterio, verificado independientemente
@@ -347,9 +444,11 @@ git diff --exit-code main -- data/resultados_experimento_detalle.csv \
 
 ## Acceptance criteria
 
-- **Dado** los 14 CSV de detalle, **cuando** se corre `src/stage1_2026.py`, **entonces** `data/2026/detalle_2026.csv` tiene 448 filas, las 17 columnas de F5 en orden, los modelos en orden de roster, cada bloque con `idx` de 0 a 31, y sin pares `(modelo, idx)` duplicados.
+- **Dado** los 12 CSV de detalle del roster activo, **cuando** se corre `src/stage1_2026.py`, **entonces** `data/2026/detalle_2026.csv` tiene 384 filas, las 17 columnas de F5 en orden, los modelos en orden de roster, cada bloque con `idx` de 0 a 31, y sin pares `(modelo, idx)` duplicados.
 - **Dado** un directorio de detalle al que le falta algún modelo del roster, **entonces** `consolidar_detalle` lanza `ValueError` nombrando los faltantes, en vez de producir un consolidado incompleto.
 - **Dado** un CSV con esquema distinto o con distinto número de filas, **entonces** `consolidar_detalle` lanza `ValueError` señalando el archivo.
+- **Dado** `data/2026/fallos_barrido.json` vacío (`[]`), **entonces** `calcular_filas_esperadas([])` devuelve 384 y `nombres_disponibles` devuelve el roster activo completo, sin ningún mensaje de exclusión impreso.
+- **Dado** `data/2026/fallos_barrido.json` con uno o más modelos, **entonces** esos modelos quedan fuera de `nombres_disponibles`, el conteo esperado del consolidado pasa a `(12 - len(fallos)) * 32`, `main()` lanza `ValueError` si el consolidado no coincide con ese número (nunca deja pasar un consolidado corto en silencio), la salida impresa nombra cada modelo excluido con su `error_textual`, y el commit de la Tarea 4 registra el conteo real (no 384) en su mensaje.
 - **Dado** un resumen con un único máximo de `exact_match_pct`, **entonces** `elegir_juez` devuelve ese modelo y `empatados` contiene solo a él.
 - **Dado** un empate en `exact_match_pct`, **entonces** gana el de mayor `params_b`; **dado** un empate también en `params_b`, **entonces** gana el que aparece antes en `MODELOS_2026`.
 - **Dado** el mismo resumen en cualquier orden de entrada, **entonces** `elegir_juez` devuelve siempre el mismo modelo (determinismo total).
