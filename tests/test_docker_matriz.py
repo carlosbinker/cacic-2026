@@ -141,6 +141,42 @@ def test_dry_run_no_escribe_el_archivo_de_fallos(monkeypatch, tmp_path):
     assert not (tmp_path / "fallos_barrido.json").exists()
 
 
+def test_correr_modelo_decodifica_stderr_utf8_sin_reventar_con_bytes_invalidos_cp1252(monkeypatch):
+    """F12.1: bug real reproducido. El contenedor emite stderr en UTF-8 (barras
+    de progreso, texto en espanol); `subprocess.run(..., text=True)` sin
+    `encoding` explicito decodifica con la codificacion preferida del locale
+    del host (cp1252 en Windows), que no puede representar bytes como 0x8d.
+    Eso revento con UnicodeDecodeError y aborto el barrido entero despues de
+    5/12 modelos. `_correr_modelo` tiene que pasarle a subprocess.run una
+    codificacion explicita (utf-8, errors=replace) para que ningun byte de
+    ningun contenedor pueda tirar abajo la corrida completa."""
+    import run_sweep
+
+    texto_utf8 = "progreso: ̍ listo"
+    crudo = texto_utf8.encode("utf-8")
+
+    class FakeCompleted:
+        def __init__(self, returncode, stderr):
+            self.returncode = returncode
+            self.stderr = stderr
+
+    def fake_run(cmd, **kwargs):
+        # Simula el comportamiento real de subprocess.run: sin `encoding`
+        # explicito, decodifica con la codificacion preferida del locale del
+        # host (cp1252 en este Windows), que no tiene mapeo para 0x8d.
+        encoding = kwargs.get("encoding", "cp1252")
+        errors = kwargs.get("errors", "strict")
+        return FakeCompleted(0, crudo.decode(encoding, errors=errors))
+
+    monkeypatch.setattr(run_sweep.subprocess, "run", fake_run)
+    modelo = roster_activo()[0]
+    codigo, stderr = run_sweep._correr_modelo(
+        modelo, "1/12", False, False, run_sweep.CPUSET_POR_DEFECTO
+    )
+    assert codigo == 0
+    assert texto_utf8 in stderr
+
+
 def test_no_hay_credenciales_en_capas_ni_login_interactivo():
     """F11: prohibido declarar HF_TOKEN en el Dockerfile, copiar .env, pasar el
     token por --build-arg o hacer login interactivo. NO prohibido: --env-file

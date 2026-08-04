@@ -154,7 +154,15 @@ def _correr_modelo(modelo: ModeloEvaluado2026, posicion: str, force: bool,
     print(" ".join(cmd))
     if dry_run:
         return 0, ""
-    completado = subprocess.run(cmd, stderr=subprocess.PIPE, text=True)
+    # F12.1: el contenedor emite stderr en UTF-8 (barras de progreso, texto en
+    # espanol). Sin `encoding` explicito, `text=True` decodifica con la
+    # codificacion preferida del locale del HOST (cp1252 en Windows), que no
+    # tiene mapeo para bytes como 0x8d y revienta con UnicodeDecodeError,
+    # abortando el barrido entero. `errors="replace"` garantiza ademas que
+    # ningun byte de ningun contenedor pueda tirar abajo la corrida.
+    completado = subprocess.run(
+        cmd, stderr=subprocess.PIPE, encoding="utf-8", errors="replace"
+    )
     if completado.stderr:
         print(completado.stderr, file=sys.stderr)
     return completado.returncode, completado.stderr or ""
