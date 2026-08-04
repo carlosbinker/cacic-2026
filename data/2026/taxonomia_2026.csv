@@ -1,0 +1,13 @@
+modelo,total_incorrectas,confusion_intencion,confusion_dispositivo,confusion_ubicacion,alucinacion_valor_unidad,valor_numerico_incorrecto,sin_error_semantico,uso_de_sinonimos
+LFM2.5-230M,30,0,20,4,0,0,1,8
+LFM2.5-350M,32,0,20,5,0,0,1,11
+granite-4.0-350m,23,3,9,0,0,0,5,6
+granite-4.0-h-350m,19,0,9,0,0,0,3,7
+Qwen3.5-0.8B,8,1,4,0,0,0,0,3
+SmolLM2-360M-Instruct,29,0,2,0,0,0,1,26
+LFM2.5-1.2B-Instruct,14,2,3,0,0,0,2,7
+granite-4.0-1b,3,0,0,0,0,0,1,2
+granite-4.0-h-1b,9,0,1,0,0,0,7,1
+OLMo-2-0425-1B-Instruct,31,0,19,3,0,1,2,9
+SmolLM2-1.7B-Instruct,16,0,5,0,0,0,5,6
+Qwen2.5-1.5B-Instruct,11,0,1,1,0,0,2,7
