@@ -1,0 +1,33 @@
+idx,comando,categoria,juez_raw,juez_parse_ok
+0,Prendé la luz del living.,encendido_apagado_simple,encendido_apagado_simple,True
+1,Apagá la luz de la cocina.,encendido_apagado_simple,encendido_apagado_simple,True
+2,Encendé el aire acondicionado del dormitorio.,encendido_apagado_simple,encendido_apagado_simple,True
+3,Apagá la tele del living.,encendido_apagado_simple,encendido_apagado_simple,True
+4,Prendé el ventilador del garage.,encendido_apagado_simple,encendido_apagado_simple,True
+5,Apagá la calefacción del baño.,encendido_apagado_simple,encendido_apagado_simple,True
+6,Encendé el parlante de la cocina.,encendido_apagado_simple,encendido_apagado_simple,True
+7,Cerrá la cerradura de la entrada.,encendido_apagado_simple,encendido_apagado_simple,True
+8,Poné el aire del dormitorio en 22 grados.,ajuste_con_valor_numerico,ajuste_con_valor_numerico,True
+9,Bajá la persiana del living al 50%.,ajuste_con_valor_numerico,ajuste_con_valor_numerico,True
+10,Poné la luz del dormitorio al 30% de brillo.,ajuste_con_valor_numerico,ajuste_con_valor_numerico,True
+11,Configurá la calefacción de la cocina a 24 grados.,ajuste_con_valor_numerico,ajuste_con_valor_numerico,True
+12,Subí la cortina del patio al 100%.,ajuste_con_valor_numerico,ajuste_con_valor_numerico,True
+13,Poné el volumen del parlante del living en 40%.,ajuste_con_valor_numerico,ajuste_con_valor_numerico,True
+14,Dejá la luz del baño al 10%.,ajuste_con_valor_numerico,ajuste_con_valor_numerico,True
+15,Poné el aire del living en 19 grados.,ajuste_con_valor_numerico,ajuste_con_valor_numerico,True
+16,Bajale un poco a la luz del living.,ajuste_con_valor_numerico,ajuste_con_valor_numerico,True
+17,"Hace un poco más de calor en el dormitorio, subí la calefacción.",ajuste_con_valor_numerico,ajuste_con_valor_numerico,True
+18,"Está muy fuerte el aire de la cocina, bajalo.",ajuste_con_valor_numerico,ajuste_con_valor_numerico,True
+19,Subí un poco el volumen del parlante del dormitorio.,ajuste_con_valor_numerico,ajuste_con_valor_numerico,True
+20,"La persiana del baño no cerró del todo, bajala un toque más.",ajuste_relativo_cualitativo,ajuste_relativo_cualitativo,True
+21,Subile más luz al living que está muy oscuro.,ajuste_con_valor_numerico,ajuste_con_valor_numerico,True
+22,Apagá todas las luces de la casa.,encendido_apagado_simple,encendido_apagado_simple,True
+23,Prendé todos los aires acondicionados.,encendido_apagado_simple,encendido_apagado_simple,True
+24,Bajá todas las persianas de la casa.,ajuste_relativo_cualitativo,ajuste_relativo_cualitativo,True
+25,Apagá todo antes de dormir.,encendido_apagado_simple,encendido_apagado_simple,True
+26,¿Está prendida la luz del living?,encendido_apagado_simple,encendido_apagado_simple,True
+27,¿A cuántos grados está el aire del dormitorio?,ajuste_con_valor_numerico,ajuste_con_valor_numerico,True
+28,¿Quedó cerrada la cerradura de la entrada?,ajuste_relativo_cualitativo,ajuste_relativo_cualitativo,True
+29,"No dejes prendida la luz de la cocina, apagala.",encendido_apagado_simple,encendido_apagado_simple,True
+30,"Che, la tele del living quedó prendida, apagala por favor.",encendido_apagado_simple,encendido_apagado_simple,True
+31,"Antes me olvidé, prendé la luz del baño.",encendido_apagado_simple,encendido_apagado_simple,True
