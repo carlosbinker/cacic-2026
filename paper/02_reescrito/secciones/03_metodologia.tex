@@ -6,36 +6,28 @@
 
 Se seleccionaron doce modelos abiertos, organizados en dos tiers de tamaño
 de seis modelos cada uno: sub-1000 millones de parámetros y entre 1000 y
-2000 millones de parámetros (Tabla \ref{tab:modelos}). Este roster de doce
-modelos es un subconjunto de un registro más amplio de dieciséis modelos
-candidatos. De los cuatro que no integran el roster activo, tres quedaron
-excluidos del estudio, por dos causas distintas que no deben mezclarse: dos
-modelos (\texttt{gemma-3-270m-it} y \texttt{Llama-3.2-1B-Instruct}) por
-acceso restringido: el acceso de descarga no fue otorgado —sus repositorios
-están marcados como \emph{gated} y la aprobación manual del acceso quedó
-pendiente—, y uno (\texttt{Qwen3.5-2B}) porque su compatibilidad de versión
-con la librería de inferencia quedó no verificada. El cuarto,
-\texttt{Qwen2.5-0.5B-Instruct}, no es una exclusión: es el último de los
-cuatro modelos del estudio original que faltaba medir bajo el harness y el
-prompt de este trabajo, y por decisión del usuario no se incorporó al roster
-activo de doce.
-Ninguna de las tres exclusiones es una decisión metodológica; el detalle de
-cada causa, y el motivo por el que el cuarto modelo no cuenta como una
-exclusión, se retoma en la Sección \ref{sec:entorno-repro}. Los doce modelos
-efectivamente evaluados son, en cambio, todos de repositorios públicos, sin
-restricción de licencia ni de token de acceso.
+2000 millones de parámetros (Tabla \ref{tab:modelos}). Los criterios de
+inclusión son tres, y los doce modelos evaluados los cumplen todos: (i) ser
+un modelo abierto de menos de 2 mil millones de parámetros, publicado en un
+repositorio público de HuggingFace, sin restricción de licencia ni de token
+de acceso; (ii) resolver, bajo alguno de los dos grupos de versión de la
+librería de inferencia documentados en la Sección \ref{sec:entorno-repro},
+a una ejecución funcional verificada empíricamente; y (iii), para los tres
+modelos que además sostienen la continuidad de la Sección
+\ref{sec:continuidad}, haber sido parte de la ronda inicial de este mismo
+experimento. Los doce modelos son, en consecuencia, todos de repositorios
+públicos: reproducir el barrido reportado en este trabajo no exige aceptar
+ninguna licencia ni disponer de credenciales de acceso.
 
-Un requisito adicional del roster es sostener la continuidad con la Tabla 2
-del estudio anterior. Con ese fin, \texttt{Qwen2.5-1.5B-Instruct} se
-reincorporó \textbf{deliberadamente} al roster activo. Los modelos
-presentes en \textbf{ambos} estudios pasan así de dos a tres:
-\texttt{SmolLM2-360M-Instruct} (0,36\,B), \texttt{Qwen2.5-1.5B-Instruct}
-(1,54\,B) y \texttt{SmolLM2-1.7B-Instruct} (1,71\,B) — \texttt{SmolLM2}
-estuvo presente en sus dos tamaños en ambos estudios desde el principio; lo
-que cambia es que las anclas de continuidad pasan de dos a tres.
-\texttt{Qwen2.5-1.5B-Instruct} es, de las tres, la única del tier 1--2B y la
-única de una familia distinta de SmolLM2, de modo que las tres anclas cubren
-en conjunto ambos tiers de tamaño y dos familias de modelos.
+Un requisito adicional del roster es sostener la continuidad con la ronda
+inicial de este mismo experimento. Con ese fin, \texttt{Qwen2.5-1.5B-Instruct}
+se incorporó \textbf{deliberadamente} al roster activo. Los modelos
+presentes en \textbf{ambas} rondas son tres: \texttt{SmolLM2-360M-Instruct}
+(0,36\,B), \texttt{Qwen2.5-1.5B-Instruct} (1,54\,B) y
+\texttt{SmolLM2-1.7B-Instruct} (1,71\,B). \texttt{Qwen2.5-1.5B-Instruct} es,
+de las tres, la única del tier 1--2B y la única de una familia distinta de
+SmolLM2, de modo que las tres anclas cubren en conjunto ambos tiers de
+tamaño y dos familias de modelos.
 
 Vale una aclaración de identificador, porque un error de este tipo es fácil
 de reintroducir: existe un identificador de apariencia similar, con el
@@ -49,69 +41,68 @@ detalla en la Sección \ref{sec:prompting}.
 
 \subsection{Dataset de comandos}
 
-El dataset de evaluación no se modificó respecto del estudio original: los
-mismos 32 comandos de domótica en español rioplatense (voseo), organizados
-en seis categorías lingüísticas (encendido/apagado simple, ajuste con valor
-numérico explícito, ajuste relativo o cualitativo sin valor numérico,
-comandos sobre múltiples dispositivos, consultas de estado, y comandos con
-negación o contexto conversacional), y el mismo esquema de referencia
-(ground truth) de cinco campos: intent, dispositivo, ubicación, valor y
-unidad. La diferencia respecto del estudio original no está en el dataset
-sino en cómo se asigna la categoría lingüística de cada comando: en este
-trabajo esa asignación ya no es manual, sino que la produce el juez
-automático (Sección \ref{sec:dos-etapas}).
+El dataset de evaluación no se modificó respecto de la ronda inicial de este
+experimento: los mismos 32 comandos de domótica en español rioplatense
+(voseo), organizados en seis categorías lingüísticas (encendido/apagado
+simple, ajuste con valor numérico explícito, ajuste relativo o cualitativo
+sin valor numérico, comandos sobre múltiples dispositivos, consultas de
+estado, y comandos con negación o contexto conversacional), y el mismo
+esquema de referencia (ground truth) de cinco campos: intent, dispositivo,
+ubicación, valor y unidad. La diferencia no está en el dataset sino en cómo
+se asigna la categoría lingüística de cada comando: en este trabajo esa
+asignación ya no es manual, sino que la produce el juez automático (Sección
+\ref{sec:dos-etapas}).
 
 \subsection{Protocolo de prompting y esquema de salida}
 \label{sec:prompting}
 
-El cambio central en el protocolo de este estudio es una cláusula
-\textbf{taxativa} agregada al prompt de sistema, que se transcribe a
-continuación en su forma completa:
+El prompt de sistema de este trabajo es único y fijo para los doce modelos
+del roster; se transcribe íntegro a continuación, junto con el prompt de
+usuario que acompaña a cada uno de los 32 comandos. Ambos se generan
+directamente desde las constantes reales que ejecuta el barrido
+(\texttt{SYSTEM\_PROMPT\_2026} en \texttt{src/prompt\_2026.py} y
+\texttt{construir\_prompt\_usuario} en \texttt{src/prompt.py}), nunca
+transcritos a mano, para que este fragmento no pueda desincronizarse en
+silencio de lo que efectivamente se ejecutó:
 
-\begin{quote}
-IMPORTANTE: los campos ``intent'', ``dispositivo'', ``ubicacion'' y
-``unidad'' son campos CATEGORICOS CERRADOS. Los valores listados entre
-parentesis mas arriba son, textualmente, los unicos outputs aceptados para
-esos campos: copialos exactamente como aparecen, sin tildes, sin
-mayusculas, sin plural y sin reformular. Usar un sinonimo, una traduccion o
-cualquier variante que no este literalmente en esa lista (por ejemplo
-``televisor'' o ``tele'' en lugar de ``tv'') es una violacion del formato y
-la respuesta se considera incorrecta. Si ningun valor de la lista aplica,
-usa null.
-\end{quote}
+\input{tablas/prompt_sistema}
 
-Los campos con valores entre paréntesis en el prompt (dispositivo,
-ubicación) son categóricos cerrados, y esos valores son los únicos outputs
-que este protocolo acepta \textbf{textualmente}: usar un sinónimo válido en
-español —por ejemplo ``tele'' en vez de ``tv''— se cuenta explícitamente
-como una violación de formato, no como una respuesta correcta con otra
-palabra. Esto endurece deliberadamente el protocolo respecto del estudio
-anterior, que no tenía esta cláusula. La consecuencia metodológica es
-directa: la exactitud estricta de este trabajo \textbf{no es comparable} con
-la del paper original bajo el mismo prompt, porque el prompt en sí cambió;
-la comparación válida contra el estudio anterior es la de la Sección
-\ref{sec:continuidad}, que controla el modelo y mide el efecto del cambio de
-prompt explícitamente, en lugar de mezclarlo con la comparación entre
-arquitecturas.
+El prompt instruye al modelo a devolver un único objeto JSON con los cinco
+campos del esquema de salida (intent, dispositivo, ubicación, valor,
+unidad), incluye dos ejemplos few-shot, y agrega una cláusula
+\textbf{taxativa} sobre los dos campos categóricos cerrados con valores
+listados entre paréntesis (dispositivo, ubicación): esos valores son,
+textualmente, los únicos outputs que este protocolo acepta, y usar un
+sinónimo válido en español —por ejemplo ``tele'' en vez de ``tv''— se
+cuenta explícitamente como una violación de formato, no como una respuesta
+correcta con otra palabra.
 
-Un segundo cambio, ortogonal al anterior, es que el modo de prompting
-—\verb|chat_template| o \emph{raw completion}— se decide en tiempo de
+La exactitud estricta reportada en la Sección 4 se calcula siempre bajo
+este mismo prompt para los doce modelos, de modo que la comparación entre
+arquitecturas de esa sección nunca mezcla prompts distintos. El efecto de
+este prompt, comparado contra el que usó la ronda inicial de este
+experimento, se aísla explícitamente y por separado en la Sección
+\ref{sec:continuidad}, que mantiene el modelo constante y cambia únicamente
+el prompt.
+
+Un segundo aspecto del protocolo, ortogonal al anterior, es que el modo de
+prompting —\verb|chat_template| o \emph{raw completion}— se decide en tiempo de
 ejecución según la capacidad del \emph{tokenizer} de cada modelo
 (\verb|tokenizer.chat_template is None|), nunca por identificador de
 modelo hardcodeado. Bajo esa detección, los \textbf{doce} modelos del roster
 activo resuelven a \verb|chat_template|, incluidos los dos modelos base
 de la familia LFM2.5, que un diagnóstico inicial suponía sin plantilla de
-chat. El modelo reincorporado \texttt{Qwen2.5-1.5B-Instruct} también resuelve
-a \verb|chat_template|, confirmado por su propia sonda de capacidad y no
-por inferencia a partir de su familia. La ruta de \emph{raw completion} se
-conserva en el código como mecanismo de reserva por capacidad, ejercitada
-únicamente por un test sintético sobre un \emph{tokenizer} sin plantilla de
-chat: ningún modelo del roster evaluado la ejerce, y este trabajo no afirma
-en ningún punto que alguno lo haya hecho.
+chat, y \texttt{Qwen2.5-1.5B-Instruct}, confirmado por su propia sonda de
+capacidad y no por inferencia a partir de su familia. La ruta de
+\emph{raw completion} se conserva en el código como mecanismo de reserva
+por capacidad, ejercitada únicamente por un test sintético sobre un
+\emph{tokenizer} sin plantilla de chat: ningún modelo del roster evaluado
+la ejerce, y este trabajo no afirma en ningún punto que alguno lo haya
+hecho.
 
 \subsection{Métricas}
 
-Se reportan las cinco métricas del estudio original —tasa de JSON válido,
+Se reportan las cinco métricas de la ronda inicial de este experimento —tasa de JSON válido,
 coincidencia exacta, exactitud por campo, latencia promedio por comando y
 exactitud por categoría lingüística— más una sexta, nueva en este trabajo.
 Las dos métricas titulares se definen con precisión:
@@ -157,8 +148,8 @@ dado el mismo modelo de entrada, la salida del juez es siempre la misma.
 
 \textbf{Etapa 2, trabajo A — taxonomía de errores.} Cada respuesta con
 \texttt{match\_exact = False} se clasifica en un subconjunto \textbf{no
-vacío} de siete etiquetas cerradas: las cinco de la taxonomía de errores
-del estudio original —confusión de intención, confusión de dispositivo,
+vacío} de siete etiquetas cerradas: las cinco de la taxonomía de errores de
+la ronda inicial de este experimento —confusión de intención, confusión de dispositivo,
 confusión de ubicación, alucinación de valor o unidad, y valor numérico
 incorrecto— más dos nuevas, \texttt{sin\_error\_semantico} y
 \texttt{uso\_de\_sinonimos}, que son precisamente las que definen la
@@ -170,7 +161,7 @@ esto ocurre se reporta como parte de los resultados.
 \textbf{Etapa 2, trabajo B — categorías lingüísticas.} Cada uno de los 32
 comandos del dataset se clasifica en \textbf{exactamente una} de las seis
 categorías lingüísticas cerradas, reemplazando la asignación manual de
-categoría del estudio original.
+categoría de la ronda inicial de este experimento.
 
 El juez, al ser uno de los propios modelos evaluados, adjudica también sobre
 sus propias respuestas de la etapa 1; esa circunstancia y su implicancia
@@ -179,9 +170,13 @@ para la validez del estudio se discuten en la Sección 6.
 \subsection{Entorno de ejecución y reproducibilidad}
 \label{sec:entorno-repro}
 
-\textbf{Hardware.} Todos los modelos —y el juez— se ejecutan en CPU, con 2
-núcleos y 8\,GB de memoria, sin GPU, igual que el estudio original, para que
-la latencia siga siendo comparable entre ambos trabajos.
+\textbf{Hardware.} El host es una máquina con procesador Intel Core
+i5-11400H (6 núcleos físicos / 12 hilos, arquitectura Tiger Lake-H), sin
+GPU. Todos los modelos —y el juez— se ejecutan exclusivamente en CPU. La
+configuración de Docker de esta máquina limita la inferencia a
+\textbf{2 procesadores lógicos} y a un techo de memoria de \textbf{8\,GB};
+el mecanismo exacto de ese límite, y su consecuencia sobre cómo deben
+leerse las latencias reportadas, se detallan a continuación.
 
 \textbf{Aislamiento.} Cada modelo corre en su propia imagen de contenedor,
 ejecutadas \textbf{secuencialmente}, una a la vez, compartiendo un único
@@ -205,59 +200,43 @@ Esta divergencia de versiones es un confusor conocido para la comparación de
 latencia entre modelos de distinto grupo, y se retoma como amenaza a la
 validez en la Sección 6.
 
-\textbf{Ejecución secuencial con núcleos fijos.} Toda invocación de
+\textbf{Ejecución secuencial con procesadores fijos.} La configuración de
+Docker de esta máquina expone únicamente \textbf{2 procesadores lógicos} a
+los contenedores: no es una partición elegida entre los 12 hilos del host,
+sino un tope global impuesto por esa configuración. Toda invocación de
 \texttt{docker run} de este estudio —las doce corridas del barrido principal
-y la corrida del juez— fija \texttt{-{}-memory=8g -{}-cpus=2
--{}-cpuset-cpus=0-1}, con el mismo par de núcleos en las doce corridas y en
-la del juez. Los tres límites no son redundantes entre sí: \texttt{-{}-cpus}
-es una \textbf{cuota} del planificador CFS, no una reserva, y permite que el
-contenedor migre entre núcleos; \texttt{-{}-memory} es un \textbf{techo}, no
-una reserva (Docker solo ofrece la reserva blanda
-\texttt{-{}-memory-reservation}); \texttt{-{}-cpuset-cpus} sí \textbf{fija}
-los núcleos concretos, y con eso elimina tanto la competencia por tiempo de
-CPU entre contenedores como la variabilidad introducida por la migración
-entre núcleos. Sin embargo, la inferencia de modelos de lenguaje en CPU está
+y la corrida del juez— fija, en consecuencia, \texttt{-{}-memory=8g
+-{}-cpus=2 -{}-cpuset-cpus=0-1}, con el mismo par de identificadores lógicos
+en las doce corridas y en la del juez. Bajo ese tope, \texttt{-{}-cpuset-cpus}
+no elige 2 núcleos de entre 12 disponibles: fija los únicos 2 procesadores
+lógicos que la configuración de Docker expone, así que su aporte real no es
+decidir qué núcleo físico se usa, sino garantizar que las doce corridas usen
+siempre el mismo par de identificadores y no migren entre sí durante una
+corrida (\texttt{-{}-cpus} es una \textbf{cuota} del planificador CFS, no una
+reserva; \texttt{-{}-memory} es un \textbf{techo}, no una reserva). Qué
+relación guardan esos 2 procesadores lógicos con los núcleos físicos del
+i5-11400H —hermanos de un mismo núcleo por \emph{hyperthreading} (SMT), o
+dos núcleos físicos distintos— la decide el hipervisor de esa configuración
+de Docker y \textbf{no es observable ni controlable} desde adentro del
+contenedor; esta limitación se retoma como amenaza a la validez en la
+Sección 6. Además, la inferencia de modelos de lenguaje en CPU está
 limitada, en la práctica, por el ancho de banda de memoria, y ni la caché L3
 ni el bus de memoria pueden particionarse por contenedor: correr varios
 modelos en paralelo habría inflado la latencia por comando de forma
 invisible en la tabla final, sin que ningún límite de Docker lo hiciera
 notar. Por eso se optó por ejecución \textbf{secuencial} —un modelo a la
-vez— en lugar de en paralelo, de modo que la latencia siga siendo comparable
-con la del estudio original, a costa de aproximadamente 7 horas de reloj en
-lugar de las aproximadamente 2 horas que hubiera tomado una ejecución
-paralela. Esta decisión afecta únicamente a la latencia: la exactitud, la
-taxonomía de errores y la equivalencia semántica no dependen de ella, porque
-se calculan sobre una decodificación determinista a temperatura 0 en ambas
-etapas.
-
-\textbf{Modelos fuera del barrido y reproducibilidad.} De los dieciséis
-modelos del registro considerado para este estudio, tres quedaron
-excluidos del estudio, por dos causas independientes entre sí. Dos modelos
-—\texttt{gemma-3-270m-it} y \texttt{Llama-3.2-1B-Instruct}— quedaron
-excluidos por acceso restringido: el acceso de descarga no fue otorgado; sus
-repositorios exigirían aceptar una licencia propia y disponer de
-credenciales de acceso para descargarse, y esa aprobación no llegó a
-completarse; no es una decisión metodológica. El tercero,
-\texttt{Qwen3.5-2B}, quedó excluido porque su compatibilidad de versión con
-la librería de inferencia quedó \textbf{no verificada}: falla bajo la versión
-del grupo A, pero no existe evidencia de
-que falle ni de que funcione bajo la versión del grupo B —nunca se obtuvo
-la confirmación positiva—, así que la formulación correcta es que su
-compatibilidad con esa versión quedó sin verificar, no que sea incompatible
-con ella. Ninguna de las tres exclusiones responde a un criterio
-metodológico.
-
-El cuarto modelo del registro que no integra el roster activo,
-\texttt{Qwen2.5-0.5B-Instruct}, no es una exclusión en ese mismo sentido:
-a diferencia de los tres anteriores, sí fue medido bajo el harness y el
-prompt de este trabajo, como el último de los cuatro modelos del estudio
-original necesario para completar, de forma internamente consistente, el
-brazo de comparación contra esa generación anterior (corridas de
-\emph{baseline-completion}, Sección 6). Que no
-forme parte del roster activo de doce es una decisión del usuario sobre el
-alcance del barrido principal, no una restricción externa ni una falla de
-compatibilidad. Estas tres exclusiones son, además, irrelevantes para
-reproducir \emph{este} estudio: los doce modelos efectivamente evaluados son
-todos de repositorios públicos, así que reproducir el barrido reportado en
-este trabajo no exige aceptar ninguna licencia ni disponer de credenciales
-de acceso.
+vez, nunca dos contenedores compitiendo por esos 2 procesadores— en lugar de
+en paralelo, a costa de aproximadamente 7 horas de reloj en lugar de las
+aproximadamente 2 horas que hubiera tomado una ejecución paralela. Esta
+decisión afecta únicamente a la latencia: la exactitud, la taxonomía de
+errores y la equivalencia semántica no dependen de ella, porque se calculan
+sobre una decodificación determinista a temperatura 0 en ambas etapas. La
+consecuencia práctica de este tope de recursos es que las latencias de este
+estudio son \textbf{comparables entre los doce modelos} —todos corrieron
+bajo el mismo tope, de a uno por vez—, pero sus valores absolutos
+\textbf{no} deben leerse como la mejor latencia alcanzable en CPU para estos
+modelos: reflejan el desempeño bajo esta configuración de recursos
+específica, no una cota inferior general. Los cocientes de latencia entre
+variantes híbridas y densas (Sección \ref{sec:discusion-latencia-hibrida})
+sí son robustos a esta limitación, porque comparan pares de modelos medidos
+bajo las mismas condiciones.

@@ -16,8 +16,9 @@ contra una taxonomía cerrada, sin ningún etiquetado manual. Se reportan dos
 métricas —exactitud estricta y exactitud laxa (semántica)—, cuya brecha
 cuantifica cuánto penaliza la coincidencia textual exacta a respuestas que
 un evaluador humano consideraría correctas. Todos los modelos se ejecutan en
-CPU, con 2 núcleos y 8 GB de memoria, en un contenedor aislado por modelo,
-para que el protocolo completo sea reproducible de punta a punta.
+CPU, con la inferencia limitada a 2 procesadores lógicos y 8 GB de memoria
+por la configuración de Docker, en un contenedor aislado por modelo, para
+que el protocolo completo sea reproducible de punta a punta.
 
 \keywords{modelos de lenguaje pequeños, domótica, evaluación automática,
 LLM como juez, procesamiento del lenguaje natural, español rioplatense.}

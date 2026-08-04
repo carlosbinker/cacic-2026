@@ -73,55 +73,60 @@ conclusión práctica para la viabilidad de SLMs en hardware modesto es directa:
 \textbf{a igual cantidad de parámetros, la variante densa es preferible en CPU
 para prompts cortos.}
 
-\textbf{Viabilidad práctica para domótica local en CPU con dos núcleos.} El
-modelo con mejor exactitud estricta, \texttt{granite-4.0-1b}, procesa cada
-comando en \textbf{42,78} segundos en promedio sobre el hardware de dos
-núcleos y 8\,GB de memoria de este estudio (Sección \ref{sec:entorno-repro}).
-Ese tiempo es incompatible con una interacción de voz conversacional en
-tiempo real, pero puede ser aceptable para un escenario de automatización
-diferida (programar una acción, no conversar con el asistente). Entre los
-modelos sub-1B, \texttt{Qwen3.5-0.8B} combina una exactitud estricta alta
-(75,0\%) con una latencia baja (18,17 segundos) para su tier, lo que lo
-vuelve, de los doce evaluados, el candidato más equilibrado si el objetivo es
-minimizar tanto el hardware como el tiempo de respuesta sin resignar
-demasiada exactitud. Ningún modelo de este estudio alcanza latencias de
-segundo único en este hardware, lo que confirma que, sobre CPU de dos
-núcleos, la interpretación de comandos de domótica con SLMs sigue siendo un
+\textbf{Viabilidad práctica para domótica local en CPU con dos procesadores
+lógicos.} El modelo con mejor exactitud estricta, \texttt{granite-4.0-1b},
+procesa cada comando en \textbf{42,78} segundos en promedio sobre los 2
+procesadores lógicos y 8\,GB de memoria de este estudio (Sección
+\ref{sec:entorno-repro}); como se detalló allí, ese valor absoluto no debe
+leerse como la mejor latencia alcanzable en CPU para este modelo, sino como
+su desempeño bajo este tope de recursos específico. Aun así, ese tiempo es
+incompatible con una interacción de voz conversacional en tiempo real, pero
+puede ser aceptable para un escenario de automatización diferida (programar
+una acción, no conversar con el asistente). Entre los modelos sub-1B,
+\texttt{Qwen3.5-0.8B} combina una exactitud estricta alta (75,0\%) con una
+latencia baja (18,17 segundos) para su tier, lo que lo vuelve, de los doce
+evaluados, el candidato más equilibrado si el objetivo es minimizar tanto el
+hardware como el tiempo de respuesta sin resignar demasiada exactitud.
+Ningún modelo de este estudio alcanza latencias de segundo único bajo este
+tope de recursos, lo que confirma que, sobre CPU con dos procesadores
+lógicos, la interpretación de comandos de domótica con SLMs sigue siendo un
 problema de compromiso entre exactitud y tiempo de respuesta, no un problema
 resuelto.
 
-\textbf{Continuidad con la Tabla 2 publicada: validación cruzada del arnés y
-cuantificación del efecto del prompt.} La Sección \ref{sec:continuidad}
-reportó, a través de las dos columnas de continuidad de la Tabla
-\ref{tab:globales}, que la exactitud estricta y la latencia de los tres
-modelos con continuidad (\texttt{SmolLM2-360M-Instruct},
+\textbf{Continuidad con la ronda inicial de este experimento: validación
+cruzada del arnés y cuantificación del efecto del prompt.} La Sección
+\ref{sec:continuidad} reportó, a través de las dos columnas de continuidad
+de la Tabla \ref{tab:globales}, que la exactitud estricta y la latencia de
+los tres modelos con continuidad (\texttt{SmolLM2-360M-Instruct},
 \texttt{Qwen2.5-1.5B-Instruct} y \texttt{SmolLM2-1.7B-Instruct}) divergen de
-lo publicado, y no todas en la misma dirección. Con el modelo mantenido
-\textbf{constante} en cada una de las tres comparaciones, cualquier
-divergencia entre lo nuevo y lo publicado no puede atribuirse al modelo en sí
-— sólo puede deberse al protocolo y al arnés de ejecución: la cláusula
-taxativa agregada al prompt (Sección \ref{sec:prompting}), la versión de
-\texttt{transformers} resuelta en cada corrida, y el estado del host (fecha de
-ejecución, carga del momento). Esto es, precisamente, lo que convierte esta
-comparación en una \textbf{validación cruzada} del arnés de este trabajo
-contra un resultado ya publicado, y en la \textbf{única} forma disponible de
-cuantificar el efecto de haber endurecido el prompt en 2026 en lugar de
-simplemente enunciarlo: dado que el modelo no cambia, la parte de la
-divergencia que no se explica por la versión de \texttt{transformers} es
-atribuible al cambio de prompt. En cuanto a la latencia, la comparación con
-las tres anclas muestra que sigue siendo del mismo orden de magnitud que la
-publicada en 2025 (decenas de segundos por comando en las tres), lo que
-respalda que el hardware y el protocolo de medición de latencia (Sección
-\ref{sec:entorno-repro}) se mantuvieron comparables entre ambos estudios,
-aunque no idénticos en la versión de la librería de inferencia usada en cada
-grupo del roster (Sección 6b). Corresponde cerrar con una aclaración
-explícita: esta comparación \textbf{no es una réplica}. La Sección
-\ref{sec:prompting} ya estableció que la exactitud estricta de este trabajo no
-es directamente comparable con la del paper original bajo el mismo prompt,
-porque el prompt en sí cambió, y la latencia carga además el confusor de los
-dos grupos de versión de \texttt{transformers} descripto en la Sección
-\ref{sec:entorno-repro} y retomado como amenaza a la validez en la Sección 6b.
-Lo que esta comparación ofrece no es una repetición del experimento anterior
-bajo las mismas condiciones, sino una cota de cuánto de la diferencia
-observada es atribuible al cambio deliberado de protocolo frente a lo que
-podría deberse al entorno de ejecución.
+esa medición inicial, y no todas en la misma dirección. Con el modelo
+mantenido \textbf{constante} en cada una de las tres comparaciones,
+cualquier divergencia entre la medición 2026 y la inicial no puede
+atribuirse al modelo en sí — sólo puede deberse al protocolo y al arnés de
+ejecución: la cláusula taxativa agregada al prompt (Sección
+\ref{sec:prompting}), la versión de \texttt{transformers} resuelta en cada
+corrida, y el estado del host (fecha de ejecución, carga del momento). Esto
+es, precisamente, lo que convierte esta comparación en una \textbf{validación
+cruzada} del arnés de este trabajo contra esa medición inicial, y en la
+\textbf{única} forma disponible de cuantificar el efecto de haber endurecido
+el prompt en 2026 en lugar de simplemente enunciarlo: dado que el modelo no
+cambia, la parte de la divergencia que no se explica por la versión de
+\texttt{transformers} es atribuible al cambio de prompt. En cuanto a la
+latencia, la comparación con las tres anclas muestra que sigue siendo del
+mismo orden de magnitud que la de la medición inicial de 2025 (decenas de
+segundos por comando en las tres), lo que respalda que el hardware y el
+protocolo de medición de latencia (Sección \ref{sec:entorno-repro}) se
+mantuvieron comparables entre ambas rondas, aunque no idénticos en la
+versión de la librería de inferencia usada en cada grupo del roster
+(Sección 6). Corresponde cerrar con una aclaración explícita: esta
+comparación \textbf{no es una réplica}. La Sección \ref{sec:prompting} ya
+estableció que la exactitud estricta reportada en la Sección 4 usa siempre
+el mismo prompt para los doce modelos, y que el efecto de haber cambiado ese
+prompt respecto de la ronda inicial se aísla, precisamente, en esta
+comparación de continuidad; la latencia carga además el confusor de los dos
+grupos de versión de \texttt{transformers} descripto en la Sección
+\ref{sec:entorno-repro} y retomado como amenaza a la validez en la Sección 6.
+Lo que esta comparación ofrece no es una repetición de la ronda inicial bajo
+las mismas condiciones, sino una cota de cuánto de la diferencia observada
+es atribuible al cambio deliberado de protocolo frente a lo que podría
+deberse al entorno de ejecución.

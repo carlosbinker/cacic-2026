@@ -4,7 +4,7 @@
 exige coincidencia textual con el ground truth bajo un protocolo que declara
 explícitamente los sinónimos de valores categóricos cerrados como violación de
 formato (Sección \ref{sec:prompting}). Esta amenaza ya no es sólo una
-advertencia sin cuantificar, como en el estudio anterior: queda
+advertencia sin cuantificar, como en la ronda inicial de este experimento: queda
 \textbf{resuelta parcialmente} por la exactitud laxa y por la taxonomía de
 errores de la Sección \ref{sec:analisis-errores}, que separan explícitamente
 cuánta exactitud estricta perdida corresponde a \texttt{uso\_de\_sinonimos} o
@@ -60,64 +60,54 @@ falla bajo 5.14.1; \texttt{LFM2.5-230M}, \texttt{LFM2.5-350M} y
 \texttt{Qwen3.5-0.8B} necesitan el grupo B porque fallan bajo 4.57.6. La
 evidencia más nítida de que el confusor no es un artefacto teórico es que el
 grupo B resuelve exactamente a la versión (5.14.1) que rompe al modelo que
-fuerza el grupo A: ninguna versión mayor única cubre el roster completo. Como
-evidencia adicional de que este confusor es real y no hipotético, un modelo
-del registro considerado, \texttt{Qwen3.5-2B}, quedó fuera del roster
-evaluado precisamente porque su compatibilidad de versión con la librería de
-inferencia quedó no verificada — sin que esto implique afirmar que falla
-bajo la versión del grupo B, sólo que la confirmación positiva nunca se
-obtuvo. No se repite aquí la premisa, ya descartada en este mismo trabajo, de
-que una única versión mayor de \texttt{transformers} elimina este confusor:
-la evidencia de ambos grupos activos la refuta en las dos direcciones.
+fuerza el grupo A: ninguna versión mayor única cubre el roster completo. No
+se repite aquí la premisa, ya descartada en este mismo trabajo, de que una
+única versión mayor de \texttt{transformers} elimina este confusor: la
+evidencia de ambos grupos activos la refuta en las dos direcciones.
+
+\emph{Topología de procesadores no observable.} La Sección
+\ref{sec:entorno-repro} estableció que la configuración de Docker de esta
+máquina expone únicamente 2 procesadores lógicos a los contenedores, y que
+\texttt{-{}-cpuset-cpus=0-1} fija ese mismo par en las doce corridas y en la
+del juez. Qué relación guardan esos 2 procesadores lógicos con los núcleos
+físicos del host —hermanos de un mismo núcleo por \emph{hyperthreading}
+(SMT), lo que introduciría contención adicional entre ellos, o dos núcleos
+físicos distintos, sin esa contención— la decide el hipervisor de esa
+configuración de Docker, y esta amenaza a la validez no puede resolverse
+observando desde adentro del contenedor: la topología efectiva no quedó bajo
+control de este experimento. Esto afecta por igual a los doce modelos —todos
+corrieron bajo el mismo tope, de a uno por vez—, así que no introduce un
+sesgo relativo entre ellos, pero sí implica que los valores absolutos de
+latencia reportados pueden estar inflados por contención respecto de lo que
+esta misma máquina lograría con dos núcleos físicos completos, y no deben
+leerse como la mejor latencia alcanzable en este hardware. Los cocientes de
+latencia entre variantes híbridas y densas de la Sección
+\ref{sec:discusion-latencia-hibrida} (\texttt{$\times$4,10} y
+\texttt{$\times$2,88}) son robustos a esta amenaza precisamente porque
+comparan pares de modelos medidos bajo la misma topología, cualquiera haya
+sido.
 
 \textbf{Validez externa.}
 
-\emph{Exclusión de modelos por razones externas al método.} El registro de
-modelos considerado para este estudio incluye \textbf{16} candidatos, de los
-cuales \textbf{3} quedaron excluidos del estudio, por \textbf{dos causas}
-distintas, y ninguna de las tres responde a una decisión metodológica (en el
-sentido de que ninguna fue elegida por diseño experimental, sino impuesta por
-una restricción externa). Dos modelos quedaron excluidos por acceso
-restringido: sus repositorios de HuggingFace están marcados como
-\emph{gated} y la aprobación manual de acceso de descarga no llegó a
-otorgarse. El tercero, \texttt{Qwen3.5-2B}, quedó excluido porque su
-compatibilidad de versión con la librería de inferencia quedó no verificada,
-sin evidencia de que falle bajo ninguna versión mayor probada, sólo ausencia
-de confirmación positiva. Ninguna de las tres exclusiones responde a un
-criterio de diseño experimental, y acotan el alcance de toda comparación de
-este trabajo a los doce modelos del roster activo: no puede afirmarse nada
-sobre el desempeño relativo de los tres excluidos frente al resto del roster.
-
-Un cuarto modelo del registro, \texttt{Qwen2.5-0.5B-Instruct}, no integra el
-roster activo de doce, pero no debe contarse como una cuarta exclusión: a
-diferencia de los tres anteriores, sí fue medido bajo el harness y el prompt
-de este trabajo, como el último de los cuatro modelos del estudio original
-necesario para completar, de forma internamente consistente, el brazo de
-comparación contra esa generación anterior (corridas de
-\emph{baseline-completion}, ver más abajo). Que no forme parte del roster
-activo es una decisión del usuario sobre el alcance del barrido principal, no
-una restricción externa ni una falla de compatibilidad; presentarlo como una
-exclusión más sería, en sentido inverso, tan impreciso como omitir las tres
-anteriores.
-
-Se conservan además las amenazas de validez externa del estudio original: el
-dataset de evaluación es chico y desbalanceado (32 comandos, entre 3 y 8 por
-categoría lingüística), se usó un único prompt sin optimización específica
-por modelo, la entrada fue siempre texto limpio sin ruido de reconocimiento de
-voz (ASR), y sólo se cubrió una variante dialectal (español rioplatense).
+Se conservan además las amenazas de validez externa de la ronda inicial de
+este experimento: el dataset de evaluación es chico y desbalanceado (32
+comandos, entre 3 y 8 por categoría lingüística), se usó un único prompt sin
+optimización específica por modelo, la entrada fue siempre texto limpio sin
+ruido de reconocimiento de voz (ASR), y sólo se cubrió una variante
+dialectal (español rioplatense).
 
 \textbf{Validez de conclusión.} Con entre 3 y 8 comandos por categoría, las
 diferencias porcentuales entre modelos de la Tabla \ref{tab:categorias} y de
 la Tabla \ref{tab:globales} son indicativas, no estadísticamente
-significativas en sentido formal — la misma limitación del estudio anterior,
-que este trabajo no resuelve. Todas las corridas del barrido principal
-(Sección \ref{sec:entorno-repro}) se ejecutaron en una \textbf{única máquina},
-de forma estrictamente secuencial y con núcleos de CPU fijos, para que la
-latencia fuera comparable entre modelos; las corridas de control y de
-baseline-completion, en cambio, compartieron la máquina con trabajo
-concurrente del orquestador y por eso se excluyen explícitamente de cualquier
-afirmación de latencia de este trabajo, quedando limitadas a la justificación
-metodológica de la Sección \ref{sec:entorno-repro}. Por último,
+significativas en sentido formal — la misma limitación de la ronda inicial
+de este experimento, que este trabajo no resuelve. Todas las corridas del
+barrido principal (Sección \ref{sec:entorno-repro}) se ejecutaron en una
+\textbf{única máquina}, de forma estrictamente secuencial y con
+procesadores fijos, para que la latencia fuera comparable entre modelos;
+las corridas de control, en cambio, compartieron la máquina con trabajo
+concurrente del orquestador y por eso se excluyen explícitamente de
+cualquier afirmación de latencia de este trabajo, quedando limitadas a la
+justificación metodológica de la Sección \ref{sec:entorno-repro}. Por último,
 \texttt{attn\_implementation} y la \texttt{revision} exacta de cada modelo de
 HuggingFace quedaron, también en este trabajo, \textbf{sin pinnear}: cada
 corrida usó lo que \texttt{transformers} resolviera por defecto en el momento

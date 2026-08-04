@@ -21,30 +21,29 @@ frente a estructuras propias del español rioplatense (voseo, diminutivos,
 expresiones relativas como ``bajale un toque'') ni cuál es el costo real en
 latencia de ejecutarlos en hardware modesto.
 
-Un estudio previo sobre esta misma tarea evaluó cuatro SLMs mediante
+Una ronda inicial de este mismo experimento evaluó cuatro SLMs mediante
 coincidencia exacta contra un ground truth y clasificó a mano las 73
 respuestas incorrectas resultantes para identificar patrones de error. Ese
 etiquetado manual no escala: repetirlo sobre un roster de doce modelos
 multiplicaría el volumen de respuestas a revisar, y su resultado tampoco es
 reproducible por un tercero, porque depende del criterio del anotador en el
 momento de clasificar cada caso. Este trabajo reemplaza esa revisión manual
-por un pipeline de verificación completamente automático, y aprovecha la
-ampliación del roster para incorporar familias de modelos publicadas
-recientemente (LFM2.5, Granite 4.0, Qwen3.5 y OLMo-2) junto con dos tiers de
-tamaño (menos de 1000 millones y entre 1000 y 2000 millones de parámetros).
+por un pipeline de verificación completamente automático, y amplía el
+roster para incorporar familias de modelos publicadas recientemente
+(LFM2.5, Granite 4.0, Qwen3.5 y OLMo-2) junto con dos tiers de tamaño (menos
+de 1000 millones y entre 1000 y 2000 millones de parámetros).
 
 Las contribuciones de este trabajo son: (1) la evaluación de un roster de
-doce modelos abiertos sub-2B —tomados de un registro de dieciséis modelos
-candidatos, de los cuales tres quedaron excluidos del estudio por causas
-externas al método (dos por acceso de descarga restringido no otorgado y
-uno por compatibilidad de versión no verificada) y un cuarto, del estudio
-original, se midió aparte sin incorporarse al roster activo—; (2) un pipeline de verificación
-automática en dos etapas, coincidencia textual determinista más un juez de
-lenguaje con una taxonomía cerrada, que elimina el etiquetado manual de
-respuestas incorrectas y de categorías lingüísticas; (3) el reporte conjunto
-de exactitud estricta y exactitud laxa, cuya brecha cuantifica el costo de
-exigir coincidencia textual exacta; (4) un protocolo de ejecución
-reproducible, con aislamiento por contenedor y versiones de librerías
-documentadas por grupo; y (5) la continuidad con el estudio anterior a
-través de tres modelos evaluados en ambos trabajos —antes dos—, que en
-conjunto cubren los dos tiers de tamaño y dos familias de modelos distintas.
+doce modelos abiertos sub-2B, de acceso público y sin restricción de
+licencia ni de token de acceso, organizados en dos tiers de tamaño de seis
+modelos cada uno y evaluados bajo un protocolo común; (2) un pipeline de
+verificación automática en dos etapas, coincidencia textual determinista
+más un juez de lenguaje con una taxonomía cerrada, que elimina el
+etiquetado manual de respuestas incorrectas y de categorías lingüísticas;
+(3) el reporte conjunto de exactitud estricta y exactitud laxa, cuya
+brecha cuantifica el costo de exigir coincidencia textual exacta; (4) un
+protocolo de ejecución reproducible, con aislamiento por contenedor y
+versiones de librerías documentadas por grupo; y (5) la continuidad con la
+ronda inicial de este experimento a través de tres modelos evaluados en
+ambas rondas —antes dos—, que en conjunto cubren los dos tiers de tamaño y
+dos familias de modelos distintas.

@@ -49,20 +49,21 @@ matiz — se retoma con el detalle por categoría de error en la Sección
 brecha resulta poco confiable exactamente donde la validez de formato es
 débil.
 
-\textbf{Continuidad con la Tabla 2 publicada.}
+\textbf{Continuidad con la ronda inicial de este experimento.}
 \label{sec:continuidad}
 Tres de los doce modelos del roster activo —\texttt{SmolLM2-360M-Instruct},
 \texttt{Qwen2.5-1.5B-Instruct} y \texttt{SmolLM2-1.7B-Instruct}— también
-estaban presentes en el estudio anterior. Para esos tres, y sólo para esos
-tres, la Tabla \ref{tab:globales} agrega dos columnas de continuidad,
-``Estricta 2025 (\%)'' y ``Latencia 2025 (s)'', tomadas directamente del
-resumen publicado entonces; los otros nueve modelos llevan un guion en esas
-dos columnas porque no tienen contraparte publicada. Comparando exclusivamente
-esas dos columnas contra las correspondientes de este trabajo: la exactitud
-estricta de \texttt{SmolLM2-360M-Instruct} desciende respecto de lo publicado,
+habían sido medidos en una ronda inicial de este mismo experimento (2025).
+Para esos tres, y sólo para esos tres, la Tabla \ref{tab:globales} agrega
+dos columnas de continuidad, ``Estricta 2025 (\%)'' y ``Latencia 2025 (s)'',
+tomadas directamente de esa medición inicial; los otros nueve modelos
+llevan un guion en esas dos columnas porque no tienen contraparte en esa
+ronda. Comparando exclusivamente esas dos columnas contra las
+correspondientes de este trabajo: la exactitud estricta de
+\texttt{SmolLM2-360M-Instruct} desciende respecto de la medición inicial,
 la de \texttt{Qwen2.5-1.5B-Instruct} sube, y la de \texttt{SmolLM2-1.7B-Instruct}
 también desciende; en latencia, \texttt{SmolLM2-360M-Instruct} sube respecto
-de lo publicado mientras que \texttt{Qwen2.5-1.5B-Instruct} y
+de la medición inicial mientras que \texttt{Qwen2.5-1.5B-Instruct} y
 \texttt{SmolLM2-1.7B-Instruct} bajan. Ninguna de las tres cifras estrictas se
 mueve en la misma dirección que las otras dos, lo que ya es un primer
 indicio de que el modelo por sí solo no explica la diferencia; la
@@ -97,11 +98,11 @@ identificado).
 \input{tablas/tabla3_por_categoria}
 
 Las categorías lingüísticas de la Tabla \ref{tab:categorias} no las asignó un
-anotador humano, como en el estudio anterior, sino el juez automático descripto
-en la Sección \ref{sec:dos-etapas}, sobre el mismo vocabulario cerrado de seis
-categorías del dataset original. La comparación contra la distribución del
-estudio anterior (8/8/6/4/3/3 sobre las seis categorías) revela una diferencia
-que no conviene ocultar: el juez automático, en esta corrida, sólo utilizó
+anotador humano, como en la ronda inicial de este experimento, sino el juez
+automático descripto en la Sección \ref{sec:dos-etapas}, sobre el mismo
+vocabulario cerrado de seis categorías del dataset original. La comparación
+contra la distribución de esa ronda inicial (8/8/6/4/3/3 sobre las seis
+categorías) revela una diferencia que no conviene ocultar: el juez automático, en esta corrida, sólo utilizó
 tres de las seis categorías cerradas —\emph{encendido/apagado simple}
 (15 comandos), \emph{ajuste con valor numérico} (14) y \emph{ajuste relativo o
 cualitativo} (3)— y ninguno de los 32 comandos quedó clasificado en
@@ -123,8 +124,9 @@ asignación automática de categoría en la Sección 6.
 
 \input{tablas/tabla4_taxonomia}
 
-Esta subsección reemplaza la revisión manual de respuestas incorrectas del
-estudio anterior por una clasificación completamente automática. El juez es el
+Esta subsección reemplaza la revisión manual de respuestas incorrectas de la
+ronda inicial de este experimento por una clasificación completamente
+automática. El juez es el
 modelo seleccionado por la regla congelada de la Sección \ref{sec:dos-etapas}
 —mayor exactitud estricta de la etapa 1, empate hacia el modelo de mayor
 tamaño—, que en este barrido es \texttt{granite-4.0-1b}, con \textbf{90,6\%}
@@ -132,7 +134,7 @@ de exactitud estricta en la etapa 1 (el mismo valor que su exactitud estricta
 final, porque no cambia entre etapas). Cada una de las 225 respuestas con
 \texttt{match\_exact = False} se clasificó en un subconjunto no vacío de las
 \textbf{siete} etiquetas de la Tabla \ref{tab:taxonomia} —las cinco heredadas
-del estudio original, con \emph{alucinación de valor/unidad} y \emph{valor
+de la ronda inicial de este experimento, con \emph{alucinación de valor/unidad} y \emph{valor
 numérico incorrecto} ya separadas en dos etiquetas distintas en vez de
 fusionadas en una, más \emph{sin error semántico} y \emph{uso de sinónimos},
 que son precisamente las que definen la exactitud laxa—. Ninguna de las 225
@@ -164,8 +166,9 @@ por lo tanto, fallos semánticos genuinos. \texttt{SmolLM2-360M-Instruct}, en
 cambio, tiene 9,4\% de exactitud estricta pero sólo \textbf{25\%} de JSON
 válido: su exactitud casi nula es, en buena medida, un artefacto de formato, y
 tratarla como incapacidad semántica contaminaría la conclusión. Por esta razón
-la afirmación de ``100\% de JSON válido'' del borrador no puede repetirse sin
-matices en este trabajo: con el roster de doce modelos la validez de formato
+la afirmación de ``100\% de JSON válido'' de la ronda inicial de este
+experimento no puede repetirse sin matices en este trabajo: con el roster
+de doce modelos la validez de formato
 no es universal (25\% en \texttt{SmolLM2-360M-Instruct}, 87,5\% en
 \texttt{LFM2.5-230M}, y 100\% en los nueve modelos restantes).
 
