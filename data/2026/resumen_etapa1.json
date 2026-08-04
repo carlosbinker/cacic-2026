@@ -1,0 +1,98 @@
+[
+  {
+    "modelo": "LFM2.5-230M",
+    "params_b": 0.23,
+    "n": 32,
+    "json_valido_pct": 87.5,
+    "exact_match_pct": 6.2,
+    "avg_latencia_s": 6.306
+  },
+  {
+    "modelo": "LFM2.5-350M",
+    "params_b": 0.35,
+    "n": 32,
+    "json_valido_pct": 100.0,
+    "exact_match_pct": 0.0,
+    "avg_latencia_s": 9.619
+  },
+  {
+    "modelo": "granite-4.0-350m",
+    "params_b": 0.35,
+    "n": 32,
+    "json_valido_pct": 100.0,
+    "exact_match_pct": 28.1,
+    "avg_latencia_s": 13.773
+  },
+  {
+    "modelo": "granite-4.0-h-350m",
+    "params_b": 0.34,
+    "n": 32,
+    "json_valido_pct": 100.0,
+    "exact_match_pct": 40.6,
+    "avg_latencia_s": 56.448
+  },
+  {
+    "modelo": "Qwen3.5-0.8B",
+    "params_b": 0.8,
+    "n": 32,
+    "json_valido_pct": 100.0,
+    "exact_match_pct": 75.0,
+    "avg_latencia_s": 18.168
+  },
+  {
+    "modelo": "SmolLM2-360M-Instruct",
+    "params_b": 0.36,
+    "n": 32,
+    "json_valido_pct": 25.0,
+    "exact_match_pct": 9.4,
+    "avg_latencia_s": 20.47
+  },
+  {
+    "modelo": "LFM2.5-1.2B-Instruct",
+    "params_b": 1.2,
+    "n": 32,
+    "json_valido_pct": 100.0,
+    "exact_match_pct": 56.2,
+    "avg_latencia_s": 31.875
+  },
+  {
+    "modelo": "granite-4.0-1b",
+    "params_b": 1.6,
+    "n": 32,
+    "json_valido_pct": 100.0,
+    "exact_match_pct": 90.6,
+    "avg_latencia_s": 42.783
+  },
+  {
+    "modelo": "granite-4.0-h-1b",
+    "params_b": 1.5,
+    "n": 32,
+    "json_valido_pct": 100.0,
+    "exact_match_pct": 71.9,
+    "avg_latencia_s": 123.145
+  },
+  {
+    "modelo": "OLMo-2-0425-1B-Instruct",
+    "params_b": 1.0,
+    "n": 32,
+    "json_valido_pct": 100.0,
+    "exact_match_pct": 3.1,
+    "avg_latencia_s": 35.306
+  },
+  {
+    "modelo": "SmolLM2-1.7B-Instruct",
+    "params_b": 1.71,
+    "n": 32,
+    "json_valido_pct": 100.0,
+    "exact_match_pct": 50.0,
+    "avg_latencia_s": 56.71
+  },
+  {
+    "modelo": "Qwen2.5-1.5B-Instruct",
+    "params_b": 1.54,
+    "n": 32,
+    "json_valido_pct": 100.0,
+    "exact_match_pct": 65.6,
+    "avg_latencia_s": 38.128
+  }
+]

@@ -1,0 +1,1003 @@
+modelo,idx,comando,gt,pred_raw,pred_json,json_valido,parse_note,latencia_s,match_intent,match_dispositivo,match_ubicacion,match_valor,match_unidad,match_exact,modo_prompting,transformers_version
+LFM2.5-230M,0,Prendé la luz del living.,"{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""living"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,10.378,False,True,True,True,True,False,chat_template,5.14.1
+LFM2.5-230M,1,Apagá la luz de la cocina.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""apagar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""cocina"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,5.802,True,True,True,True,True,True,chat_template,5.14.1
+LFM2.5-230M,2,Encendé el aire acondicionado del dormitorio.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""dormitorio"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,6.377,False,False,True,True,True,False,chat_template,5.14.1
+LFM2.5-230M,3,Apagá la tele del living.,"{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""apagar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""living"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,5.724,True,False,True,True,True,False,chat_template,5.14.1
+LFM2.5-230M,4,Prendé el ventilador del garage.,"{""intent"": ""encender"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""ventilador"",
+  ""ubicacion"": ""garage"",
+  ""valor"": null,
+  ""unidad"": ""°C""
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": ""°C""}",True,extraido_de_fence_markdown,6.21,False,True,True,True,False,False,chat_template,5.14.1
+LFM2.5-230M,5,Apagá la calefacción del baño.,"{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""apagar"",
+  ""dispositivo"": ""calefaccion"",
+  ""ubicacion"": ""baño"",
+  ""valor"": null,
+  ""unidad"": ""°C""
+}
+```","{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": ""°C""}",True,extraido_de_fence_markdown,6.292,True,True,False,True,False,False,chat_template,5.14.1
+LFM2.5-230M,6,Encendé el parlante de la cocina.,"{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""cocina"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,6.226,False,False,True,True,True,False,chat_template,5.14.1
+LFM2.5-230M,7,Cerrá la cerradura de la entrada.,"{""intent"": ""apagar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""cerrar"",
+  ""dispositivo"": ""cierre"",
+  ""ubicacion"": ""entrada"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""cerrar"", ""dispositivo"": ""cierre"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,6.361,False,False,True,True,True,False,chat_template,5.14.1
+LFM2.5-230M,8,Poné el aire del dormitorio en 22 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22.0, ""unidad"": ""°C""}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""dormitorio"",
+  ""valor"": null,
+  ""unidad"": ""°C""
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""°C""}",True,extraido_de_fence_markdown,6.358,True,False,True,False,True,False,chat_template,5.14.1
+LFM2.5-230M,9,Bajá la persiana del living al 50%.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50.0, ""unidad"": ""%""}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""living"",
+  ""valor"": null,
+  ""unidad"": ""%""
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}",True,extraido_de_fence_markdown,6.011,True,False,True,False,True,False,chat_template,5.14.1
+LFM2.5-230M,10,Poné la luz del dormitorio al 30% de brillo.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30.0, ""unidad"": ""%""}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""dormitorio"",
+  ""valor"": null,
+  ""unidad"": ""%""
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""%""}",True,extraido_de_fence_markdown,6.156,True,True,True,False,True,False,chat_template,5.14.1
+LFM2.5-230M,11,Configurá la calefacción de la cocina a 24 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24.0, ""unidad"": ""°C""}","```json
+{
+  ""intent"": ""configurar"",
+  ""dispositivo"": ""calefaccion"",
+  ""ubicacion"": ""cocina"",
+  ""valor"": null,
+  ""unidad"": ""°C""
+}
+```","{""intent"": ""configurar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": ""°C""}",True,extraido_de_fence_markdown,6.147,False,True,True,False,True,False,chat_template,5.14.1
+LFM2.5-230M,12,Subí la cortina del patio al 100%.,"{""intent"": ""ajustar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": 100.0, ""unidad"": ""%""}","```json
+{
+  ""intent"": ""subir"",
+  ""dispositivo"": ""cortina"",
+  ""ubicacion"": ""patio"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""subir"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,7.092,False,True,True,False,False,False,chat_template,5.14.1
+LFM2.5-230M,13,Poné el volumen del parlante del living en 40%.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40.0, ""unidad"": ""%""}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""living"",
+  ""valor"": null,
+  ""unidad"": ""%""
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}",True,extraido_de_fence_markdown,7.459,True,False,True,False,True,False,chat_template,5.14.1
+LFM2.5-230M,14,Dejá la luz del baño al 10%.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": 10.0, ""unidad"": ""%""}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""baño"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,6.096,True,True,False,False,False,False,chat_template,5.14.1
+LFM2.5-230M,15,Poné el aire del living en 19 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19.0, ""unidad"": ""°C""}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""living"",
+  ""valor"": null,
+  ""unidad"": ""°C""
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""°C""}",True,extraido_de_fence_markdown,6.462,True,False,True,False,True,False,chat_template,5.14.1
+LFM2.5-230M,16,Bajale un poco a la luz del living.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""living"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,6.658,True,True,True,True,True,True,chat_template,5.14.1
+LFM2.5-230M,17,"Hace un poco más de calor en el dormitorio, subí la calefacción.","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""calefacción"",
+  ""ubicacion"": ""dormitorio"",
+  ""valor"": null,
+  ""unidad"": ""°C""
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""calefacción"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""°C""}",True,extraido_de_fence_markdown,6.427,True,False,True,True,False,False,chat_template,5.14.1
+LFM2.5-230M,18,"Está muy fuerte el aire de la cocina, bajalo.","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""cocina"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,6.016,True,False,True,True,True,False,chat_template,5.14.1
+LFM2.5-230M,19,Subí un poco el volumen del parlante del dormitorio.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""subir"",
+  ""dispositivo"": ""volumen"",
+  ""ubicacion"": ""dormitorio"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""subir"", ""dispositivo"": ""volumen"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,6.08,False,False,True,True,True,False,chat_template,5.14.1
+LFM2.5-230M,20,"La persiana del baño no cerró del todo, bajala un toque más.","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""baño"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,6.227,True,False,False,True,True,False,chat_template,5.14.1
+LFM2.5-230M,21,Subile más luz al living que está muy oscuro.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""subile"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""living"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""subile"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,5.977,False,True,True,True,True,False,chat_template,5.14.1
+LFM2.5-230M,22,Apagá todas las luces de la casa.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""apagar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""casa"",
+  ""valor"": null,
+  ""unidad"": ""%""""
+}
+```",,False,no_parseable_como_json,5.91,False,False,False,False,False,False,chat_template,5.14.1
+LFM2.5-230M,23,Prendé todos los aires acondicionados.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""air_conditioned"",
+  ""ubicacion"": ""living"",
+  ""valor"": null,
+  ""unidad"": ""%""
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""air_conditioned"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}",True,extraido_de_fence_markdown,6.367,False,False,False,True,False,False,chat_template,5.14.1
+LFM2.5-230M,24,Bajá todas las persianas de la casa.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""todas"", ""valor"": 0.0, ""unidad"": ""%""}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""cocina"",
+  ""valor"": null,
+  ""unidad"": ""%""
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": ""%""}",True,extraido_de_fence_markdown,6.05,True,False,False,False,True,False,chat_template,5.14.1
+LFM2.5-230M,25,Apagá todo antes de dormir.,"{""intent"": ""apagar"", ""dispositivo"": ""todos"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""apagar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""cocina"",
+  ""valor"": null,
+  ""unidad"": ""°C""
+}
+```","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": ""°C""}",True,extraido_de_fence_markdown,6.122,True,False,False,True,False,False,chat_template,5.14.1
+LFM2.5-230M,26,¿Está prendida la luz del living?,"{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","La respuesta es ""no"".",,False,no_parseable_como_json,4.315,False,False,False,False,False,False,chat_template,5.14.1
+LFM2.5-230M,27,¿A cuántos grados está el aire del dormitorio?,"{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","El comando ""¿A cuántos grados está el aire del dormitorio?"" se responde con ""cocina"". El valor es 20 grados.",,False,no_parseable_como_json,5.342,False,False,False,False,False,False,chat_template,5.14.1
+LFM2.5-230M,28,¿Quedó cerrada la cerradura de la entrada?,"{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","El comando ""¿Quedó cerrada la cerradura de la entrada?"" está configurado para responder ""valor"" y ""unidad"" como null. Esto indica que el comando no proporciona un valor numérico para el campo ""valor"".",,False,no_parseable_como_json,6.228,False,False,False,False,False,False,chat_template,5.14.1
+LFM2.5-230M,29,"No dejes prendida la luz de la cocina, apagala.","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""no dejar prendida la luz de la cocina, apagala"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""cocina"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""no dejar prendida la luz de la cocina, apagala"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,6.664,False,True,True,True,True,False,chat_template,5.14.1
+LFM2.5-230M,30,"Che, la tele del living quedó prendida, apagala por favor.","{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""living"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,5.999,False,False,True,True,True,False,chat_template,5.14.1
+LFM2.5-230M,31,"Antes me olvidé, prendé la luz del baño.","{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""baño"",
+  ""valor"": null,
+  ""unidad"": null
+}
+```","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": null}",True,extraido_de_fence_markdown,6.264,False,True,False,True,True,False,chat_template,5.14.1
+LFM2.5-350M,0,Prendé la luz del living.,"{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}",True,,16.104,False,True,True,True,False,False,chat_template,5.14.1
+LFM2.5-350M,1,Apagá la luz de la cocina.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagá"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""apagá"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": ""%""}",True,,9.783,False,True,True,True,False,False,chat_template,5.14.1
+LFM2.5-350M,2,Encendé el aire acondicionado del dormitorio.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""%""}",True,,9.87,False,False,True,True,False,False,chat_template,5.14.1
+LFM2.5-350M,3,Apagá la tele del living.,"{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagá"", ""dispositivo"": ""tele"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""apagá"", ""dispositivo"": ""tele"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}",True,,9.322,False,False,True,True,False,False,chat_template,5.14.1
+LFM2.5-350M,4,Prendé el ventilador del garage.,"{""intent"": ""encender"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garaje"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garaje"", ""valor"": null, ""unidad"": ""%""}",True,,9.535,False,True,False,True,False,False,chat_template,5.14.1
+LFM2.5-350M,5,Apagá la calefacción del baño.,"{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagá"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""apagá"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": ""%""}",True,,10.275,False,True,False,True,False,False,chat_template,5.14.1
+LFM2.5-350M,6,Encendé el parlante de la cocina.,"{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""encendir"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""unidad"": ""%""}","{""intent"": ""encendir"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""unidad"": ""%""}",True,,9.727,False,True,True,True,False,False,chat_template,5.14.1
+LFM2.5-350M,7,Cerrá la cerradura de la entrada.,"{""intent"": ""apagar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""cerradura"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""unidad"": ""%""}","{""intent"": ""cerradura"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""unidad"": ""%""}",True,,9.972,False,True,True,True,False,False,chat_template,5.14.1
+LFM2.5-350M,8,Poné el aire del dormitorio en 22 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22.0, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""%""}",True,,9.392,True,False,True,False,False,False,chat_template,5.14.1
+LFM2.5-350M,9,Bajá la persiana del living al 50%.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}",True,,9.26,True,False,True,False,True,False,chat_template,5.14.1
+LFM2.5-350M,10,Poné la luz del dormitorio al 30% de brillo.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""%""}",True,,9.718,True,True,True,False,True,False,chat_template,5.14.1
+LFM2.5-350M,11,Configurá la calefacción de la cocina a 24 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24.0, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": ""°C""}",True,,9.708,True,True,True,False,True,False,chat_template,5.14.1
+LFM2.5-350M,12,Subí la cortina del patio al 100%.,"{""intent"": ""ajustar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": 100.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""patio"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""patio"", ""valor"": null, ""unidad"": ""%""}",True,,9.599,True,False,True,False,True,False,chat_template,5.14.1
+LFM2.5-350M,13,Poné el volumen del parlante del living en 40%.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}",True,,9.45,True,True,True,False,True,False,chat_template,5.14.1
+LFM2.5-350M,14,Dejá la luz del baño al 10%.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": 10.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": ""%""}",True,,9.132,True,True,False,False,True,False,chat_template,5.14.1
+LFM2.5-350M,15,Poné el aire del living en 19 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19.0, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}",True,,9.165,True,False,True,False,False,False,chat_template,5.14.1
+LFM2.5-350M,16,Bajale un poco a la luz del living.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}",True,,9.336,True,True,True,True,False,False,chat_template,5.14.1
+LFM2.5-350M,17,"Hace un poco más de calor en el dormitorio, subí la calefacción.","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""°C""}",True,,10.054,True,True,True,True,False,False,chat_template,5.14.1
+LFM2.5-350M,18,"Está muy fuerte el aire de la cocina, bajalo.","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}",True,,9.078,True,False,False,True,False,False,chat_template,5.14.1
+LFM2.5-350M,19,Subí un poco el volumen del parlante del dormitorio.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""%""}",True,,9.736,True,True,True,True,False,False,chat_template,5.14.1
+LFM2.5-350M,20,"La persiana del baño no cerró del todo, bajala un toque más.","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": ""%""}",True,,9.238,True,True,False,True,False,False,chat_template,5.14.1
+LFM2.5-350M,21,Subile más luz al living que está muy oscuro.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}",True,,8.854,True,True,True,True,False,False,chat_template,5.14.1
+LFM2.5-350M,22,Apagá todas las luces de la casa.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagá"", ""dispositivo"": ""luz"", ""ubicacion"": ""casa"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""apagá"", ""dispositivo"": ""luz"", ""ubicacion"": ""casa"", ""valor"": null, ""unidad"": ""%""}",True,,9.65,False,True,False,True,False,False,chat_template,5.14.1
+LFM2.5-350M,23,Prendé todos los aires acondicionados.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}",True,,9.178,False,False,False,True,False,False,chat_template,5.14.1
+LFM2.5-350M,24,Bajá todas las persianas de la casa.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""todas"", ""valor"": 0.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}",True,,8.905,True,False,False,False,True,False,chat_template,5.14.1
+LFM2.5-350M,25,Apagá todo antes de dormir.,"{""intent"": ""apagar"", ""dispositivo"": ""todos"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagá"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""garaje"", ""unidad"": ""%""}","{""intent"": ""apagá"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""garaje"", ""unidad"": ""%""}",True,,9.024,False,False,False,True,False,False,chat_template,5.14.1
+LFM2.5-350M,26,¿Está prendida la luz del living?,"{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}",True,,9.552,False,True,True,True,False,False,chat_template,5.14.1
+LFM2.5-350M,27,¿A cuántos grados está el aire del dormitorio?,"{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""%""}",True,,9.509,False,False,True,True,False,False,chat_template,5.14.1
+LFM2.5-350M,28,¿Quedó cerrada la cerradura de la entrada?,"{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""unidad"": ""%""}","{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""unidad"": ""%""}",True,,8.935,True,True,True,True,False,False,chat_template,5.14.1
+LFM2.5-350M,29,"No dejes prendida la luz de la cocina, apagala.","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""unidad"": ""%""}","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""unidad"": ""%""}",True,,8.85,False,True,True,True,False,False,chat_template,5.14.1
+LFM2.5-350M,30,"Che, la tele del living quedó prendida, apagala por favor.","{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}",True,,9.003,False,False,True,True,False,False,chat_template,5.14.1
+LFM2.5-350M,31,"Antes me olvidé, prendé la luz del baño.","{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": ""%""}",True,,8.901,False,True,False,True,False,False,chat_template,5.14.1
+granite-4.0-350m,0,Prendé la luz del living.,"{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,13.914,False,True,True,True,True,False,chat_template,4.57.6
+granite-4.0-350m,1,Apagá la luz de la cocina.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,12.996,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-350m,2,Encendé el aire acondicionado del dormitorio.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,,14.705,False,True,True,True,True,False,chat_template,4.57.6
+granite-4.0-350m,3,Apagá la tele del living.,"{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""televisor"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""televisor"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,13.406,True,False,True,True,True,False,chat_template,4.57.6
+granite-4.0-350m,4,Prendé el ventilador del garage.,"{""intent"": ""encender"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}",True,,13.396,False,True,True,True,True,False,chat_template,4.57.6
+granite-4.0-350m,5,Apagá la calefacción del baño.,"{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": null}",True,,14.67,True,True,False,True,True,False,chat_template,4.57.6
+granite-4.0-350m,6,Encendé el parlante de la cocina.,"{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,14.229,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-350m,7,Cerrá la cerradura de la entrada.,"{""intent"": ""apagar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""cerradura"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""cerradura"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}",True,,13.609,False,True,True,True,True,False,chat_template,4.57.6
+granite-4.0-350m,8,Poné el aire del dormitorio en 22 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22.0, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22, ""unidad"": ""%""}",True,,14.598,True,True,True,True,False,False,chat_template,4.57.6
+granite-4.0-350m,9,Bajá la persiana del living al 50%.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50, ""unidad"": ""%""}",True,,13.595,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-350m,10,Poné la luz del dormitorio al 30% de brillo.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30, ""unidad"": ""%""}",True,,14.005,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-350m,11,Configurá la calefacción de la cocina a 24 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24.0, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24, ""unidad"": ""%""}",True,,14.694,True,True,True,True,False,False,chat_template,4.57.6
+granite-4.0-350m,12,Subí la cortina del patio al 100%.,"{""intent"": ""ajustar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": 100.0, ""unidad"": ""%""}","{""intent"": ""consultar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": null, ""unidad"": null}",True,,13.812,False,True,True,False,False,False,chat_template,4.57.6
+granite-4.0-350m,13,Poné el volumen del parlante del living en 40%.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40.0, ""unidad"": ""%""}","{""intent"": ""consultar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40}","{""intent"": ""consultar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40}",True,,13.082,False,True,True,True,False,False,chat_template,4.57.6
+granite-4.0-350m,14,Dejá la luz del baño al 10%.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": 10.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""baño"", ""valor"": 10, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""baño"", ""valor"": 10, ""unidad"": ""%""}",True,,14.195,True,True,False,True,True,False,chat_template,4.57.6
+granite-4.0-350m,15,Poné el aire del living en 19 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19.0, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19, ""unidad"": ""%""}",True,,14.903,True,True,True,True,False,False,chat_template,4.57.6
+granite-4.0-350m,16,Bajale un poco a la luz del living.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,13.197,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-350m,17,"Hace un poco más de calor en el dormitorio, subí la calefacción.","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,,13.915,False,True,True,True,True,False,chat_template,4.57.6
+granite-4.0-350m,18,"Está muy fuerte el aire de la cocina, bajalo.","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,14.714,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-350m,19,Subí un poco el volumen del parlante del dormitorio.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,,13.296,False,True,True,True,True,False,chat_template,4.57.6
+granite-4.0-350m,20,"La persiana del baño no cerró del todo, bajala un toque más.","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": null}",True,,13.711,True,True,False,True,True,False,chat_template,4.57.6
+granite-4.0-350m,21,Subile más luz al living que está muy oscuro.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,13.774,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-350m,22,Apagá todas las luces de la casa.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""casa"", ""valor"": null}","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""casa"", ""valor"": null}",True,,12.697,False,True,False,True,True,False,chat_template,4.57.6
+granite-4.0-350m,23,Prendé todos los aires acondicionados.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""todos"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""todos"", ""valor"": null, ""unidad"": null}",True,,13.595,False,True,False,True,True,False,chat_template,4.57.6
+granite-4.0-350m,24,Bajá todas las persianas de la casa.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""todas"", ""valor"": 0.0, ""unidad"": ""%""}","{""intent"": ""consultar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""casa"", ""valor"": null}","{""intent"": ""consultar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""casa"", ""valor"": null}",True,,13.827,False,True,False,False,False,False,chat_template,4.57.6
+granite-4.0-350m,25,Apagá todo antes de dormir.,"{""intent"": ""apagar"", ""dispositivo"": ""todos"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,,14.109,False,False,False,True,True,False,chat_template,4.57.6
+granite-4.0-350m,26,¿Está prendida la luz del living?,"{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null}","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null}",True,,12.314,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-350m,27,¿A cuántos grados está el aire del dormitorio?,"{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,,14.095,False,True,True,True,True,False,chat_template,4.57.6
+granite-4.0-350m,28,¿Quedó cerrada la cerradura de la entrada?,"{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null}","{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null}",True,,12.475,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-350m,29,"No dejes prendida la luz de la cocina, apagala.","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,14.018,False,True,True,True,True,False,chat_template,4.57.6
+granite-4.0-350m,30,"Che, la tele del living quedó prendida, apagala por favor.","{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""televisor"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""televisor"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,13.401,False,False,True,True,True,False,chat_template,4.57.6
+granite-4.0-350m,31,"Antes me olvidé, prendé la luz del baño.","{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": null}",True,,13.801,False,True,False,True,True,False,chat_template,4.57.6
+granite-4.0-h-350m,0,Prendé la luz del living.,"{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,67.631,False,True,True,True,True,False,chat_template,4.57.6
+granite-4.0-h-350m,1,Apagá la luz de la cocina.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,62.957,False,True,True,True,True,False,chat_template,4.57.6
+granite-4.0-h-350m,2,Encendé el aire acondicionado del dormitorio.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": ""null"", ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": ""null"", ""unidad"": null}",True,,58.867,False,True,True,False,True,False,chat_template,4.57.6
+granite-4.0-h-350m,3,Apagá la tele del living.,"{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""TV"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""TV"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,57.166,False,False,True,True,True,False,chat_template,4.57.6
+granite-4.0-h-350m,4,Prendé el ventilador del garage.,"{""intent"": ""encender"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}",True,,57.561,False,True,True,True,True,False,chat_template,4.57.6
+granite-4.0-h-350m,5,Apagá la calefacción del baño.,"{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": null}",True,,60.445,False,True,False,True,True,False,chat_template,4.57.6
+granite-4.0-h-350m,6,Encendé el parlante de la cocina.,"{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": ""null"", ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": ""null"", ""unidad"": null}",True,,63.582,False,True,True,False,True,False,chat_template,4.57.6
+granite-4.0-h-350m,7,Cerrá la cerradura de la entrada.,"{""intent"": ""apagar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""cerradura"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""entidad"", ""valor"": null, ""unidad"": null}","{""intent"": ""cerradura"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""entidad"", ""valor"": null, ""unidad"": null}",True,,54.802,False,False,False,True,True,False,chat_template,4.57.6
+granite-4.0-h-350m,8,Poné el aire del dormitorio en 22 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22.0, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22, ""unidad"": ""°C""}",True,,57.579,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-350m,9,Bajá la persiana del living al 50%.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50, ""unidad"": ""%""}",True,,57.393,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-350m,10,Poné la luz del dormitorio al 30% de brillo.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30, ""unidad"": ""%""}",True,,57.023,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-350m,11,Configurá la calefacción de la cocina a 24 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24.0, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24, ""unidad"": ""°C""}",True,,56.212,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-350m,12,Subí la cortina del patio al 100%.,"{""intent"": ""ajustar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": 100.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": 100, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": 100, ""unidad"": ""%""}",True,,55.2,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-350m,13,Poné el volumen del parlante del living en 40%.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40, ""unidad"": ""%""}",True,,55.237,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-350m,14,Dejá la luz del baño al 10%.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": 10.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": 10, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": 10, ""unidad"": ""%""}",True,,55.222,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-350m,15,Poné el aire del living en 19 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19.0, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19, ""unidad"": ""°C""}",True,,54.147,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-350m,16,Bajale un poco a la luz del living.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,54.636,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-350m,17,"Hace un poco más de calor en el dormitorio, subí la calefacción.","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": 1, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": 1, ""unidad"": ""°C""}",True,,55.47,True,True,True,False,False,False,chat_template,4.57.6
+granite-4.0-h-350m,18,"Está muy fuerte el aire de la cocina, bajalo.","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,54.382,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-350m,19,Subí un poco el volumen del parlante del dormitorio.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,,54.838,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-350m,20,"La persiana del baño no cerró del todo, bajala un toque más.","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}",True,,54.092,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-350m,21,Subile más luz al living que está muy oscuro.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": 0, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": 0, ""unidad"": null}",True,,54.654,True,True,True,False,True,False,chat_template,4.57.6
+granite-4.0-h-350m,22,Apagá todas las luces de la casa.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""casa"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""casa"", ""valor"": null, ""unidad"": null}",True,,56.079,True,True,False,True,True,False,chat_template,4.57.6
+granite-4.0-h-350m,23,Prendé todos los aires acondicionados.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}",True,,54.651,False,True,True,True,True,False,chat_template,4.57.6
+granite-4.0-h-350m,24,Bajá todas las persianas de la casa.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""todas"", ""valor"": 0.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}",True,,54.052,True,True,True,False,False,False,chat_template,4.57.6
+granite-4.0-h-350m,25,Apagá todo antes de dormir.,"{""intent"": ""apagar"", ""dispositivo"": ""todos"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""cerradura"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""cerradura"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}",True,,54.965,False,False,True,True,True,False,chat_template,4.57.6
+granite-4.0-h-350m,26,¿Está prendida la luz del living?,"{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,54.408,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-350m,27,¿A cuántos grados está el aire del dormitorio?,"{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 0, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 0, ""unidad"": null}",True,,54.928,True,True,True,False,True,False,chat_template,4.57.6
+granite-4.0-h-350m,28,¿Quedó cerrada la cerradura de la entrada?,"{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""cerrar"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""entidad"", ""valor"": null, ""unidad"": null}","{""intent"": ""cerrar"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""entidad"", ""valor"": null, ""unidad"": null}",True,,53.9,False,False,False,True,True,False,chat_template,4.57.6
+granite-4.0-h-350m,29,"No dejes prendida la luz de la cocina, apagala.","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,54.51,False,True,True,True,True,False,chat_template,4.57.6
+granite-4.0-h-350m,30,"Che, la tele del living quedó prendida, apagala por favor.","{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""TV"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""TV"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,53.955,False,False,True,True,True,False,chat_template,4.57.6
+granite-4.0-h-350m,31,"Antes me olvidé, prendé la luz del baño.","{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}",True,,55.792,False,True,True,True,True,False,chat_template,4.57.6
+Qwen3.5-0.8B,0,Prendé la luz del living.,"{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}
+","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,35.014,False,True,True,True,True,False,chat_template,5.14.1
+Qwen3.5-0.8B,1,Apagá la luz de la cocina.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}
+","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,19.096,True,True,True,True,True,True,chat_template,5.14.1
+Qwen3.5-0.8B,2,Encendé el aire acondicionado del dormitorio.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}
+","{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,,18.254,True,True,True,True,True,True,chat_template,5.14.1
+Qwen3.5-0.8B,3,Apagá la tele del living.,"{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}
+","{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,17.234,True,True,True,True,True,True,chat_template,5.14.1
+Qwen3.5-0.8B,4,Prendé el ventilador del garage.,"{""intent"": ""encender"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}
+","{""intent"": ""ajustar"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}",True,,17.751,False,True,True,True,True,False,chat_template,5.14.1
+Qwen3.5-0.8B,5,Apagá la calefacción del baño.,"{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}
+","{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}",True,,17.685,True,True,True,True,True,True,chat_template,5.14.1
+Qwen3.5-0.8B,6,Encendé el parlante de la cocina.,"{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}
+","{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,17.699,True,True,True,True,True,True,chat_template,5.14.1
+Qwen3.5-0.8B,7,Cerrá la cerradura de la entrada.,"{""intent"": ""apagar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}
+","{""intent"": ""ajustar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}",True,,17.093,False,True,True,True,True,False,chat_template,5.14.1
+Qwen3.5-0.8B,8,Poné el aire del dormitorio en 22 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22.0, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22, ""unidad"": ""°C""}
+","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22, ""unidad"": ""°C""}",True,,18.694,True,True,True,True,True,True,chat_template,5.14.1
+Qwen3.5-0.8B,9,Bajá la persiana del living al 50%.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50, ""unidad"": ""%""}
+","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50, ""unidad"": ""%""}",True,,17.865,True,True,True,True,True,True,chat_template,5.14.1
+Qwen3.5-0.8B,10,Poné la luz del dormitorio al 30% de brillo.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30, ""unidad"": ""%""}
+","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30, ""unidad"": ""%""}",True,,18.276,True,True,True,True,True,True,chat_template,5.14.1
+Qwen3.5-0.8B,11,Configurá la calefacción de la cocina a 24 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24.0, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24, ""unidad"": ""°C""}
+","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24, ""unidad"": ""°C""}",True,,18.792,True,True,True,True,True,True,chat_template,5.14.1
+Qwen3.5-0.8B,12,Subí la cortina del patio al 100%.,"{""intent"": ""ajustar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": 100.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""patio"", ""valor"": null, ""unidad"": null}
+","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""patio"", ""valor"": null, ""unidad"": null}",True,,17.194,True,False,True,False,False,False,chat_template,5.14.1
+Qwen3.5-0.8B,13,Poné el volumen del parlante del living en 40%.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40, ""unidad"": ""%""}
+","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40, ""unidad"": ""%""}",True,,17.729,True,True,True,True,True,True,chat_template,5.14.1
+Qwen3.5-0.8B,14,Dejá la luz del baño al 10%.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": 10.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": 10, ""unidad"": ""%""}
+","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": 10, ""unidad"": ""%""}",True,,18.746,True,True,True,True,True,True,chat_template,5.14.1
+Qwen3.5-0.8B,15,Poné el aire del living en 19 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19.0, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19, ""unidad"": ""°C""}
+","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19, ""unidad"": ""°C""}",True,,18.477,True,True,True,True,True,True,chat_template,5.14.1
+Qwen3.5-0.8B,16,Bajale un poco a la luz del living.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}
+","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,17.732,True,True,True,True,True,True,chat_template,5.14.1
+Qwen3.5-0.8B,17,"Hace un poco más de calor en el dormitorio, subí la calefacción.","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}
+","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,,17.394,True,True,True,True,True,True,chat_template,5.14.1
+Qwen3.5-0.8B,18,"Está muy fuerte el aire de la cocina, bajalo.","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}
+","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,17.442,True,True,True,True,True,True,chat_template,5.14.1
+Qwen3.5-0.8B,19,Subí un poco el volumen del parlante del dormitorio.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}
+","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,,17.651,True,True,True,True,True,True,chat_template,5.14.1
+Qwen3.5-0.8B,20,"La persiana del baño no cerró del todo, bajala un toque más.","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}
+","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}",True,,16.917,True,True,True,True,True,True,chat_template,5.14.1
+Qwen3.5-0.8B,21,Subile más luz al living que está muy oscuro.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}
+","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,17.14,True,True,True,True,True,True,chat_template,5.14.1
+Qwen3.5-0.8B,22,Apagá todas las luces de la casa.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}
+","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}",True,,17.026,True,True,True,True,True,True,chat_template,5.14.1
+Qwen3.5-0.8B,23,Prendé todos los aires acondicionados.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}
+","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}",True,,17.617,False,True,True,True,True,False,chat_template,5.14.1
+Qwen3.5-0.8B,24,Bajá todas las persianas de la casa.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""todas"", ""valor"": 0.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""casa"", ""valor"": null, ""unidad"": null}
+","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""casa"", ""valor"": null, ""unidad"": null}",True,,17.118,True,True,False,False,False,False,chat_template,5.14.1
+Qwen3.5-0.8B,25,Apagá todo antes de dormir.,"{""intent"": ""apagar"", ""dispositivo"": ""todos"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""todos"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}
+","{""intent"": ""apagar"", ""dispositivo"": ""todos"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}",True,,17.084,True,True,True,True,True,True,chat_template,5.14.1
+Qwen3.5-0.8B,26,¿Está prendida la luz del living?,"{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}
+","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,16.77,True,True,True,True,True,True,chat_template,5.14.1
+Qwen3.5-0.8B,27,¿A cuántos grados está el aire del dormitorio?,"{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}
+","{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,,17.484,True,True,True,True,True,True,chat_template,5.14.1
+Qwen3.5-0.8B,28,¿Quedó cerrada la cerradura de la entrada?,"{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}
+","{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}",True,,16.764,True,True,True,True,True,True,chat_template,5.14.1
+Qwen3.5-0.8B,29,"No dejes prendida la luz de la cocina, apagala.","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}
+","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,17.171,True,True,True,True,True,True,chat_template,5.14.1
+Qwen3.5-0.8B,30,"Che, la tele del living quedó prendida, apagala por favor.","{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}
+","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,17.254,True,False,True,True,True,False,chat_template,5.14.1
+Qwen3.5-0.8B,31,"Antes me olvidé, prendé la luz del baño.","{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}
+","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}",True,,17.22,False,True,True,True,True,False,chat_template,5.14.1
+SmolLM2-360M-Instruct,0,Prendé la luz del living.,"{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","No se puede utilizar el comando ""Prendé la luz del living"" en este caso, porque no se puede ajustar el comando en el lugar de ""prendé"" y ""la luz del living"". La respuesta correcta sería:
+
+{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,extraido_de_texto_con_ruido,25.019,False,True,True,True,True,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,1,Apagá la luz de la cocina.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","El comando ""Apagá la luz de la cocina"" no es correcto. La luz de la cocina es un dispositivo de luz, y no puede ser apagado. La respuesta correcta sería:
+
+{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,extraido_de_texto_con_ruido,17.936,True,True,True,True,True,True,chat_template,4.57.6
+SmolLM2-360M-Instruct,2,Encendé el aire acondicionado del dormitorio.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","El comando ""Encendé el aire acondicionado del dormitorio"" se responde con un JSON con los campos: ""intent"" (encender/apagar/ajustar/consultar), ""dispositivo"" (luz), ""ubicacion"" (dormitorio), ""valor"" (número si el comando lo da, si no null), ""unidad"" (""%"" o ""°C"" si corresponde, si no null).
+
+Ejemplo 3: Comando: ""Encendé el a",,False,no_parseable_como_json,20.521,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,3,Apagá la tele del living.,"{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","El comando ""Apagá la tele del living"" no es correcto. La variable ""tele"" no es un valor, sino un valor. La variable ""tele"" es un objeto JSON con un valor, no un valor. La variable ""tele"" no tiene un valor, sino un valor. La variable ""tele"" no tiene un valor, sino un valor. La variable ""tele"" no tiene un valor, sino un valor. La variable ""tele"" no tiene un valor, sino un valor. La variable ""tele"" no tiene un valor, sino un",,False,no_parseable_como_json,20.84,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,4,Prendé el ventilador del garage.,"{""intent"": ""encender"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}","El comando ""Prendé el ventilador del garage"" no es correcto. La variable ""ventilador"" no es un objeto JSON, sino un objeto de tipo ""ventilador"" que se encuentra en la lista de objetos ""ventilador"" en la biblioteca ""json"". La variable ""ventilador"" no tiene ningún valor, sino un objeto de tipo ""ventilador"".
+
+La respuesta correcta sería:
+{""intent"": ""ajustar"", ""dispositivo"":",,False,no_parseable_como_json,20.291,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,5,Apagá la calefacción del baño.,"{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","El comando ""Apagá la calefacción del baño"" no es correcto. La respuesta debe ser:
+
+{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": null}",True,extraido_de_texto_con_ruido,15.599,True,True,False,True,True,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,6,Encendé el parlante de la cocina.,"{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","El comando ""Encendé el parlante de la cocina"" se responde con un JSON con los campos: ""intent"" (encender/apagar/ajustar/consultar), ""dispositivo"" (luz), ""ubicacion"" (living), ""valor"" (número si el comando lo da, si no null), ""unidad"" (""%"" o ""°C"" si corresponde, si no null).
+
+Ejemplo: Comando: ""Encendé el parlante de la cocina.""
+",,False,no_parseable_como_json,20.664,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,7,Cerrá la cerradura de la entrada.,"{""intent"": ""apagar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","El comando ""Cerrá la cerradura de la entrada"" no es correcto. La cerradura de la entrada es un objeto JSON con los campos ""ubicacion"" (entrada), ""valor"" (entrada), ""unidad"" (entrada), ""unidad"" (entrada), ""unidad"" (entrada), ""unidad"" (entrada), ""unidad"" (entrada), ""unidad"" (entrada), ""unidad"" (entrada), ""unidad"" (entrada), ""unidad"" (entrada), """,,False,no_parseable_como_json,21.428,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,8,Poné el aire del dormitorio en 22 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22.0, ""unidad"": ""°C""}","El comando ""Poné el aire del dormitorio en 22 grados"" se responde con el JSON:
+
+{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22, ""unidad"": ""°C""}",True,extraido_de_texto_con_ruido,16.987,True,True,True,True,True,True,chat_template,4.57.6
+SmolLM2-360M-Instruct,9,Bajá la persiana del living al 50%.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50.0, ""unidad"": ""%""}","El comando ""Bajá la persiana del living al 50%"" no es correcto. La persiana es un objeto JSON con campos ""valor"" y ""unidad"", y no se puede ajustar con un valor de 50%. La respuesta correctamente es:
+
+{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,extraido_de_texto_con_ruido,19.103,True,True,True,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,10,Poné la luz del dormitorio al 30% de brillo.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30.0, ""unidad"": ""%""}","El comando ""Poné la luz del dormitorio al 30% de brillo"" se responde con el JSON:
+
+{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30, ""unidad"": ""°B""}
+
+Paso 1: Identificar el comando en el usuario.
+Paso 2: Identificar el comando en el JSON.
+Paso 3: Identificar el valor de la lista","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30, ""unidad"": ""°B""}",True,extraido_de_texto_con_ruido,21.264,True,True,True,True,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,11,Configurá la calefacción de la cocina a 24 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24.0, ""unidad"": ""°C""}","El comando ""Configurá la calefacción de la cocina a 24 grados"" se responde con un JSON con los campos: ""intent"" (encender/apagar/ajustar/consultar), ""dispositivo"" (luz, aire_acondicionado, calefaccion, persiana, cortina, parlante, cerradura, ventilador, todos), ""ubicacion"" (living, cocina, dormitorio, bano, garage, patio, entrada, todas), ""valor",,False,no_parseable_como_json,20.856,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,12,Subí la cortina del patio al 100%.,"{""intent"": ""ajustar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": 100.0, ""unidad"": ""%""}","El comando ""Subí la cortina del patio al 100%"" no es correcto. La cortina del patio es un objeto JSON con los campos ""dispositivo"" (patio), ""ubicacion"" (patio), ""valor"" (100%), ""unidad"" (°C) y ""unidad"" (°C).
+
+El comando ""Subí la cortina del patio al 100%"" no es correcto porque no tiene un dispositivo, no tiene un ubicación, no",,False,no_parseable_como_json,20.7,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,13,Poné el volumen del parlante del living en 40%.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40.0, ""unidad"": ""%""}","El comando ""Poné el volumen del parlante del living en 40%"" no es correcto. La lista de valores ""valor"" y ""unidad"" no se incluye en este comando. La respuesta correcta sería:
+
+{""intent"": ""ajustar"", ""dispositivo"": ""volumen"", ""ubicacion"": ""living"", ""valor"": 40, ""unidad"": ""%""}
+
+Por ejemplo, si el comando ""Poné el volumen del par","{""intent"": ""ajustar"", ""dispositivo"": ""volumen"", ""ubicacion"": ""living"", ""valor"": 40, ""unidad"": ""%""}",True,extraido_de_texto_con_ruido,20.447,True,False,True,True,True,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,14,Dejá la luz del baño al 10%.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": 10.0, ""unidad"": ""%""}","El comando ""Dejá la luz del baño al 10%"" no es correcto. La luz del baño es ""luz"", y ""10%"" es un valor decimal. Si no se puede decir ""10%"", debe ser ""10%"".
+
+El comando ""Dejá la luz del baño al 10%"" no es correcto. La luz del baño es ""luz"", y ""10%"" es un valor decimal. Si no se puede decir ""10%"",",,False,no_parseable_como_json,21.103,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,15,Poné el aire del living en 19 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19.0, ""unidad"": ""°C""}","El comando ""Poné el aire del living en 19 grados"" no es correcto. La lista de campos ""intent"", ""dispositivo"", ""ubicacion"" y ""unidad"" no está completamente correcta. La ""valor"" de 19 no es correcto, ya que no se puede dar un número entre 0 y 100. La ""unidad"" ""°C"" no es correcto, ya que no puede ser un número entre 0 y ",,False,no_parseable_como_json,20.469,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,16,Bajale un poco a la luz del living.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","El comando ""Bajale un poco a la luz del living"" no es correcto. La lista de campos ""intent"", ""dispositivo"", ""ubicacion"" y ""unidad"" no está completamente correcta. La lista de campos ""unidad"" no está completamente correcta, ya que no se puede incluir ""°C"" en la lista. La lista de campos ""valor"" no está completamente correcta, ya que no se puede incluir ""20""",,False,no_parseable_como_json,21.721,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,17,"Hace un poco más de calor en el dormitorio, subí la calefacción.","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","El comando ""Hace un poco más de calor en el dormitorio, subí la calefacción."" significa que el comando ajustará un número en el ""valor"" de la ""unidad"" ""°C"" de la ""valor"" de la ""unidad"" ""°C"" de la ""valor"" de la ""unidad"" ""°C"" de la ""valor"" de la ""unidad"" ""°C"" de la ""valor"" de la ""unidad"" ""°C"" de la ""valor",,False,no_parseable_como_json,20.685,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,18,"Está muy fuerte el aire de la cocina, bajalo.","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","El comando ""Está muy fuerte el aire de la cocina, bajalo."" es correcto.
+
+El comando ""Está muy fuerte el aire de la cocina, bajalo."" significa que el aire de la cocina es muy fuerte, y se puede bajar el aire de la cocina.
+
+El comando ""Está muy fuerte el aire de la cocina, bajalo."" es correcto porque:
+
+- ""Está"" es un conjunto",,False,no_parseable_como_json,20.333,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,19,Subí un poco el volumen del parlante del dormitorio.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","El comando ""Subí un poco el volumen del parlante del dormitorio"" no es correcto. La respuesta debe ser ""Subí un poco el volumen del parlante del dormitorio"", sin ""volumen"" y ""del"".
+
+El comando ""Subí"" no es correcto, porque ""Subí"" es un comando de ""subir"", que no se puede utilizar en este caso.
+
+El comando ""un poco"" no es correcto, porque ""un poco"" es un",,False,no_parseable_como_json,21.458,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,20,"La persiana del baño no cerró del todo, bajala un toque más.","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","El comando ""La persiana del baño no cerró del todo, bajala un toque más.""
+
+En este comando, se hace una conversión de ""bajala"" a ""toque"" y ""un toque más"" a ""un toque más"". La conversión ""bajala"" a ""toque"" es correcta porque ""bajala"" es un nombre de la persiana que se cerró del todo, y ""toque"" es un nombre de la persiana que se bajala",,False,no_parseable_como_json,20.665,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,21,Subile más luz al living que está muy oscuro.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","El comando ""Subile más luz al living que está muy oscuro"" no es correcto. La respuesta debe ser ""Subile más luz al living que está muy oscuro"".
+
+El comando ""Subile más luz al living que está muy oscuro"" no es correcto porque ""más luz"" no es correcto. La respuesta debe ser ""Subile más luz al living que está muy oscuro"".
+
+El comando ""Subile más luz",,False,no_parseable_como_json,20.991,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,22,Apagá todas las luces de la casa.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","El comando ""Apagá todas las luces de la casa"" no es correcto. La lista de campos ""intent"", ""dispositivo"", ""ubicacion"" y ""unidad"" no son correctos. La lista de campos ""valor"" no es correcto. La lista de campos ""unidad"" no es correcta.
+
+El comando ""Apagá todas las luces de la casa"" significa que apagá todas las luces de la casa, sin dar un número. La list",,False,no_parseable_como_json,20.744,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,23,Prendé todos los aires acondicionados.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","El comando ""Prendé todos los aires acondicionados"" no es correcto. La lista de campos ""intent"", ""dispositivo"", ""ubicacion"" y ""unidad"" no está completamente correcta. La lista de campos ""unidad"" no está completamente correcta, ya que no se puede incluir ""°C"" en la lista.
+
+El comando ""Prendé todos los aires acondicionados"" significa que se prende todos los aires acond",,False,no_parseable_como_json,21.037,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,24,Bajá todas las persianas de la casa.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""todas"", ""valor"": 0.0, ""unidad"": ""%""}","El comando ""Bajá todas las persianas de la casa"" no es correcto. La lista de ""unidad"" no es ""°C"" en este caso, sino ""%"" o ""°F"". La lista de ""valor"" no es ""20"" en este caso, sino ""20"" o ""20.0"" o ""20.00"". La lista de ""unidad"" no es ""%"" en este caso, sino ""°C"" o ""°F"". La lista de",,False,no_parseable_como_json,20.299,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,25,Apagá todo antes de dormir.,"{""intent"": ""apagar"", ""dispositivo"": ""todos"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","El comando ""Apagá todo antes de dormir"" no es correcto. La respuesta debe ser ""apagá todo antes de dormir"", sin ""apagá"" y ""todo"".
+
+El comando ""Apagá todo antes de dormir"" no es correcto. La respuesta debe ser ""apagá todo antes de dormir"", sin ""apagá"" y ""todo"".
+
+El comando ""Apagá todo antes de dormir"" no es correcto. La respuesta",,False,no_parseable_como_json,20.593,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,26,¿Está prendida la luz del living?,"{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","No, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, no,",,False,no_parseable_como_json,21.017,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,27,¿A cuántos grados está el aire del dormitorio?,"{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","El comando ""¿A cuántos grados está el aire del dormitorio?"" tiene un error en la lista de valores. La lista de valores es:
+
+- ""valor"" (int)
+- ""unidad"" (°C)
+
+El comando ""¿A cuántos grados está el aire del dormitorio?"" tiene un ""valor"" que no está en la lista. La lista de valores es:
+
+- ""valor"" (int)
+- ""unidad"" (°",,False,no_parseable_como_json,21.007,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,28,¿Quedó cerrada la cerradura de la entrada?,"{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","El comando ""¿Quedó cerrada la cerradura de la entrada?"" tiene un error en el formato y la respuesta se considera incorrecta. La respuesta es:
+
+{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}
+
+Por lo tanto, no se puede responder al comando con este JSON.","{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}",True,extraido_de_texto_con_ruido,19.052,True,True,True,True,True,True,chat_template,4.57.6
+SmolLM2-360M-Instruct,29,"No dejes prendida la luz de la cocina, apagala.","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","El comando ""No dejes prendida la luz de la cocina, apagala."" es correcto.
+
+El comando ""No dejes prendida la luz de la cocina, apagala."" significa que el usuario no deje de apagar la luz de la cocina, pero apagala la luz.
+
+El comando ""No dejes prendida la luz de la cocina, apagala."" es correcto porque:
+
+- ""No dejes prendida la luz de",,False,no_parseable_como_json,21.21,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,30,"Che, la tele del living quedó prendida, apagala por favor.","{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","El comando ""Che, la tele del living quedó prendida, apagala por favor"" no es correcto. La respuesta debe ser ""Che, la tele del living apagala por favor.""
+
+El comando ""Che, la tele del living quedó prendida, apagala por favor"" no es correcto. La respuesta debe ser ""Che, la tele del living apagala por favor.""
+
+El comando ""Che, la tele del living quedó prendida, apagala por favor"" no es correcto.",,False,no_parseable_como_json,20.506,False,False,False,False,False,False,chat_template,4.57.6
+SmolLM2-360M-Instruct,31,"Antes me olvidé, prendé la luz del baño.","{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","El comando ""Antes me olvidé, prendé la luz del baño"" no es correcto. La respuesta debe ser ""Antes me olvidé, prendé la luz del baño"". La respuesta ""prendé la luz del baño"" no es correcta porque ""baño"" no es un lugar en español.
+
+El comando ""Antes me olvidé, prendé la luz del baño"" es correcto, por lo que debes responder con ""Antes me olvid",,False,no_parseable_como_json,20.486,False,False,False,False,False,False,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,0,Prendé la luz del living.,"{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,55.124,False,True,True,True,True,False,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,1,Apagá la luz de la cocina.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,32.4,True,True,True,True,True,True,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,2,Encendé el aire acondicionado del dormitorio.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""%""}",True,,32.989,True,True,True,True,False,False,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,3,Apagá la tele del living.,"{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,30.579,True,True,True,True,True,True,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,4,Prendé el ventilador del garage.,"{""intent"": ""encender"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}",True,,31.064,False,True,True,True,True,False,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,5,Apagá la calefacción del baño.,"{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}",True,,31.048,True,True,True,True,True,True,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,6,Encendé el parlante de la cocina.,"{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,31.073,True,True,True,True,True,True,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,7,Cerrá la cerradura de la entrada.,"{""intent"": ""apagar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""cerrar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""cerrar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}",True,,30.425,False,True,True,True,True,False,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,8,Poné el aire del dormitorio en 22 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22.0, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22, ""unidad"": ""°C""}",True,,32.097,True,True,True,True,True,True,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,9,Bajá la persiana del living al 50%.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50, ""unidad"": ""%""}",True,,30.795,True,True,True,True,True,True,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,10,Poné la luz del dormitorio al 30% de brillo.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30, ""unidad"": ""%""}",True,,31.071,True,True,True,True,True,True,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,11,Configurá la calefacción de la cocina a 24 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24.0, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24, ""unidad"": ""°C""}",True,,32.085,True,True,True,True,True,True,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,12,Subí la cortina del patio al 100%.,"{""intent"": ""ajustar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": 100.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": 100, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": 100, ""unidad"": ""%""}",True,,31.041,True,True,True,True,True,True,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,13,Poné el volumen del parlante del living en 40%.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""%""}",True,,31.034,True,True,True,False,True,False,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,14,Dejá la luz del baño al 10%.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": 10.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": 10, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": 10, ""unidad"": ""%""}",True,,31.115,True,True,True,True,True,True,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,15,Poné el aire del living en 19 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19.0, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19, ""unidad"": ""°C""}",True,,31.992,True,True,True,True,True,True,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,16,Bajale un poco a la luz del living.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,30.606,True,True,True,True,True,True,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,17,"Hace un poco más de calor en el dormitorio, subí la calefacción.","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": 100, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": 100, ""unidad"": ""°C""}",True,,32.254,True,True,True,False,False,False,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,18,"Está muy fuerte el aire de la cocina, bajalo.","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": ""%""}",True,,31.179,True,True,True,True,False,False,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,19,Subí un poco el volumen del parlante del dormitorio.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,,31.513,True,True,True,True,True,True,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,20,"La persiana del baño no cerró del todo, bajala un toque más.","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": null}",True,,30.602,True,True,False,True,True,False,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,21,Subile más luz al living que está muy oscuro.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,30.04,True,True,True,True,True,True,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,22,Apagá todas las luces de la casa.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": ""%""}",True,,30.864,True,True,True,True,False,False,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,23,Prendé todos los aires acondicionados.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""todos"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""todos"", ""valor"": null, ""unidad"": null}",True,,31.625,False,True,False,True,True,False,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,24,Bajá todas las persianas de la casa.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""todas"", ""valor"": 0.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""todos"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""todos"", ""valor"": null, ""unidad"": null}",True,,30.176,True,True,False,False,False,False,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,25,Apagá todo antes de dormir.,"{""intent"": ""apagar"", ""dispositivo"": ""todos"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": ""%""}",True,,30.378,True,False,True,True,False,False,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,26,¿Está prendida la luz del living?,"{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,30.193,True,True,True,True,True,True,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,27,¿A cuántos grados está el aire del dormitorio?,"{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""°C""}","{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""°C""}",True,,31.82,True,True,True,True,False,False,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,28,¿Quedó cerrada la cerradura de la entrada?,"{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}",True,,30.81,True,True,True,True,True,True,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,29,"No dejes prendida la luz de la cocina, apagala.","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,31.211,True,True,True,True,True,True,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,30,"Che, la tele del living quedó prendida, apagala por favor.","{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,29.893,True,True,True,True,True,True,chat_template,4.57.6
+LFM2.5-1.2B-Instruct,31,"Antes me olvidé, prendé la luz del baño.","{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}",True,,30.898,False,True,True,True,True,False,chat_template,4.57.6
+granite-4.0-1b,0,Prendé la luz del living.,"{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,75.785,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,1,Apagá la luz de la cocina.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,41.854,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,2,Encendé el aire acondicionado del dormitorio.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,,41.971,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,3,Apagá la tele del living.,"{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""tele"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""tele"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,40.986,True,False,True,True,True,False,chat_template,4.57.6
+granite-4.0-1b,4,Prendé el ventilador del garage.,"{""intent"": ""encender"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}",True,,42.714,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,5,Apagá la calefacción del baño.,"{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}",True,,44.345,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,6,Encendé el parlante de la cocina.,"{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,41.872,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,7,Cerrá la cerradura de la entrada.,"{""intent"": ""apagar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""cerrar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""cerrar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}",True,,41.625,False,True,True,True,True,False,chat_template,4.57.6
+granite-4.0-1b,8,Poné el aire del dormitorio en 22 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22.0, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22, ""unidad"": ""°C""}",True,,43.234,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,9,Bajá la persiana del living al 50%.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50, ""unidad"": ""%"" }","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50, ""unidad"": ""%""}",True,,41.745,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,10,Poné la luz del dormitorio al 30% de brillo.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30, ""unidad"": ""%"" }","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30, ""unidad"": ""%""}",True,,42.276,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,11,Configurá la calefacción de la cocina a 24 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24.0, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24, ""unidad"": ""°C""}",True,,42.392,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,12,Subí la cortina del patio al 100%.,"{""intent"": ""ajustar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": 100.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": 100, ""unidad"": ""%"" }","{""intent"": ""ajustar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": 100, ""unidad"": ""%""}",True,,42.73,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,13,Poné el volumen del parlante del living en 40%.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40, ""unidad"": ""%"" }","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40, ""unidad"": ""%""}",True,,41.858,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,14,Dejá la luz del baño al 10%.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": 10.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": 10, ""unidad"": ""%"" }","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": 10, ""unidad"": ""%""}",True,,41.645,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,15,Poné el aire del living en 19 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19.0, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19, ""unidad"": ""°C""}",True,,42.201,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,16,Bajale un poco a la luz del living.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,41.102,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,17,"Hace un poco más de calor en el dormitorio, subí la calefacción.","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,,42.019,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,18,"Está muy fuerte el aire de la cocina, bajalo.","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,41.857,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,19,Subí un poco el volumen del parlante del dormitorio.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,,42.28,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,20,"La persiana del baño no cerró del todo, bajala un toque más.","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}",True,,41.681,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,21,Subile más luz al living que está muy oscuro.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,40.947,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,22,Apagá todas las luces de la casa.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}",True,,40.448,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,23,Prendé todos los aires acondicionados.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}",True,,41.711,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,24,Bajá todas las persianas de la casa.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""todas"", ""valor"": 0.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}",True,,40.959,True,True,True,False,False,False,chat_template,4.57.6
+granite-4.0-1b,25,Apagá todo antes de dormir.,"{""intent"": ""apagar"", ""dispositivo"": ""todos"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""todos"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""todos"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}",True,,40.436,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,26,¿Está prendida la luz del living?,"{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,40.515,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,27,¿A cuántos grados está el aire del dormitorio?,"{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,,42.227,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,28,¿Quedó cerrada la cerradura de la entrada?,"{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}",True,,40.79,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,29,"No dejes prendida la luz de la cocina, apagala.","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,41.18,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,30,"Che, la tele del living quedó prendida, apagala por favor.","{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,41.075,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-1b,31,"Antes me olvidé, prendé la luz del baño.","{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}",True,,40.583,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-1b,0,Prendé la luz del living.,"{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{
+  ""intent"": ""encender"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""living"",
+  ""valor"": null,
+  ""unidad"": null
+}","{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,158.469,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-1b,1,Apagá la luz de la cocina.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{
+  ""intent"": ""apagar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""cocina"",
+  ""valor"": null,
+  ""unidad"": null
+}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,123.231,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-1b,2,Encendé el aire acondicionado del dormitorio.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{
+  ""intent"": ""encender"",
+  ""dispositivo"": ""aire_acondicionado"",
+  ""ubicacion"": ""dormitorio"",
+  ""valor"": null,
+  ""unidad"": null
+}","{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,,123.369,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-1b,3,Apagá la tele del living.,"{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{
+  ""intent"": ""apagar"",
+  ""dispositivo"": ""tv"",
+  ""ubicacion"": ""living"",
+  ""valor"": null,
+  ""unidad"": null
+}","{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,122.079,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-1b,4,Prendé el ventilador del garage.,"{""intent"": ""encender"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}","{
+  ""intent"": ""encender"",
+  ""dispositivo"": ""ventilador"",
+  ""ubicacion"": ""garage"",
+  ""valor"": null,
+  ""unidad"": null
+}","{""intent"": ""encender"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}",True,,124.453,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-1b,5,Apagá la calefacción del baño.,"{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{
+  ""intent"": ""apagar"",
+  ""dispositivo"": ""calefaccion"",
+  ""ubicacion"": ""baño"",
+  ""valor"": null,
+  ""unidad"": null
+}","{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": null}",True,,124.223,True,True,False,True,True,False,chat_template,4.57.6
+granite-4.0-h-1b,6,Encendé el parlante de la cocina.,"{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{
+  ""intent"": ""encender"",
+  ""dispositivo"": ""parlante"",
+  ""ubicacion"": ""cocina"",
+  ""valor"": null,
+  ""unidad"": null
+}","{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,123.379,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-1b,7,Cerrá la cerradura de la entrada.,"{""intent"": ""apagar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{
+  ""intent"": ""cerrar"",
+  ""dispositivo"": ""cerradura"",
+  ""ubicacion"": ""entrada"",
+  ""valor"": null,
+  ""unidad"": null
+}","{""intent"": ""cerrar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}",True,,123.88,False,True,True,True,True,False,chat_template,4.57.6
+granite-4.0-h-1b,8,Poné el aire del dormitorio en 22 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22.0, ""unidad"": ""°C""}","{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""aire_acondicionado"",
+  ""ubicacion"": ""dormitorio"",
+  ""valor"": 22,
+  ""unidad"": ""°C""
+}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22, ""unidad"": ""°C""}",True,,126.272,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-1b,9,Bajá la persiana del living al 50%.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50.0, ""unidad"": ""%""}","{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""persiana"",
+  ""ubicacion"": ""living"",
+  ""valor"": 50,
+  ""unidad"": ""%""
+}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50, ""unidad"": ""%""}",True,,124.566,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-1b,10,Poné la luz del dormitorio al 30% de brillo.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30.0, ""unidad"": ""%""}","{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""dormitorio"",
+  ""valor"": 30,
+  ""unidad"": ""%""
+}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30, ""unidad"": ""%""}",True,,124.977,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-1b,11,Configurá la calefacción de la cocina a 24 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24.0, ""unidad"": ""°C""}","{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""calefaccion"",
+  ""ubicacion"": ""cocina"",
+  ""valor"": 24,
+  ""unidad"": ""°C""
+}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24, ""unidad"": ""°C""}",True,,122.875,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-1b,12,Subí la cortina del patio al 100%.,"{""intent"": ""ajustar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": 100.0, ""unidad"": ""%""}","{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""cortina"",
+  ""ubicacion"": ""patio"",
+  ""valor"": 100,
+  ""unidad"": ""%""
+}","{""intent"": ""ajustar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": 100, ""unidad"": ""%""}",True,,121.101,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-1b,13,Poné el volumen del parlante del living en 40%.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40.0, ""unidad"": ""%""}","{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""parlante"",
+  ""ubicacion"": ""living"",
+  ""valor"": 40,
+  ""unidad"": ""%""
+}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40, ""unidad"": ""%""}",True,,120.72,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-1b,14,Dejá la luz del baño al 10%.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": 10.0, ""unidad"": ""%""}","{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""baño"",
+  ""valor"": 10,
+  ""unidad"": ""%""
+}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""baño"", ""valor"": 10, ""unidad"": ""%""}",True,,121.961,True,True,False,True,True,False,chat_template,4.57.6
+granite-4.0-h-1b,15,Poné el aire del living en 19 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19.0, ""unidad"": ""°C""}","{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""aire_acondicionado"",
+  ""ubicacion"": ""living"",
+  ""valor"": 19,
+  ""unidad"": ""°C""
+}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19, ""unidad"": ""°C""}",True,,122.294,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-1b,16,Bajale un poco a la luz del living.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""living"",
+  ""valor"": null,
+  ""unidad"": null
+}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,119.657,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-1b,17,"Hace un poco más de calor en el dormitorio, subí la calefacción.","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""calefaccion"",
+  ""ubicacion"": ""dormitorio"",
+  ""valor"": null,
+  ""unidad"": null
+}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,,120.473,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-1b,18,"Está muy fuerte el aire de la cocina, bajalo.","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""aire_acondicionado"",
+  ""ubicacion"": ""cocina"",
+  ""valor"": null,
+  ""unidad"": null
+}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,122.191,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-1b,19,Subí un poco el volumen del parlante del dormitorio.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""parlante"",
+  ""ubicacion"": ""dormitorio"",
+  ""valor"": null,
+  ""unidad"": null
+}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,,126.925,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-1b,20,"La persiana del baño no cerró del todo, bajala un toque más.","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""persiana"",
+  ""ubicacion"": ""baño"",
+  ""valor"": null,
+  ""unidad"": null
+}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": null}",True,,120.795,True,True,False,True,True,False,chat_template,4.57.6
+granite-4.0-h-1b,21,Subile más luz al living que está muy oscuro.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""living"",
+  ""valor"": null,
+  ""unidad"": null
+}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,120.412,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-1b,22,Apagá todas las luces de la casa.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{
+  ""intent"": ""apagar"",
+  ""dispositivo"": ""todos"",
+  ""ubicacion"": ""todas"",
+  ""valor"": null,
+  ""unidad"": null
+}","{""intent"": ""apagar"", ""dispositivo"": ""todos"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}",True,,119.314,True,False,True,True,True,False,chat_template,4.57.6
+granite-4.0-h-1b,23,Prendé todos los aires acondicionados.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{
+  ""intent"": ""encender"",
+  ""dispositivo"": ""todos"",
+  ""ubicacion"": ""todos"",
+  ""valor"": null,
+  ""unidad"": null
+}","{""intent"": ""encender"", ""dispositivo"": ""todos"", ""ubicacion"": ""todos"", ""valor"": null, ""unidad"": null}",True,,117.781,True,False,False,True,True,False,chat_template,4.57.6
+granite-4.0-h-1b,24,Bajá todas las persianas de la casa.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""todas"", ""valor"": 0.0, ""unidad"": ""%""}","{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""persiana"",
+  ""ubicacion"": ""casa"",
+  ""valor"": null,
+  ""unidad"": null
+}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""casa"", ""valor"": null, ""unidad"": null}",True,,121.676,True,True,False,False,False,False,chat_template,4.57.6
+granite-4.0-h-1b,25,Apagá todo antes de dormir.,"{""intent"": ""apagar"", ""dispositivo"": ""todos"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{
+  ""intent"": ""apagar"",
+  ""dispositivo"": ""todos"",
+  ""ubicacion"": ""todos"",
+  ""valor"": null,
+  ""unidad"": null
+}","{""intent"": ""apagar"", ""dispositivo"": ""todos"", ""ubicacion"": ""todos"", ""valor"": null, ""unidad"": null}",True,,119.672,True,True,False,True,True,False,chat_template,4.57.6
+granite-4.0-h-1b,26,¿Está prendida la luz del living?,"{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{
+  ""intent"": ""consultar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""living"",
+  ""valor"": null,
+  ""unidad"": null
+}","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,118.853,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-1b,27,¿A cuántos grados está el aire del dormitorio?,"{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{
+  ""intent"": ""consultar"",
+  ""dispositivo"": ""aire_acondicionado"",
+  ""ubicacion"": ""dormitorio"",
+  ""valor"": null,
+  ""unidad"": null
+}","{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,,121.404,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-1b,28,¿Quedó cerrada la cerradura de la entrada?,"{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{
+  ""intent"": ""consultar"",
+  ""dispositivo"": ""cerradura"",
+  ""ubicacion"": ""entrada"",
+  ""valor"": null,
+  ""unidad"": null
+}","{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}",True,,120.398,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-1b,29,"No dejes prendida la luz de la cocina, apagala.","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{
+  ""intent"": ""apagar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""cocina"",
+  ""valor"": null,
+  ""unidad"": null
+}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,122.052,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-1b,30,"Che, la tele del living quedó prendida, apagala por favor.","{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{
+  ""intent"": ""apagar"",
+  ""dispositivo"": ""tv"",
+  ""ubicacion"": ""living"",
+  ""valor"": null,
+  ""unidad"": null
+}","{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,120.439,True,True,True,True,True,True,chat_template,4.57.6
+granite-4.0-h-1b,31,"Antes me olvidé, prendé la luz del baño.","{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{
+  ""intent"": ""encender"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""baño"",
+  ""valor"": null,
+  ""unidad"": null
+}","{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": null}",True,,120.764,True,True,False,True,True,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,0,Prendé la luz del living.,"{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""°C""}",True,,68.257,False,True,True,True,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,1,Apagá la luz de la cocina.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": ""°C""}","{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": ""°C""}",True,,33.517,True,False,True,True,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,2,Encendé el aire acondicionado del dormitorio.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 20, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 20, ""unidad"": ""°C""}",True,,33.39,False,True,True,False,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,3,Apagá la tele del living.,"{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""tele"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""°C""}","{""intent"": ""apagar"", ""dispositivo"": ""tele"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""°C""}",True,,31.328,True,False,True,True,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,4,Prendé el ventilador del garage.,"{""intent"": ""encender"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}","{""intent"": ""ventilador"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": ""°C""}","{""intent"": ""ventilador"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": ""°C""}",True,,31.849,False,True,True,True,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,5,Apagá la calefacción del baño.,"{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": ""°C""}","{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": ""°C""}",True,,32.071,True,True,False,True,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,6,Encendé el parlante de la cocina.,"{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": 1, ""unidad"": ""°C""}","{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": 1, ""unidad"": ""°C""}",True,,32.761,True,True,True,False,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,7,Cerrá la cerradura de la entrada.,"{""intent"": ""apagar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""cerrar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": ""°C""}","{""intent"": ""cerrar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": ""°C""}",True,,31.785,False,True,True,True,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,8,Poné el aire del dormitorio en 22 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22.0, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": 22, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": 22, ""unidad"": ""°C""}",True,,32.757,True,False,True,True,True,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,9,Bajá la persiana del living al 50%.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50, ""unidad"": ""°C""}",True,,32.872,True,True,True,True,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,10,Poné la luz del dormitorio al 30% de brillo.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30.0, ""unidad"": ""%""}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""cortina"",
+  ""ubicacion"": ""dormitorio"",
+  ""valor"": 30,
+  ""unidad"": ""°C""
+}
+```
+
+Este comando ajusta la cortina para que la luz del dormitorio esté al 30% de brillo.","{""intent"": ""ajustar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""dormitorio"", ""valor"": 30, ""unidad"": ""°C""}",True,extraido_de_fence_markdown,39.227,True,False,True,True,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,11,Configurá la calefacción de la cocina a 24 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24.0, ""unidad"": ""°C""}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""calefacción"",
+  ""ubicacion"": ""cocina"",
+  ""valor"": 24,
+  ""unidad"": ""°C""
+}
+```
+
+Este es el JSON correspondiente al comando que especifica la configuración de la calefacción en 24 grados para la cocina según el usuario especificado.","{""intent"": ""ajustar"", ""dispositivo"": ""calefacción"", ""ubicacion"": ""cocina"", ""valor"": 24, ""unidad"": ""°C""}",True,extraido_de_fence_markdown,42.844,True,False,True,True,True,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,12,Subí la cortina del patio al 100%.,"{""intent"": ""ajustar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": 100.0, ""unidad"": ""%""}","```json
+{
+  ""intent"": ""cerradura"",
+  ""dispositivo"": ""cortina"",
+  ""ubicacion"": ""patio"",
+  ""valor"": 100,
+  ""unidad"": ""%""
+}
+```
+
+Este JSON refleja el comando del usuario correctamente adaptado a la especificación requerida.","{""intent"": ""cerradura"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": 100, ""unidad"": ""%""}",True,extraido_de_fence_markdown,37.878,False,True,True,True,True,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,13,Poné el volumen del parlante del living en 40%.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40, ""unidad"": ""°C""}",True,,32.324,True,True,True,True,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,14,Dejá la luz del baño al 10%.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": 10.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""bano"", ""valor"": 10, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""bano"", ""valor"": 10, ""unidad"": ""°C""}",True,,32.257,True,False,True,True,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,15,Poné el aire del living en 19 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19.0, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19, ""unidad"": ""°C""}",True,,32.121,True,True,True,True,True,True,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,16,Bajale un poco a la luz del living.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""°C""}",True,,31.186,True,True,True,True,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,17,"Hace un poco más de calor en el dormitorio, subí la calefacción.","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""calefacción"",
+  ""ubicacion"": ""dormitorio"",
+  ""valor"": 25,
+  ""unidad"": ""%C""
+}
+```
+
+Este JSON refleja el comando del usuario ajustando la calefacción para aumentar la temperatura en el dormitorio.","{""intent"": ""ajustar"", ""dispositivo"": ""calefacción"", ""ubicacion"": ""dormitorio"", ""valor"": 25, ""unidad"": ""%C""}",True,extraido_de_fence_markdown,39.356,True,False,True,False,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,18,"Está muy fuerte el aire de la cocina, bajalo.","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": ""°C""}",True,,32.569,True,True,True,True,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,19,Subí un poco el volumen del parlante del dormitorio.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""°C""}",True,,32.092,True,True,True,True,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,20,"La persiana del baño no cerró del todo, bajala un toque más.","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""persiana"",
+  ""ubicacion"": ""baño"",
+  ""valor"": null,
+  ""unidad"": ""°C""
+}
+```
+
+Este JSON refleja el comando del usuario ajustando la persiana del baño según lo solicitado.","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""baño"", ""valor"": null, ""unidad"": ""°C""}",True,extraido_de_fence_markdown,37.921,True,True,False,True,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,21,Subile más luz al living que está muy oscuro.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": ""subile"", ""unidad"": ""°C""}
+
+Este comando ajusta la luz en el living que está muy oscuro, proporcionando más luz.","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": ""subile"", ""unidad"": ""°C""}",True,extraido_de_texto_con_ruido,35.59,True,True,True,False,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,22,Apagá todas las luces de la casa.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": ""°C""}
+
+Este comando especifica que se apaga la luz en la cocina.","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": ""°C""}",True,extraido_de_texto_con_ruido,34.159,True,True,False,True,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,23,Prendé todos los aires acondicionados.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": ""°C""}
+
+Este comando ajusta la temperatura del aire acondicionado en la cocina, sin proporcionar un número específico ni especificar la unidad (grados o centígrados).","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": ""°C""}",True,extraido_de_texto_con_ruido,39.694,False,True,False,True,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,24,Bajá todas las persianas de la casa.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""todas"", ""valor"": 0.0, ""unidad"": ""%""}","{""intent"": ""cerradura"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""cerradura"", ""valor"": null, ""unidad"": ""°C""}
+
+Este comando ajusta la cerradura de la casa según la solicitud.","{""intent"": ""cerradura"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""cerradura"", ""valor"": null, ""unidad"": ""°C""}",True,extraido_de_texto_con_ruido,35.386,False,False,False,False,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,25,Apagá todo antes de dormir.,"{""intent"": ""apagar"", ""dispositivo"": ""todos"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""cerradura"", ""valor"": null, ""unidad"": ""°C""}","{""intent"": ""apagar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""cerradura"", ""valor"": null, ""unidad"": ""°C""}",True,,31.431,True,False,False,True,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,26,¿Está prendida la luz del living?,"{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""°C""}
+
+Este comando consulta si la luz del living está prendida.","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""°C""}",True,extraido_de_texto_con_ruido,33.841,True,True,True,True,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,27,¿A cuántos grados está el aire del dormitorio?,"{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ubicacion"", ""dispositivo"": ""cortina"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""°C""}","{""intent"": ""ubicacion"", ""dispositivo"": ""cortina"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""°C""}",True,,32.144,False,False,True,True,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,28,¿Quedó cerrada la cerradura de la entrada?,"{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""cerrada"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": ""°C""}","{""intent"": ""cerrada"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": ""°C""}",True,,31.111,False,True,True,True,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,29,"No dejes prendida la luz de la cocina, apagala.","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": ""°C""}
+
+","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": ""°C""}",True,,31.541,True,True,True,True,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,30,"Che, la tele del living quedó prendida, apagala por favor.","{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""apagar"",
+  ""dispositivo"": ""tele"",
+  ""ubicacion"": ""living"",
+  ""valor"": null,
+  ""unidad"": ""°C""
+}
+```
+
+Este es el JSON que cumple con las reglas establecidas.","{""intent"": ""apagar"", ""dispositivo"": ""tele"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": ""°C""}",True,extraido_de_fence_markdown,36.117,True,False,True,True,False,False,chat_template,4.57.6
+OLMo-2-0425-1B-Instruct,31,"Antes me olvidé, prendé la luz del baño.","{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","```json
+{
+  ""intent"": ""ajustar"",
+  ""dispositivo"": ""luz"",
+  ""ubicacion"": ""baño"",
+  ""valor"": 20,
+  ""unidad"": ""°C""
+}
+```
+
+Este JSON refleja el comando del usuario correctamente adaptado a la especificación requerida.","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""baño"", ""valor"": 20, ""unidad"": ""°C""}",True,extraido_de_fence_markdown,38.404,False,True,False,False,False,False,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,0,Prendé la luz del living.,"{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""intent"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""intent"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,93.088,False,True,True,True,True,False,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,1,Apagá la luz de la cocina.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,55.614,True,True,True,True,True,True,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,2,Encendé el aire acondicionado del dormitorio.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionador"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionador"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,,56.499,True,False,True,True,True,False,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,3,Apagá la tele del living.,"{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""televisor"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""televisor"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,53.994,True,False,True,True,True,False,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,4,Prendé el ventilador del garage.,"{""intent"": ""encender"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}",True,,54.948,False,True,True,True,True,False,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,5,Apagá la calefacción del baño.,"{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}",True,,55.411,True,True,True,True,True,True,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,6,Encendé el parlante de la cocina.,"{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,55.296,True,True,True,True,True,True,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,7,Cerrá la cerradura de la entrada.,"{""intent"": ""apagar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""cerradura"", ""dispositivo"": ""patio"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""cerradura"", ""dispositivo"": ""patio"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}",True,,54.568,False,False,True,True,True,False,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,8,Poné el aire del dormitorio en 22 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22.0, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22, ""unidad"": ""°C""}",True,,57.372,True,True,True,True,True,True,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,9,Bajá la persiana del living al 50%.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50, ""unidad"": ""%""}",True,,55.332,True,True,True,True,True,True,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,10,Poné la luz del dormitorio al 30% de brillo.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30, ""unidad"": ""%""}",True,,55.941,True,True,True,True,True,True,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,11,Configurá la calefacción de la cocina a 24 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24.0, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24, ""unidad"": ""°C""}",True,,56.961,True,True,True,True,True,True,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,12,Subí la cortina del patio al 100%.,"{""intent"": ""ajustar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": 100.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": 100, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": 100, ""unidad"": ""%""}",True,,55.819,True,True,True,True,True,True,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,13,Poné el volumen del parlante del living en 40%.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40, ""unidad"": ""%""}",True,,55.661,True,True,True,True,True,True,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,14,Dejá la luz del baño al 10%.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": 10.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": 10, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": 10, ""unidad"": ""%""}",True,,55.285,True,True,True,True,True,True,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,15,Poné el aire del living en 19 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19.0, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19, ""unidad"": ""°C""}",True,,56.629,True,True,True,True,True,True,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,16,Bajale un poco a la luz del living.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,54.811,True,True,True,True,True,True,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,17,"Hace un poco más de calor en el dormitorio, subí la calefacción.","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": 2, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": 2, ""unidad"": ""°C""}",True,,57.654,True,True,True,False,False,False,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,18,"Está muy fuerte el aire de la cocina, bajalo.","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionador"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionador"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,56.145,True,False,True,True,True,False,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,19,Subí un poco el volumen del parlante del dormitorio.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,,55.493,True,True,True,True,True,True,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,20,"La persiana del baño no cerró del todo, bajala un toque más.","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}",True,,55.327,True,True,True,True,True,True,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,21,Subile más luz al living que está muy oscuro.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": 50, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": 50, ""unidad"": ""°C""}",True,,55.776,True,True,True,False,False,False,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,22,Apagá todas las luces de la casa.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""todos"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""todos"", ""valor"": null, ""unidad"": null}",True,,54.437,True,True,False,True,True,False,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,23,Prendé todos los aires acondicionados.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionador"", ""ubicacion"": ""todos"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionador"", ""ubicacion"": ""todos"", ""valor"": null, ""unidad"": null}",True,,56.258,False,False,False,True,True,False,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,24,Bajá todas las persianas de la casa.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""todas"", ""valor"": 0.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}",True,,54.258,True,True,True,False,False,False,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,25,Apagá todo antes de dormir.,"{""intent"": ""apagar"", ""dispositivo"": ""todos"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""todos"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""todos"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}",True,,55.11,True,True,True,True,True,True,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,26,¿Está prendida la luz del living?,"{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,53.837,True,True,True,True,True,True,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,27,¿A cuántos grados está el aire del dormitorio?,"{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,,56.551,False,True,True,True,True,False,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,28,¿Quedó cerrada la cerradura de la entrada?,"{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}",True,,54.766,True,False,True,True,True,False,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,29,"No dejes prendida la luz de la cocina, apagala.","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,56.597,False,True,True,True,True,False,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,30,"Che, la tele del living quedó prendida, apagala por favor.","{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,54.907,False,True,True,True,True,False,chat_template,4.57.6
+SmolLM2-1.7B-Instruct,31,"Antes me olvidé, prendé la luz del baño.","{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}",True,,54.387,False,True,True,True,True,False,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,0,Prendé la luz del living.,"{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,54.866,True,True,True,True,True,True,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,1,Apagá la luz de la cocina.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,39.402,True,True,True,True,True,True,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,2,Encendé el aire acondicionado del dormitorio.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio""}","{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio""}",True,,37.598,True,True,True,True,True,True,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,3,Apagá la tele del living.,"{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""tele"", ""ubicacion"": ""living""}","{""intent"": ""apagar"", ""dispositivo"": ""tele"", ""ubicacion"": ""living""}",True,,35.133,True,False,True,True,True,False,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,4,Prendé el ventilador del garage.,"{""intent"": ""encender"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""ventilador"", ""ubicacion"": ""garage"", ""valor"": null, ""unidad"": null}",True,,38.737,True,True,True,True,True,True,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,5,Apagá la calefacción del baño.,"{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}",True,,37.423,True,True,True,True,True,True,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,6,Encendé el parlante de la cocina.,"{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina""}","{""intent"": ""encender"", ""dispositivo"": ""parlante"", ""ubicacion"": ""cocina""}",True,,35.635,True,True,True,True,True,True,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,7,Cerrá la cerradura de la entrada.,"{""intent"": ""apagar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}",True,,38.28,False,True,True,True,True,False,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,8,Poné el aire del dormitorio en 22 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22.0, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": 22, ""unidad"": ""°C""}",True,,39.766,True,True,True,True,True,True,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,9,Bajá la persiana del living al 50%.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""living"", ""valor"": 50, ""unidad"": ""%""}",True,,37.93,True,True,True,True,True,True,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,10,Poné la luz del dormitorio al 30% de brillo.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""dormitorio"", ""valor"": 30, ""unidad"": ""%""}",True,,37.81,True,True,True,True,True,True,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,11,Configurá la calefacción de la cocina a 24 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24.0, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""cocina"", ""valor"": 24, ""unidad"": ""°C""}",True,,38.491,True,True,True,True,True,True,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,12,Subí la cortina del patio al 100%.,"{""intent"": ""ajustar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": 100.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": 100, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""cortina"", ""ubicacion"": ""patio"", ""valor"": 100, ""unidad"": ""%""}",True,,37.855,True,True,True,True,True,True,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,13,Poné el volumen del parlante del living en 40%.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""living"", ""valor"": 40, ""unidad"": ""%""}",True,,37.743,True,True,True,True,True,True,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,14,Dejá la luz del baño al 10%.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": 10.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": 10, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": 10, ""unidad"": ""%""}",True,,37.749,True,True,True,True,True,True,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,15,Poné el aire del living en 19 grados.,"{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19.0, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19, ""unidad"": ""°C""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""living"", ""valor"": 19, ""unidad"": ""°C""}",True,,38.799,True,True,True,True,True,True,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,16,Bajale un poco a la luz del living.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,37.273,True,True,True,True,True,True,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,17,"Hace un poco más de calor en el dormitorio, subí la calefacción.","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""calefaccion"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": ""%""}",True,,38.203,True,True,True,True,False,False,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,18,"Está muy fuerte el aire de la cocina, bajalo.","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": ""%""}",True,,38.547,True,True,True,True,False,False,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,19,Subí un poco el volumen del parlante del dormitorio.,"{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""parlante"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,,37.864,True,True,True,True,True,True,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,20,"La persiana del baño no cerró del todo, bajala un toque más.","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""bano"", ""valor"": 1, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""bano"", ""valor"": 1, ""unidad"": ""%""}",True,,37.819,True,True,True,False,False,False,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,21,Subile más luz al living que está muy oscuro.,"{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": 100, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": 100, ""unidad"": ""%""}",True,,37.786,True,True,True,False,False,False,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,22,Apagá todas las luces de la casa.,"{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""todos"", ""ubicacion"": ""toda"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""todos"", ""ubicacion"": ""toda"", ""valor"": null, ""unidad"": null}",True,,36.442,True,False,False,True,True,False,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,23,Prendé todos los aires acondicionados.,"{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}",True,,38.231,True,True,True,True,True,True,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,24,Bajá todas las persianas de la casa.,"{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""todas"", ""valor"": 0.0, ""unidad"": ""%""}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""toda"", ""valor"": null, ""unidad"": null}","{""intent"": ""ajustar"", ""dispositivo"": ""persiana"", ""ubicacion"": ""toda"", ""valor"": null, ""unidad"": null}",True,,36.792,True,True,False,False,False,False,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,25,Apagá todo antes de dormir.,"{""intent"": ""apagar"", ""dispositivo"": ""todos"", ""ubicacion"": ""todas"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""todos"", ""ubicacion"": null, ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""todos"", ""ubicacion"": null, ""valor"": null, ""unidad"": null}",True,,35.889,True,True,False,True,True,False,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,26,¿Está prendida la luz del living?,"{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": true, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""luz"", ""ubicacion"": ""living"", ""valor"": true, ""unidad"": null}",True,,36.915,True,True,True,False,True,False,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,27,¿A cuántos grados está el aire del dormitorio?,"{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""aire_acondicionado"", ""ubicacion"": ""dormitorio"", ""valor"": null, ""unidad"": null}",True,,37.93,True,True,True,True,True,True,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,28,¿Quedó cerrada la cerradura de la entrada?,"{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}","{""intent"": ""consultar"", ""dispositivo"": ""cerradura"", ""ubicacion"": ""entrada"", ""valor"": null, ""unidad"": null}",True,,36.96,True,True,True,True,True,True,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,29,"No dejes prendida la luz de la cocina, apagala.","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""luz"", ""ubicacion"": ""cocina"", ""valor"": null, ""unidad"": null}",True,,36.624,True,True,True,True,True,True,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,30,"Che, la tele del living quedó prendida, apagala por favor.","{""intent"": ""apagar"", ""dispositivo"": ""tv"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""televisora"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}","{""intent"": ""apagar"", ""dispositivo"": ""televisora"", ""ubicacion"": ""living"", ""valor"": null, ""unidad"": null}",True,,36.445,True,False,True,True,True,False,chat_template,4.57.6
+Qwen2.5-1.5B-Instruct,31,"Antes me olvidé, prendé la luz del baño.","{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}","{""intent"": ""encender"", ""dispositivo"": ""luz"", ""ubicacion"": ""bano"", ""valor"": null, ""unidad"": null}",True,,37.145,True,True,True,True,True,True,chat_template,4.57.6

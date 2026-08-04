@@ -1,0 +1,10 @@
+{
+  "modelo": "granite-4.0-1b",
+  "hf_repo_id": "ibm-granite/granite-4.0-1b",
+  "params_b": 1.6,
+  "exact_match_pct": 90.6,
+  "criterio": "mayor exact_match_pct en etapa 1; desempate por mayor params_b; luego orden del roster",
+  "empatados": [
+    "granite-4.0-1b"
+  ]
+}
