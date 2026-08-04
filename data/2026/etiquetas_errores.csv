@@ -103,3 +103,11 @@ granite-4.0-h-350m,28,confusion_dispositivo,confusion_dispositivo;,True
 granite-4.0-h-350m,29,uso_de_sinonimos,uso_de_sinonimos,True
 granite-4.0-h-350m,30,confusion_dispositivo,confusion_dispositivo,True
 granite-4.0-h-350m,31,uso_de_sinonimos,uso_de_sinonimos,True
+Qwen3.5-0.8B,0,confusion_intencion,confusion_intencion,True
+Qwen3.5-0.8B,4,uso_de_sinonimos,uso_de_sinonimos,True
+Qwen3.5-0.8B,7,uso_de_sinonimos,uso_de_sinonimos,True
+Qwen3.5-0.8B,12,confusion_dispositivo,confusion_dispositivo;,True
+Qwen3.5-0.8B,23,confusion_dispositivo,confusion_dispositivo,True
+Qwen3.5-0.8B,24,confusion_dispositivo,confusion_dispositivo,True
+Qwen3.5-0.8B,30,confusion_dispositivo,confusion_dispositivo,True
+Qwen3.5-0.8B,31,uso_de_sinonimos,uso_de_sinonimos,True
