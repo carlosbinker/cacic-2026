@@ -34,6 +34,7 @@ from pathlib import Path
 
 import matplotlib
 matplotlib.use("Agg")
+import matplotlib.patches as mpatches  # noqa: E402
 import matplotlib.pyplot as plt  # noqa: E402
 
 RAIZ = Path(__file__).resolve().parent.parent
@@ -52,14 +53,19 @@ CAMPOS_FIG2 = [
 ]
 
 # Orden categórico fijo para los 5 campos de fig. 2: un color por campo más
-# una textura redundante, para que la serie se distinga sin depender del
-# color (impresión en escala de grises).
+# una textura redundante de densidad mínima (un solo carácter), para que la
+# serie se distinga sin depender del color -- pero sin producir moire a
+# ancho de columna LNCS. Los 5 tonos son una rampa de luminancia monótona
+# (evitando el par "casi idéntico" #63a0d4/#9fc6e8 del diseño anterior, que
+# en escala de grises solo se distinguía por el rayado): luminancia
+# aproximada 45 / 81 / 118 / 164 / 209 sobre 255, con saltos >35 entre
+# vecinos.
 ESTILOS_FIG2 = [
-    {"color": "#1a3a5c", "hatch": None},
-    {"color": "#2b6cb0", "hatch": "//"},
-    {"color": "#63a0d4", "hatch": "xx"},
-    {"color": "#9fc6e8", "hatch": ".."},
-    {"color": "#d9d9d9", "hatch": "\\\\"},
+    {"color": "#123354", "hatch": None},
+    {"color": "#205c97", "hatch": "/"},
+    {"color": "#3585d4", "hatch": "x"},
+    {"color": "#78ade2", "hatch": "."},
+    {"color": "#bcd6f1", "hatch": "\\"},
 ]
 
 
@@ -171,7 +177,18 @@ def generar_figuras(path_resumen: Path, dir_salida: Path, sufijo: str) -> list[P
     izq.invert_yaxis()
     izq.set_xlabel("Coincidencia exacta (%)")
     izq.set_xlim(0, 108)
-    izq.legend(loc="lower right", fontsize=9)
+    # Tercera entrada de leyenda como parche proxy: el rayado no lo dibuja
+    # ninguna serie de barh (se aplica post-hoc solo a los dos parches
+    # afectados en _marcar_laxo_con_json_invalido), así que sin este proxy
+    # la leyenda de 2 entradas termina atribuyéndole el rayado a "laxa
+    # (semántica)" completa y las barras rayadas quedan sin explicar.
+    handles, labels = izq.get_legend_handles_labels()
+    if notas_laxo:
+        handles.append(mpatches.Patch(
+            facecolor="#90cdf4", hatch="///", edgecolor="#4a1010",
+            linewidth=0.7, label="laxa con JSON inválido",
+        ))
+    izq.legend(handles=handles, loc="lower right", fontsize=9)
     izq.grid(axis="x", alpha=0.3)
     _etiquetas_de_tier(izq, tiers, pos)
 
@@ -222,7 +239,12 @@ def generar_figuras(path_resumen: Path, dir_salida: Path, sufijo: str) -> list[P
     ax.invert_yaxis()
     ax.set_xlabel("Exactitud por campo (%)")
     ax.set_xlim(0, 100)
-    ax.legend(loc="lower right", fontsize=9, ncol=2)
+    # Leyenda fuera del área de datos (franja horizontal debajo del eje): con
+    # 5 series "lower right" caía encima de las barras de
+    # SmolLM2-1.7B-Instruct y tapaba datos. bbox_inches="tight" en el
+    # savefig de más abajo expande el lienzo para incluirla entera.
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.08),
+              fontsize=9, ncol=len(CAMPOS_FIG2))
     ax.grid(axis="x", alpha=0.3)
     _etiquetas_de_tier(ax, tiers, pos)
 
