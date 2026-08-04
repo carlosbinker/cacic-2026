@@ -90,6 +90,58 @@ pytest tests/ -v
 
 Hallazgo central: los cuatro modelos fallan sistemáticamente (0%–16,7% de exactitud) al interpretar comandos de ajuste relativo o cualitativo sin valor numérico explícito ("bajale un poco a la luz"), tendiendo a alucinar un valor o unidad inexistente en el comando original — un patrón que no mejora con el tamaño del modelo dentro del rango evaluado.
 
+## Estudio 2026 — roster ampliado y evaluación automática
+
+A partir de este estudio, el repositorio incorpora una segunda ronda de
+evaluación, ampliada y automatizada, que convive con el código original de
+2025 descripto arriba sin modificarlo.
+
+**Roster.** El registro de candidatos (`src/models_2026.py:MODELOS_2026`)
+considera **15** modelos abiertos de menos de 2 mil millones de parámetros;
+el roster efectivamente evaluado (`roster_activo()`) son **12**, organizados
+en dos tiers de seis modelos (sub-1000M y 1000–2000M de parámetros). Los
+**3** restantes quedaron fuera por dos causas distintas, ninguna
+metodológica: **2** por acceso restringido (repositorios `gated` de
+HuggingFace cuya aprobación manual de descarga no llegó a otorgarse) y **1**
+(`Qwen3.5-2B`) porque su compatibilidad de versión con la librería de
+inferencia quedó sin verificar. El detalle completo, con las versiones de
+`transformers` que fuerza cada grupo, está en `docker/README.md` y en la
+Tabla 5 del paper reescrito.
+
+**Pipeline de dos etapas.** La etapa 1 compara cada respuesta campo a campo
+contra el ground truth (exactitud estricta, determinista). La etapa 2 usa
+como juez automático al modelo con mayor exactitud estricta de la etapa 1
+(empate hacia el de mayor tamaño), corrido con decodificación greedy, para
+clasificar cada respuesta incorrecta en una taxonomía cerrada de siete
+etiquetas y para asignar la categoría lingüística de cada uno de los 32
+comandos — reemplazando el etiquetado manual del estudio original. Ver
+`src/judge_2026.py`, `src/taxonomia_2026.py` y `src/metrics_2026.py`.
+
+**Cómo correr el barrido:**
+```bash
+python docker/build_all.py   # construye una imagen por modelo del roster activo
+python docker/run_sweep.py   # corre las 12 imágenes, de a una, en orden de registro
+```
+Ambos scripts operan por defecto sobre `roster_activo()` (12 modelos); pedir
+explícitamente un modelo excluido falla con un `ValueError` que nombra su
+motivo de exclusión.
+
+**Cómo regenerar métricas, figuras y tablas:**
+```bash
+python src/metrics_2026.py           # agrega data/2026/detalle_2026.csv a resumen_2026.json y CSVs derivados
+python src/generate_figures_2026.py  # regenera figures/2026/fig1_*.png y fig2_*.png
+python src/generate_tex_tables.py    # regenera paper/02_reescrito/tablas/*.tex (5 fragmentos)
+```
+
+**Cómo compilar los dos papers:**
+```bash
+# transcripción del estudio original (4 modelos)
+(cd paper/01_original && latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex)
+# paper reescrito con el roster ampliado de 12 modelos (envío ciego a CACIC 2026)
+(cd paper/02_reescrito && latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex)
+python scripts/check_anonimato.py paper/02_reescrito   # puerta de envío ciego, código 0 esperado
+```
+
 ## Cómo citar
 
 Ver `CITATION.cff`. Citación en texto:

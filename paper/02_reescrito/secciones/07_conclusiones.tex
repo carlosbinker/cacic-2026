@@ -1,1 +1,59 @@
-% Se completa en el subtask 15.
+\section{Conclusiones y trabajo futuro}
+
+Este trabajo evaluó automáticamente doce Small Language Models open-source de
+menos de 2 mil millones de parámetros en la interpretación de comandos de
+domótica en español rioplatense, organizados en dos tiers de tamaño y
+sostenidos, para tres de ellos, por continuidad directa con el estudio
+anterior. Bajo el mismo prompt endurecido en 2026, el mejor modelo evaluado,
+\texttt{granite-4.0-1b}, alcanza 90,6\% de exactitud estricta, 25,0 puntos
+porcentuales por encima del mejor modelo del brazo de generación anterior
+medido idénticamente (\texttt{Qwen2.5-1.5B-Instruct}, 65,6\%): la evidencia
+más directa de que arquitecturas recientes de tamaño sub-2B amplían lo que es
+factible para esta tarea respecto de lo que era factible con la generación de
+modelos evaluada un año antes. El barrido completo terminó sin ninguna falla
+irrecuperable: las 384 filas (12 modelos $\times$ 32 comandos) están
+completas y ningún modelo tuvo que documentarse como limitación por fallo de
+ejecución.
+
+Los resultados también muestran que el tamaño no es el único factor que
+explica el desempeño —\texttt{Qwen3.5-0.8B}, con menos de mil millones de
+parámetros, supera a la mayoría de los modelos del tier superior— y que la
+brecha entre exactitud estricta y laxa, cuantificada por primera vez en este
+estudio mediante una taxonomía cerrada de siete etiquetas, es sustancial pero
+no uniformemente confiable: donde la validez de formato es débil, buena parte
+de esa brecha es un artefacto de JSON inválido acreditado por el juez, no
+evidencia de competencia semántica. La variante híbrida de \texttt{granite-4.0}
+paga, en ambos tamaños evaluados, una penalización de latencia de varias
+veces la de su contraparte densa sin una ganancia de exactitud proporcional,
+lo que sugiere que, en CPU y con prompts cortos, la arquitectura densa sigue
+siendo la opción preferible a igual cantidad de parámetros.
+
+El aporte metodológico central es reemplazar la revisión manual de respuestas
+incorrectas y la asignación manual de categoría lingüística —ambas
+inherentemente no escalables— por un pipeline de verificación completamente
+automático, en dos etapas y con decodificación determinista en ambas. Ese
+pipeline es reproducible por construcción (mismo modelo de entrada, misma
+salida del juez) y escala a rosters de modelos mucho más grandes que los doce
+de este estudio sin que el costo de anotación crezca con el número de
+modelos evaluados, a diferencia del etiquetado manual del estudio anterior.
+La comparación de continuidad contra la Tabla 2 publicada, sostenida sobre
+tres modelos evaluados con modelo constante, mostró además que buena parte de
+la divergencia entre lo nuevo y lo publicado es atribuible al protocolo y al
+entorno de ejecución y no al modelo en sí — la validación cruzada más directa
+disponible de que el nuevo arnés de este trabajo es, en ese sentido,
+consistente con el anterior.
+
+Como trabajo futuro se plantea: (1) incorporar un juez externo, de mayor
+escala y no perteneciente al roster evaluado, para mitigar el sesgo de
+auto-favorecimiento discutido en la Sección 6, o complementar la adjudicación
+automática con una validación humana sobre una muestra; (2) ampliar el
+dataset con más comandos por categoría lingüística y balancear mejor la
+representación entre categorías, incluyendo voz real transcripta por
+reconocimiento automático de habla (ASR) en vez de texto limpio; (3) cubrir
+variantes dialectales del español más allá del rioplatense; (4) reintentar la
+evaluación de los dos modelos excluidos por acceso restringido
+(\texttt{gemma-3-270m-it} y \texttt{Llama-3.2-1B-Instruct}) si su acceso de
+descarga llega a otorgarse; y (5) obtener la confirmación de compatibilidad
+de \texttt{Qwen3.5-2B} bajo la versión del grupo B de \texttt{transformers}
+(5.14.1), que este estudio nunca llegó a sondear y que dejó a ese modelo fuera
+del roster evaluado por prudencia y no por evidencia de incompatibilidad.

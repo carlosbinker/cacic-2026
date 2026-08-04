@@ -41,3 +41,8 @@ LaTeX2e (1).zip
 *.out
 *.synctex.gz
 *.toc
+
+# PDF de salida de latexmk: se regenera con "latexmk -pdf main.tex" (subtask 15);
+# no se versiona, igual que el resto de los auxiliares de compilación.
+paper/01_original/main.pdf
+paper/02_reescrito/main.pdf

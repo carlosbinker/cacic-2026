@@ -1,1 +1,115 @@
-% Se completa en el subtask 15.
+\section{Amenazas a la validez}
+
+\textbf{Validez de constructo.} La métrica principal (exactitud estricta)
+exige coincidencia textual con el ground truth bajo un protocolo que declara
+explícitamente los sinónimos de valores categóricos cerrados como violación de
+formato (Sección \ref{sec:prompting}). Esta amenaza ya no es sólo una
+advertencia sin cuantificar, como en el estudio anterior: queda
+\textbf{resuelta parcialmente} por la exactitud laxa y por la taxonomía de
+errores de la Sección \ref{sec:analisis-errores}, que separan explícitamente
+cuánta exactitud estricta perdida corresponde a \texttt{uso\_de\_sinonimos} o
+a \texttt{sin\_error\_semantico} en lugar de a un error de contenido real. La
+brecha sigue siendo una cota superior semántica, no una medición
+independiente con un evaluador humano, y la Sección 4.4 mostró que esta
+métrica laxa es a su vez poco confiable donde la validez de formato es débil
+(ver más abajo, amenaza de validez interna sobre el sesgo del juez y la
+fragilidad de \texttt{SmolLM2-360M-Instruct}).
+
+\textbf{Validez interna.}
+
+\emph{Sesgo de auto-favorecimiento del juez.} El juez de la etapa 2 es
+\texttt{granite-4.0-1b}, seleccionado por la regla congelada de mayor
+exactitud estricta en la etapa 1 (Sección \ref{sec:dos-etapas}), y ese mismo
+modelo es uno de los doce evaluados: \textbf{juzga también sus propias
+respuestas de la etapa 1}. Un juez basado en LLM puede favorecer respuestas
+generadas por sí mismo o por modelos de su misma familia
+\cite{zheng2023judging}, y en este diseño esa posibilidad no está controlada
+ni por un juez externo ni por un segundo evaluador independiente. El riesgo es
+mayor todavía porque, al ser el modelo con mayor exactitud estricta de la
+etapa 1, \texttt{granite-4.0-1b} es también el modelo con \textbf{menos}
+respuestas incorrectas en juego (apenas 3 de 32, Tabla \ref{tab:taxonomia}):
+tiene la menor cantidad relativa de casos propios para favorecer, lo que
+acota — sin eliminar — el margen concreto de ese sesgo sobre el resultado
+agregado. Además, es un modelo de menos de 2 mil millones de parámetros
+adjudicando equivalencia semántica en lenguaje natural, una tarea de juicio
+más exigente que la clasificación de campos estructurados, con la capacidad
+limitada que ese tamaño implica; los 0 casos de \texttt{juez\_parse\_ok = False}
+reportados en la Sección \ref{sec:analisis-errores} indican que el juez sí
+logró producir salidas parseables de forma consistente, pero no dicen nada
+sobre la calidad de su criterio semántico. Mitigar esta amenaza en trabajo
+futuro requeriría un juez externo de mayor escala, no perteneciente al roster
+evaluado, o una validación humana sobre una muestra de sus adjudicaciones.
+Como contrapeso, la adjudicación es \textbf{reproducible por diseño}: ambas
+etapas corren con decodificación greedy (\texttt{do\_sample=False},
+temperatura 0), de modo que, dado el mismo modelo de entrada, cualquiera puede
+re-ejecutar el juicio y obtener exactamente el mismo resultado.
+
+\emph{Versiones divergentes de la librería de inferencia como confusor de
+latencia.} Los doce modelos del roster activo corren bajo \textbf{dos grupos
+de versión} de \texttt{transformers}, mutuamente excluyentes (Tabla
+\ref{tab:versiones}): el grupo A resuelve a la versión 4.57.6, con
+\textbf{9} modelos, y el grupo B resuelve a la versión 5.14.1, con los
+\textbf{3} restantes. Esto es un confusor conocido para cualquier comparación
+de \textbf{latencia} entre un modelo del grupo A y uno del grupo B: parte de
+la diferencia observada puede deberse a la versión de la librería y no al
+modelo en sí. Cada grupo está forzado por evidencia empírica propia, no por
+preferencia de diseño: \texttt{granite-4.0-350m} necesita el grupo A porque
+falla bajo 5.14.1; \texttt{LFM2.5-230M}, \texttt{LFM2.5-350M} y
+\texttt{Qwen3.5-0.8B} necesitan el grupo B porque fallan bajo 4.57.6. La
+evidencia más nítida de que el confusor no es un artefacto teórico es que el
+grupo B resuelve exactamente a la versión (5.14.1) que rompe al modelo que
+fuerza el grupo A: ninguna versión mayor única cubre el roster completo. Como
+evidencia adicional de que este confusor es real y no hipotético, un modelo
+del registro considerado, \texttt{Qwen3.5-2B}, quedó fuera del roster
+evaluado precisamente porque su compatibilidad de versión con la librería de
+inferencia quedó no verificada — sin que esto implique afirmar que falla
+bajo la versión del grupo B, sólo que la confirmación positiva nunca se
+obtuvo. No se repite aquí la premisa, ya descartada en este mismo trabajo, de
+que una única versión mayor de \texttt{transformers} elimina este confusor:
+la evidencia de ambos grupos activos la refuta en las dos direcciones.
+
+\textbf{Validez externa.}
+
+\emph{Exclusión de modelos por razones externas al método.} El registro de
+modelos considerado para este estudio incluye 15 candidatos, de los cuales
+\textbf{3} quedaron fuera del roster evaluado, por \textbf{dos causas}
+distintas, y ninguna de las tres responde a una decisión metodologica (en el
+sentido de que ninguna fue elegida por diseño experimental, sino impuesta por
+una restricción externa). Dos modelos quedaron fuera por acceso
+restringido: sus repositorios de HuggingFace están marcados como
+\emph{gated} y la aprobación manual de acceso de descarga no llegó a
+otorgarse. El tercero quedó fuera porque su compatibilidad de versión con la
+librería de inferencia quedó no verificada, sin evidencia de que falle bajo
+ninguna versión mayor probada, sólo ausencia de confirmación positiva. Ninguna
+de las tres exclusiones responde a un criterio de diseño experimental, pero
+acota el alcance de toda comparación de este trabajo a los doce modelos
+efectivamente evaluados: no puede afirmarse nada sobre el desempeño relativo
+de los tres excluidos frente al resto del roster.
+
+Se conservan además las amenazas de validez externa del estudio original: el
+dataset de evaluación es chico y desbalanceado (32 comandos, entre 3 y 8 por
+categoría lingüística), se usó un único prompt sin optimización específica
+por modelo, la entrada fue siempre texto limpio sin ruido de reconocimiento de
+voz (ASR), y sólo se cubrió una variante dialectal (español rioplatense).
+
+\textbf{Validez de conclusión.} Con entre 3 y 8 comandos por categoría, las
+diferencias porcentuales entre modelos de la Tabla \ref{tab:categorias} y de
+la Tabla \ref{tab:globales} son indicativas, no estadísticamente
+significativas en sentido formal — la misma limitación del estudio anterior,
+que este trabajo no resuelve. Todas las corridas del barrido principal
+(Sección \ref{sec:entorno-repro}) se ejecutaron en una \textbf{única máquina},
+de forma estrictamente secuencial y con núcleos de CPU fijos, para que la
+latencia fuera comparable entre modelos; las corridas de control y de
+baseline-completion, en cambio, compartieron la máquina con trabajo
+concurrente del orquestador y por eso se excluyen explícitamente de cualquier
+afirmación de latencia de este trabajo, quedando limitadas a la justificación
+metodológica de la Sección \ref{sec:entorno-repro}. Por último,
+\texttt{attn\_implementation} y la \texttt{revision} exacta de cada modelo de
+HuggingFace quedaron, también en este trabajo, \textbf{sin pinnear}: cada
+corrida usó lo que \texttt{transformers} resolviera por defecto en el momento
+de ejecutarse, y ningún registro deja constancia de qué implementación de
+atención ni qué revisión de pesos se usó exactamente. Pinnear ambos valores
+ahora exigiría re-correr el barrido completo para que la comparación siguiera
+siendo de igual a igual, lo que explícitamente no se consideró que valiera la
+pena frente al beneficio; se documenta aquí como limitación conocida y no como
+un defecto corregido.
