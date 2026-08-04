@@ -14,7 +14,6 @@ Uso:
 """
 
 import argparse
-import functools
 import json
 import textwrap
 from pathlib import Path
@@ -78,8 +77,6 @@ _MODO_PROMPTING = "Chat template"
 RAIZ = Path(__file__).resolve().parent.parent
 DIR_2026 = RAIZ / "data" / "2026"
 DIR_SALIDA = RAIZ / "paper" / "02_reescrito" / "tablas"
-
-PATH_PUBLICADO = RAIZ / "data" / "resultados_experimento_resumen.json"  # F0: solo lectura
 
 ARCHIVOS_TABLAS = [
     "tabla1_modelos.tex",
@@ -171,60 +168,34 @@ def tabla1_modelos() -> str:
     )
 
 
-@functools.lru_cache(maxsize=1)
-def _publicado() -> dict[str, dict]:
-    """{modelo: fila publicada}, leída una sola vez de data/resultados_experimento_resumen.json."""
-    filas = json.loads(PATH_PUBLICADO.read_text(encoding="utf-8"))
-    return {f["modelo"]: f for f in filas}
-
-
-def _celdas_continuidad_2025(nombre_modelo: str) -> tuple[str, str]:
-    """Devuelve (Estricta 2025, Latencia 2025) ya formateadas, o ('--', '--') si el
-    modelo no está en el estudio publicado de 2025."""
-    fila = _publicado().get(nombre_modelo)
-    if fila is None:
-        return "--", "--"
-    return f"{fila['exact_match_pct']:.1f}", f"{fila['avg_latencia_s']:.2f}"
-
-
 def tabla2_resultados(resumen: list[dict]) -> str:
-    """Tabla 2: resultados globales 2026 (JSON válido, estricta, laxa, latencia) más
-    las dos columnas de continuidad 2025 (enmienda F8/RF19b), en el orden
-    canónico del paper (item 3 de la revisión de PDF). Sin `resizebox`
-    (criterio del item 1 de la revisión de PDF, extendido a las 5 tablas):
-    con `\\small` sólo no alcanza -- los 7 encabezados en una línea siguen
-    desbordando por ~130pt --, así que además se parten en \\shortstack de
-    2-3 líneas cortas (p.ej. "Estricta" / "2025" / "(\\%)"): el ancho de
-    columna que exige `tabular` es el de la línea más ancha del encabezado,
-    no el de la frase completa, y los datos (siempre más angostos) nunca
-    lo determinan."""
+    """Tabla 2: resultados globales 2026 (JSON válido, estricta, laxa, latencia),
+    en el orden canónico del paper (item 3 de la revisión de PDF). Sin
+    `resizebox` (criterio del item 1 de la revisión de PDF, extendido a las 5
+    tablas): los encabezados se parten en \\shortstack de 2 líneas cortas para
+    no desbordar la caja LNCS."""
     filas = []
     resumen_ordenado = sorted(
         resumen, key=lambda f: clave_orden_canonico(f["tier"], f["params_b"], f["modelo"])
     )
     for fila in resumen_ordenado:
-        estricta_2025, latencia_2025 = _celdas_continuidad_2025(fila["modelo"])
         filas.append([
             _escapar(fila["modelo"]),
             f"{fila['json_valido_pct']:.1f}",
             f"{fila['exact_match_pct']:.1f}",
             f"{fila['exact_match_laxo_pct']:.1f}",
             f"{fila['avg_latencia_s']:.2f}",
-            estricta_2025,
-            latencia_2025,
         ])
     return _tabla(
         caption="Resultados globales por modelo",
         label="tab:globales",
-        spec="lrrrrrr",
+        spec="lrrrr",
         encabezado=[
             "Modelo",
             r"\shortstack{JSON\\válido\\(\%)}",
             r"\shortstack{Estricta\\(\%)}",
             r"\shortstack{Laxa\\(\%)}",
             r"\shortstack{Latencia\\(s)}",
-            r"\shortstack{Estricta\\2025\\(\%)}",
-            r"\shortstack{Latencia\\2025 (s)}",
         ],
         filas=filas,
         fuente_pequena=True,

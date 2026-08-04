@@ -1,6 +1,5 @@
 """Tests del generador de fragmentos .tex de tablas (F8 del índice)."""
 
-import json
 import sys
 from pathlib import Path
 
@@ -97,69 +96,18 @@ def test_tabla2_trae_estricta_y_laxa():
     assert "40.0" in tex and "45.0" in tex
 
 
-def _fila_de(tex: str, nombre_modelo: str) -> list[str]:
-    """Devuelve las celdas de la fila de `nombre_modelo` en un fragmento de tabla."""
-    linea = next(
-        l for l in tex.splitlines()
-        if _escapar(nombre_modelo) in l and l.strip().endswith(r"\\")
-    )
-    return [c.strip().rstrip(r"\\").strip() for c in linea.split("&")]
-
-
-def _publicado_2025() -> dict:
-    ruta = Path(__file__).resolve().parent.parent / "data" / "resultados_experimento_resumen.json"
-    return {f["modelo"]: f for f in json.loads(ruta.read_text(encoding="utf-8"))}
-
-
-def test_tabla2_agrega_las_dos_columnas_de_continuidad_2025_con_siete_columnas():
-    # Encabezados envueltos en \shortstack (fix de alineacion del item 1 de la
-    # revision de PDF: sin resizebox, el encabezado de una linea desbordaba
-    # ~130pt): "Estricta 2025"/"Latencia 2025" ya no son substrings contiguos
-    # del encabezado (quedan partidos por un \\ de \shortstack), asi que se
-    # verifica por celda en vez de por substring de la linea completa.
+def test_tabla2_tiene_exactamente_cinco_columnas_sin_continuidad_2025():
+    # La ronda 2025 fue un borrador de este mismo paper, nunca publicado, y sus
+    # cifras se produjeron con el entorno sin fijar: no hay comparación válida
+    # que hacer contra ellas, así que la tabla no lleva columnas de
+    # continuidad (ver Delta 04, item 6).
     tex = tabla2_resultados(_resumen())
-    encabezado = next(l for l in tex.splitlines() if "2025" in l)
-    celdas = encabezado.split(" & ")
-    assert sum("2025" in c for c in celdas) == 2
-    assert any("Estricta" in c and "2025" in c for c in celdas)
-    assert any("Latencia" in c and "2025" in c for c in celdas)
-    assert encabezado.count("&") == 6  # 7 columnas
+    encabezado = next(l for l in tex.splitlines() if "Modelo" in l)
+    assert "2025" not in tex
+    assert encabezado.count("&") == 4  # 5 columnas: Modelo, JSON válido, Estricta, Laxa, Latencia
 
 
-def test_tabla2_fila_de_continuidad_trae_los_valores_publicados_correctos():
-    tex = tabla2_resultados(_resumen())
-    celdas = _fila_de(tex, "Qwen2.5-1.5B-Instruct")
-    assert celdas[-2] == "50.0"    # exact_match_pct publicado
-    assert celdas[-1] == "43.16"   # avg_latencia_s publicado, redondeado a 2 decimales (43.159 -> 43.16)
-
-
-def test_tabla2_pone_guiones_en_los_modelos_ausentes_del_estudio_publicado():
-    tex = tabla2_resultados(_resumen())
-    celdas = _fila_de(tex, "granite-4.0-1b")
-    assert celdas[-2] == "--"
-    assert celdas[-1] == "--"
-
-
-def test_tabla2_tiene_exactamente_tres_modelos_con_continuidad_2025():
-    tex = tabla2_resultados(_resumen())
-    con_datos = [
-        m for m in roster_activo()
-        if _fila_de(tex, m.nombre)[-2:] != ["--", "--"]
-    ]
-    assert len(con_datos) == 3
-
-
-def test_tabla2_los_valores_publicados_coinciden_digito_a_digito_con_el_json_f0():
-    publicado = _publicado_2025()
-    tex = tabla2_resultados(_resumen())
-    for nombre in ("SmolLM2-360M-Instruct", "Qwen2.5-1.5B-Instruct", "SmolLM2-1.7B-Instruct"):
-        f = publicado[nombre]
-        celdas = _fila_de(tex, nombre)
-        assert celdas[-2] == f"{f['exact_match_pct']:.1f}"
-        assert celdas[-1] == f"{f['avg_latencia_s']:.2f}"
-
-
-def test_tabla2_no_incluye_al_modelo_publicado_ausente_del_roster_2026():
+def test_tabla2_no_incluye_al_modelo_excluido_del_roster_2026():
     tex = tabla2_resultados(_resumen())
     assert "Qwen2.5-0.5B-Instruct" not in tex
     assert _escapar("Qwen2.5-0.5B-Instruct") not in tex
