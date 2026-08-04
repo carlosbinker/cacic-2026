@@ -1,0 +1,95 @@
+{
+  "anclajes": [
+    {
+      "modelo": "SmolLM2-360M-Instruct",
+      "publicado": {
+        "exact_match_pct": 18.8,
+        "json_valido_pct": 100.0,
+        "avg_latencia_s": 15.617
+      },
+      "control_prompt_original": {
+        "n": 32,
+        "exact_match_pct": 0.0,
+        "json_valido_pct": 100.0,
+        "avg_latencia_s": 8.805
+      },
+      "nuevo_prompt_2026": {
+        "n": 32,
+        "exact_match_pct": 9.4,
+        "json_valido_pct": 25.0,
+        "avg_latencia_s": 20.47
+      },
+      "deltas_exact_match_pp": {
+        "control_vs_publicado": -18.8,
+        "nuevo_vs_publicado": -9.4,
+        "nuevo_vs_control": 9.4
+      },
+      "deltas_json_valido_pp": {
+        "control_vs_publicado": 0.0,
+        "nuevo_vs_publicado": -75.0,
+        "nuevo_vs_control": -75.0
+      }
+    },
+    {
+      "modelo": "Qwen2.5-1.5B-Instruct",
+      "publicado": {
+        "exact_match_pct": 50.0,
+        "json_valido_pct": 100.0,
+        "avg_latencia_s": 43.159
+      },
+      "control_prompt_original": {
+        "n": 32,
+        "exact_match_pct": 56.2,
+        "json_valido_pct": 100.0,
+        "avg_latencia_s": 24.85
+      },
+      "nuevo_prompt_2026": {
+        "n": 32,
+        "exact_match_pct": 65.6,
+        "json_valido_pct": 100.0,
+        "avg_latencia_s": 38.128
+      },
+      "deltas_exact_match_pp": {
+        "control_vs_publicado": 6.2,
+        "nuevo_vs_publicado": 15.6,
+        "nuevo_vs_control": 9.4
+      },
+      "deltas_json_valido_pp": {
+        "control_vs_publicado": 0.0,
+        "nuevo_vs_publicado": 0.0,
+        "nuevo_vs_control": 0.0
+      }
+    },
+    {
+      "modelo": "SmolLM2-1.7B-Instruct",
+      "publicado": {
+        "exact_match_pct": 59.4,
+        "json_valido_pct": 100.0,
+        "avg_latencia_s": 61.869
+      },
+      "control_prompt_original": {
+        "n": 32,
+        "exact_match_pct": 50.0,
+        "json_valido_pct": 100.0,
+        "avg_latencia_s": 35.62
+      },
+      "nuevo_prompt_2026": {
+        "n": 32,
+        "exact_match_pct": 50.0,
+        "json_valido_pct": 100.0,
+        "avg_latencia_s": 56.71
+      },
+      "deltas_exact_match_pp": {
+        "control_vs_publicado": -9.4,
+        "nuevo_vs_publicado": -9.4,
+        "nuevo_vs_control": 0.0
+      },
+      "deltas_json_valido_pp": {
+        "control_vs_publicado": 0.0,
+        "nuevo_vs_publicado": 0.0,
+        "nuevo_vs_control": 0.0
+      }
+    }
+  ],
+  "nota_latencia": "La latencia promedio NO es comparable entre bandas cuando la máquina no estuvo ociosa: las cifras publicadas provienen exclusivamente del barrido principal (data/2026/detalle/), corrido sobre host ocioso (RNF1); la corrida de control puede haber compartido la máquina con otro trabajo del orquestador mientras corría. Se reporta igual, con el mismo criterio que RF19, pero no debe usarse para argumentar un efecto del prompt sobre la latencia -- solo la exactitud estricta y la tasa de JSON válido lo permiten."
+}
