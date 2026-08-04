@@ -46,11 +46,14 @@ def comando_build(modelo: ModeloEvaluado2026, raiz: Path) -> list[str]:
 
 
 def seleccionar_modelos(nombre: str | None) -> list[ModeloEvaluado2026]:
-    """El roster ACTIVO (12), o solo el modelo pedido si esta activo."""
+    """El roster ACTIVO (12), o solo el modelo pedido si esta activo o es
+    baseline-completion (Delta 05: `Qwen2.5-0.5B-Instruct` es `activo=False` pero
+    su exclusion es de roster, no de acceso ni de version, asi que sigue siendo
+    construible explicitamente via --modelo)."""
     if nombre is None:
         return roster_activo()
     modelo = por_nombre(nombre)
-    if not modelo.activo:
+    if not modelo.activo and not modelo.baseline_original:
         raise ValueError(
             f"{nombre!r} esta excluido del roster activo: {modelo.motivo_exclusion} "
             f"Reactivarlo requiere poner activo=True en src/models_2026.py."

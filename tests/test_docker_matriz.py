@@ -20,7 +20,7 @@ RAIZ = Path(__file__).resolve().parent.parent
 
 def test_tag_por_modelo_es_unico_y_usa_el_slug():
     tags = [tag_imagen(m) for m in MODELOS_2026]
-    assert len(set(tags)) == 15
+    assert len(set(tags)) == 16
     assert tag_imagen(MODELOS_2026[0]) == f"slm-domotica-2026:{slug(MODELOS_2026[0].nombre)}"
 
 
@@ -289,11 +289,12 @@ def test_docker_no_contiene_el_valor_del_token():
 
 
 def test_run_sweep_agrega_env_file_solo_a_los_gated():
-    """F11: --env-file solo para los 2 gated; los otros 13 no (12 activos + Qwen3.5-2B)."""
+    """F11: --env-file solo para los 2 gated; los otros 14 no (12 activos + Qwen3.5-2B
+    + Qwen2.5-0.5B-Instruct, Delta 05)."""
     gated_ = [m for m in MODELOS_2026 if m.gated]
     no_gated = [m for m in MODELOS_2026 if not m.gated]
     assert len(gated_) == 2
-    assert len(no_gated) == 13
+    assert len(no_gated) == 14
     for m in gated_:
         cmd = comando_run(m, RAIZ)
         assert "--env-file" in cmd
@@ -357,6 +358,23 @@ def test_build_all_pedir_un_modelo_activo_sigue_funcionando():
     assert [m.nombre for m in seleccionados] == ["SmolLM2-360M-Instruct"]
 
 
+def test_build_all_permite_construir_un_modelo_baseline_completion_aunque_no_este_activo():
+    """Delta 05: Qwen2.5-0.5B-Instruct es activo=False pero SI se puede construir
+    explicitamente via --modelo, porque su exclusion es de roster (no de acceso ni de
+    version): es baseline_original, no un bloqueo real como los gated o Qwen3.5-2B."""
+    from build_all import seleccionar_modelos as seleccionar_build
+    seleccionados = seleccionar_build("Qwen2.5-0.5B-Instruct")
+    assert [m.nombre for m in seleccionados] == ["Qwen2.5-0.5B-Instruct"]
+
+
+def test_build_all_pedir_qwen35_2b_sigue_fallando_aunque_no_sea_gated():
+    """Qwen3.5-2B no es baseline_original: su exclusion (version no verificada) sigue
+    bloqueando el build explicito, a diferencia de Qwen2.5-0.5B-Instruct."""
+    from build_all import seleccionar_modelos as seleccionar_build
+    with pytest.raises(ValueError, match="excluido"):
+        seleccionar_build("Qwen3.5-2B")
+
+
 def test_el_readme_documenta_la_matriz_del_roster_activo_con_necesidad():
     """RF5 + F11: los 12 del roster activo estan en la matriz. Los necesarios
     DENTRO del roster activo son 4 (F3 (g)): Qwen3.5-2B sigue siendo necesario
@@ -370,14 +388,15 @@ def test_el_readme_documenta_la_matriz_del_roster_activo_con_necesidad():
     }
 
 
-def test_el_readme_documenta_las_tres_exclusiones_con_su_causa():
+def test_el_readme_documenta_las_cuatro_exclusiones_con_su_causa():
     readme = (RAIZ / "docker" / "README.md").read_text(encoding="utf-8")
     excluidos = [m for m in MODELOS_2026 if not m.activo]
-    assert len(excluidos) == 3
+    assert len(excluidos) == 4
     for m in excluidos:
         assert m.nombre in readme, f"falta la exclusion de {m.nombre}"
     assert "403" in readme                      # los dos gated
     assert "no verificada" in readme.lower()    # Qwen3.5-2B
+    assert "baseline" in readme.lower()         # Qwen2.5-0.5B-Instruct (Delta 05)
 
 
 def test_el_readme_registra_el_cpuset_usado():
