@@ -1,0 +1,21 @@
+\begin{table}[htbp]
+\centering
+\caption{Distribución de errores por categoría de la taxonomía}
+\label{tab:taxonomia}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrrrrrrrrrrr}
+\toprule
+Categoría de error & LFM2.5-230M & LFM2.5-350M & granite-4.0-350m & granite-4.0-h-350m & Qwen3.5-0.8B & SmolLM2-360M-Instruct & LFM2.5-1.2B-Instruct & granite-4.0-1b & granite-4.0-h-1b & OLMo-2-0425-1B-Instruct & SmolLM2-1.7B-Instruct & Qwen2.5-1.5B-Instruct \\
+\midrule
+Total de respuestas incorrectas & 30 & 32 & 23 & 19 & 8 & 29 & 14 & 3 & 9 & 31 & 16 & 11 \\
+Confusión de intención & 0 & 0 & 3 & 0 & 1 & 0 & 2 & 0 & 0 & 0 & 0 & 0 \\
+Confusión de dispositivo & 20 & 20 & 9 & 9 & 4 & 2 & 3 & 0 & 1 & 19 & 5 & 1 \\
+Confusión de ubicación & 4 & 5 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 3 & 0 & 1 \\
+Alucinación de valor/unidad & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+Valor numérico incorrecto & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+Sin error semántico & 1 & 1 & 5 & 3 & 0 & 1 & 2 & 1 & 7 & 2 & 5 & 2 \\
+Uso de sinónimos & 8 & 11 & 6 & 7 & 3 & 26 & 7 & 2 & 1 & 9 & 6 & 7 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
