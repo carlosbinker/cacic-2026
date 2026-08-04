@@ -1,27 +1,43 @@
 #!/usr/bin/env python3
-"""Comparación de baseline RE-MEDIDO para los 4 modelos del paper original
-(Delta 05 / subtask 19).
+"""Matriz de prompt del brazo de generación ANTERIOR (Delta 06).
 
 Por qué existe -- leer antes de tocar este archivo:
 
-Un control con el prompt ORIGINAL del paper (subtask 18) NO reprodujo la
-Tabla 2 publicada para los tres anclajes de continuidad. La causa, con
-evidencia: `requirements.txt` legacy fija `transformers>=4.46.0` SIN cota
-superior y `data/resultados_experimento_detalle.csv` no tiene columna
-`transformers_version` -- el entorno de la corrida original nunca quedó
-fijado ni registrado, así que es irrecuperable. Es irreproducibilidad del
-trabajo ORIGINAL, no un defecto del harness nuevo (`tests/test_metricas.py`
-sigue verde: la ruta de scoring es fiel).
+`paper_cacic_LNCS_word.docx` es un BORRADOR del paper que se está
+reescribiendo, no trabajo publicado (corrige hacia adelante el Delta 04/05,
+que lo trataba como si lo fuera, sin editarlos). Sus cifras
+(SmolLM2-360M-Instruct 18.8, Qwen2.5-0.5B-Instruct 43.8, Qwen2.5-1.5B-Instruct
+50.0, SmolLM2-1.7B-Instruct 59.4) son valores de BORRADOR SUPERADOS, no una
+base de comparación: no hay "publicado vs re-medido" que reportar, y este
+módulo NO es una auditoría de reproducibilidad -- esa framing queda
+RETIRADA por completo (ver TODO.md, Delta 06).
 
-Consecuencia (la que implementa este módulo): las cifras publicadas dejan de
-ser un baseline validado y pasan a referencia HISTÓRICA, no reproducida. El
-paper compara en cambio contra un baseline RE-MEDIDO e internamente
-consistente: los 4 modelos del paper original, medidos bajo el mismo
-harness/prompt 2026, misma máquina, temperatura 0. Este módulo arma esa
-comparación -- publicado (histórico) vs re-medido, con su delta -- y
-determina por CÓDIGO cuál es el mejor original re-medido, para que la
-comparación central del paper (mejor arquitectura 2026 vs mejor original
-re-medido) no se afirme a mano.
+Los 4 modelos de `roster_baseline_original()` son el brazo de generación
+ANTERIOR de ESTE MISMO experimento: se miden bajo el mismo harness, prompt,
+máquina, versiones fijadas y decodificación greedy que los modelos más
+nuevos (Granite 4 / Qwen3.5 / LFM2.5 / OLMo-2), primero bajo el prompt
+ORIGINAL del borrador (`data/2026/control_prompt_original/`) y después bajo
+el prompt 2026 endurecido (`data/2026/detalle/` para los tres ya activos,
+`data/2026/baseline_original/` para la baseline-completion de
+`Qwen2.5-0.5B-Instruct`). Eso hace que la comparación generacional sea
+internamente válida SIN apoyarse en ningún número del borrador. El control
+y la baseline-completion sobreviven solo como justificación METODOLÓGICA de
+por qué se re-midieron en vez de reusar las cifras del borrador -- nunca
+como sección de resultados.
+
+Este módulo arma la matriz 4×2 (4 modelos × {prompt original, prompt 2026})
+de exactitud estricta y tasa de JSON válido, el efecto de prompt por modelo
+(2026 − original), y calcula por CÓDIGO el titular del paper: la mejor
+generación anterior BAJO EL MISMO PROMPT 2026 vs `granite-4.0-1b` (mejor
+arquitectura 2026), para no afirmarlo a mano ni mezclar prompts -- ese error
+real ya se cometió una vez (comparar una celda de prompt 2026 contra una de
+prompt original produjo un delta de ~40 pp que no correspondía a nada real).
+
+Las latencias de `control_prompt_original/` y `baseline_original/` se
+midieron con la máquina compartida con otro trabajo del orquestador (no
+ociosa): no son válidas para argumentar sobre latencia y por eso ni siquiera
+se cargan en la celda. Las latencias del paper vienen exclusivamente de
+`data/2026/detalle/`, corrido en secuencial estricto sobre máquina ociosa.
 
 Uso:
     python src/comparar_baseline.py
@@ -30,122 +46,145 @@ Uso:
 import json
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import pandas as pd
 
 from models_2026 import ModeloEvaluado2026, roster_baseline_original, slug
 
 RAIZ = Path(__file__).resolve().parent.parent
-RESUMEN_PUBLICADO_PATH = RAIZ / "data" / "resultados_experimento_resumen.json"
 DIR_DETALLE = RAIZ / "data" / "2026" / "detalle"
 DIR_BASELINE = RAIZ / "data" / "2026" / "baseline_original"
-SALIDA_PATH = DIR_BASELINE / "comparacion_baseline.json"
+DIR_CONTROL = RAIZ / "data" / "2026" / "control_prompt_original"
+SALIDA_PATH = RAIZ / "data" / "2026" / "matriz_generacion_anterior.json"
 
-# El modelo cuyo re-medido ancla la comparación central del paper (mejor
-# arquitectura 2026 vs mejor original re-medido). No es el mejor de los 12 por
-# definición externa: es el que la Sección de resultados ya usa como cierre
-# del barrido principal, y su CSV vive en data/2026/detalle/ (comprometido,
-# solo lectura), así que leerlo de ahí nunca lo hardcodea como número.
+Prompt = Literal["original", "2026"]
+
+# El modelo cuyo CSV real ancla el lado "arquitectura 2026" del titular. No es
+# el mejor de los 12 por definición externa: es el que la Sección de
+# resultados ya usa como cierre del barrido principal, y su CSV vive en
+# data/2026/detalle/ (comprometido, solo lectura), así que leerlo de ahí nunca
+# lo hardcodea como número.
 MODELO_ARQUITECTURA_2026 = "granite-4.0-1b"
 
-NOTA_PUBLICADO = (
-    "Referencia histórica, NO reproducida: un control con el prompt original del "
-    "paper no reprodujo estas cifras (ver Delta 05, subtask 18/19). La causa es "
-    "irreproducibilidad del entorno original (transformers sin cota superior, sin "
-    "columna de versión registrada), no un defecto del harness 2026."
+NOTA_LATENCIA = (
+    "Las latencias de control_prompt_original/ y baseline_original/ se midieron con "
+    "la maquina NO ociosa (trabajo concurrente del orquestador mientras corrian): no "
+    "son validas para argumentar sobre latencia y por eso no se incluyen en esta "
+    "matriz. Las latencias del paper provienen exclusivamente de data/2026/detalle/, "
+    "corrido en secuencial estricto sobre maquina ociosa (RNF1)."
 )
 
 
-def cargar_publicado(ruta: Path = RESUMEN_PUBLICADO_PATH) -> dict[str, dict[str, Any]]:
-    """Cifras de la Tabla 2 publicada, indexadas por modelo. Fuente única F0:
-    nunca se hardcodea un número que ya vive en este archivo."""
-    filas = json.loads(ruta.read_text(encoding="utf-8"))
-    return {fila["modelo"]: fila for fila in filas}
-
-
 def metricas_de_detalle(df: pd.DataFrame) -> dict[str, float]:
-    """`exact_match_pct` / `json_valido_pct` / `avg_latencia_s` de un CSV de
-    detalle, mismo criterio que `src/comparar_control.py` y `src/metrics.py`."""
+    """`exact_match_pct` / `json_valido_pct` de un CSV de detalle. Sin
+    latencia: ver `NOTA_LATENCIA` sobre por qué esta matriz no la reporta."""
     return {
         "n": int(len(df)),
         "exact_match_pct": round(100 * df["match_exact"].mean(), 1),
         "json_valido_pct": round(100 * df["json_valido"].mean(), 1),
-        "avg_latencia_s": round(df["latencia_s"].mean(), 3),
     }
 
 
-def ruta_remedida(modelo: ModeloEvaluado2026) -> Path:
-    """Dónde vive el CSV re-medido de un modelo del baseline original: en
-    `data/2026/detalle/` si ya está en el roster activo (los 3 anclajes,
-    corridos por el barrido principal), o en `data/2026/baseline_original/`
-    si es baseline-completion (hoy, `Qwen2.5-0.5B-Instruct`)."""
+def ruta_celda(modelo: ModeloEvaluado2026, prompt: Prompt) -> Path:
+    """Dónde vive el CSV de una celda (modelo, prompt) de la matriz 4×2.
+
+    Prompt original: siempre `control_prompt_original/` (los 4 modelos se
+    miden ahí, sin excepción). Prompt 2026: `detalle/` si el modelo ya está
+    en el roster activo (los 3 anclajes), o `baseline_original/` si es
+    baseline-completion (hoy, `Qwen2.5-0.5B-Instruct`)."""
+    if prompt == "original":
+        return DIR_CONTROL / f"{slug(modelo.nombre)}.csv"
     directorio = DIR_DETALLE if modelo.activo else DIR_BASELINE
     return directorio / f"{slug(modelo.nombre)}.csv"
 
 
-def cargar_remedido(modelo: ModeloEvaluado2026) -> dict[str, float] | None:
-    """Métricas re-medidas de un modelo, o `None` si su CSV todavía no existe."""
-    ruta = ruta_remedida(modelo)
+def cargar_celda(modelo: ModeloEvaluado2026, prompt: Prompt) -> dict[str, float] | None:
+    """Métricas de una celda, o `None` si su CSV todavía no existe (celda
+    PENDIENTE, no un error: hoy es exactamente la celda (Qwen2.5-0.5B-Instruct,
+    original), que el orquestador completa después de este reporte)."""
+    ruta = ruta_celda(modelo, prompt)
     if not ruta.exists():
         return None
     return metricas_de_detalle(pd.read_csv(ruta))
 
 
-def _delta_pp(remedido: float | None, publicado: float) -> float | None:
-    """Diferencia en puntos porcentuales (re-medido - publicado), o `None` si
-    el re-medido todavía no existe."""
-    if remedido is None:
+def _delta_pp(nuevo: float | None, viejo: float | None) -> float | None:
+    """Efecto de prompt (2026 − original) en puntos porcentuales, o `None` si
+    falta cualquiera de las dos celdas."""
+    if nuevo is None or viejo is None:
         return None
-    return round(remedido - publicado, 1)
+    return round(nuevo - viejo, 1)
 
 
-def comparar_modelo(nombre_modelo: str, publicado: dict[str, dict[str, Any]]) -> dict[str, Any]:
-    """Publicado (histórico) vs re-medido para un modelo del baseline original."""
-    baseline = {m.nombre: m for m in roster_baseline_original()}
-    if nombre_modelo not in baseline:
-        raise ValueError(
-            f"{nombre_modelo} no es uno de los 4 modelos de roster_baseline_original(); "
-            f"la comparación de baseline está restringida a ellos."
-        )
-    if nombre_modelo not in publicado:
-        raise ValueError(
-            f"{nombre_modelo} no tiene cifra publicada en {RESUMEN_PUBLICADO_PATH.name}."
-        )
-    modelo = baseline[nombre_modelo]
-    fila_publicada = publicado[nombre_modelo]
-    pub = {
-        "exact_match_pct": fila_publicada["exact_match_pct"],
-        "json_valido_pct": fila_publicada["json_valido_pct"],
-        "nota": NOTA_PUBLICADO,
-    }
-    remedido = cargar_remedido(modelo)
+def fila_modelo(modelo: ModeloEvaluado2026) -> dict[str, Any]:
+    """Una fila de la matriz 4×2: las dos celdas de un modelo y su efecto de
+    prompt (2026 − original), calculado solo si ambas celdas existen."""
+    original = cargar_celda(modelo, "original")
+    nuevo = cargar_celda(modelo, "2026")
     return {
-        "modelo": nombre_modelo,
-        "publicado": pub,
-        "remedido": remedido,
-        "delta_exact_match_pp": _delta_pp(
-            remedido["exact_match_pct"] if remedido else None, pub["exact_match_pct"]),
-        "delta_json_valido_pp": _delta_pp(
-            remedido["json_valido_pct"] if remedido else None, pub["json_valido_pct"]),
+        "modelo": modelo.nombre,
+        "prompt_original": original,
+        "prompt_2026": nuevo,
+        "efecto_prompt_exact_match_pp": _delta_pp(
+            nuevo["exact_match_pct"] if nuevo else None,
+            original["exact_match_pct"] if original else None,
+        ),
+        "efecto_prompt_json_valido_pp": _delta_pp(
+            nuevo["json_valido_pct"] if nuevo else None,
+            original["json_valido_pct"] if original else None,
+        ),
     }
 
 
-def _mejor_remedido(comparaciones: list[dict[str, Any]]) -> dict[str, Any] | None:
-    """El original re-medido con mayor `exact_match_pct`, calculado por código
-    (nunca afirmado a mano): `None` si ninguno tiene todavía su CSV."""
-    candidatos = [c for c in comparaciones if c["remedido"] is not None]
+def matriz() -> list[dict[str, Any]]:
+    """La matriz 4×2 completa, en el orden de registro de
+    `roster_baseline_original()`."""
+    return [fila_modelo(m) for m in roster_baseline_original()]
+
+
+def mejor_bajo_prompt(filas: list[dict[str, Any]], clave_prompt: str) -> dict[str, Any] | None:
+    """El modelo de generación anterior con mayor `exact_match_pct` bajo UN
+    prompt fijo (`clave_prompt` es `"prompt_original"` o `"prompt_2026"`),
+    calculado por código; `None` si ninguna fila tiene todavía esa celda."""
+    candidatos = [(f["modelo"], f[clave_prompt]) for f in filas if f[clave_prompt] is not None]
     if not candidatos:
         return None
-    mejor = max(candidatos, key=lambda c: c["remedido"]["exact_match_pct"])
-    return {"modelo": mejor["modelo"], "exact_match_pct": mejor["remedido"]["exact_match_pct"]}
+    nombre, celda = max(candidatos, key=lambda par: par[1]["exact_match_pct"])
+    return {"modelo": nombre, "exact_match_pct": celda["exact_match_pct"]}
 
 
-def _comparacion_central(mejor_remedido: dict[str, Any] | None) -> dict[str, Any] | None:
-    """El contraste central del paper: mejor arquitectura 2026 (leída del CSV
-    real del barrido principal, nunca hardcodeada) vs mejor original re-medido.
-    `None` si `mejor_remedido` todavía no está disponible."""
-    if mejor_remedido is None:
+def comparar_celdas(fila_a: dict[str, Any], prompt_a: Prompt,
+                     fila_b: dict[str, Any], prompt_b: Prompt) -> float:
+    """Diferencia de `exact_match_pct` entre dos celdas de la matriz (celda_a
+    − celda_b). Guardia de sanidad OBLIGATORIA: rechaza comparar celdas de
+    distinto prompt -- ese error real ya se cometió una vez (una celda de
+    prompt 2026 contra una de prompt original) y produjo un delta de ~40 pp
+    que no correspondía a nada real. También rechaza si alguna celda todavía
+    no tiene CSV (pendiente): no hay nada que comparar todavía."""
+    if prompt_a != prompt_b:
+        raise ValueError(
+            f"no se puede comparar la celda de prompt {prompt_a!r} contra la de "
+            f"prompt {prompt_b!r}: el titular del paper se calcula SIEMPRE con el "
+            f"prompt fijo, nunca mezclando prompts distintos."
+        )
+    celda_a = fila_a[f"prompt_{prompt_a}"]
+    celda_b = fila_b[f"prompt_{prompt_b}"]
+    if celda_a is None or celda_b is None:
+        raise ValueError(
+            "no se puede comparar: al menos una de las dos celdas todavía no tiene "
+            "CSV (pendiente)."
+        )
+    return round(celda_a["exact_match_pct"] - celda_b["exact_match_pct"], 1)
+
+
+def titular(filas: list[dict[str, Any]]) -> dict[str, Any] | None:
+    """El contraste central del paper, prompt SIEMPRE fijo: mejor arquitectura
+    2026 (leída de su propio CSV real de `data/2026/detalle/`) vs mejor
+    generación anterior bajo el MISMO prompt 2026. `None` si esa celda de
+    `granite-4.0-1b` o la mejor generación anterior todavía no existen."""
+    mejor_anterior = mejor_bajo_prompt(filas, "prompt_2026")
+    if mejor_anterior is None:
         return None
     ruta_arquitectura = DIR_DETALLE / f"{slug(MODELO_ARQUITECTURA_2026)}.csv"
     if not ruta_arquitectura.exists():
@@ -156,25 +195,22 @@ def _comparacion_central(mejor_remedido: dict[str, Any] | None) -> dict[str, Any
         "exact_match_pct": metricas_arquitectura["exact_match_pct"],
     }
     return {
+        "prompt": "2026",
         "mejor_arquitectura_2026": arquitectura,
-        "mejor_original_remedido": mejor_remedido,
+        "mejor_generacion_anterior": mejor_anterior,
         "delta_pp": round(
-            arquitectura["exact_match_pct"] - mejor_remedido["exact_match_pct"], 1
+            arquitectura["exact_match_pct"] - mejor_anterior["exact_match_pct"], 1
         ),
     }
 
 
-def comparar_todo(publicado: dict[str, dict[str, Any]] | None = None) -> dict[str, Any]:
-    """La comparación de los 4 modelos del baseline original, en orden de registro."""
-    if publicado is None:
-        publicado = cargar_publicado()
-    modelos = [comparar_modelo(m.nombre, publicado) for m in roster_baseline_original()]
-    mejor = _mejor_remedido(modelos)
+def comparar_todo() -> dict[str, Any]:
+    """La matriz 4×2 completa más el titular del paper y la nota de latencia."""
+    filas = matriz()
     return {
-        "modelos": modelos,
-        "mejor_remedido": mejor,
-        "comparacion_central": _comparacion_central(mejor),
-        "nota_publicado": NOTA_PUBLICADO,
+        "matriz": filas,
+        "titular": titular(filas),
+        "nota_latencia": NOTA_LATENCIA,
     }
 
 
@@ -183,34 +219,37 @@ def _formatear_valor(valor: float | None) -> str:
 
 
 def imprimir_tabla(comparacion: dict[str, Any]) -> None:
-    """Tabla markdown legible en stdout: publicado (histórico) vs re-medido,
-    por modelo, más el ganador y la comparación central."""
-    print("| modelo | publicado (histórico, NO reproducido) | re-medido (prompt 2026) "
-          "| Δ re-medido − publicado |")
+    """Tabla markdown legible en stdout: las dos celdas de la matriz y el
+    efecto de prompt, por modelo, más el titular calculado."""
+    print("| modelo | prompt original | prompt 2026 | Δ prompt (2026 − original) |")
     print("|---|---|---|---|")
-    for fila in comparacion["modelos"]:
-        remedido = fila["remedido"]
+    for fila in comparacion["matriz"]:
+        original = fila["prompt_original"]
+        nuevo = fila["prompt_2026"]
+        celda_original = _formatear_valor(original["exact_match_pct"] if original else None)
+        celda_nuevo = _formatear_valor(nuevo["exact_match_pct"] if nuevo else None)
+        if original is None or nuevo is None:
+            celda_original = "pendiente" if original is None else celda_original
+            celda_nuevo = "pendiente" if nuevo is None else celda_nuevo
         print(
-            f"| {fila['modelo']} "
-            f"| {_formatear_valor(fila['publicado']['exact_match_pct'])} "
-            f"| {_formatear_valor(remedido['exact_match_pct'] if remedido else None)} "
-            f"| {_formatear_valor(fila['delta_exact_match_pp'])} |"
+            f"| {fila['modelo']} | {celda_original} | {celda_nuevo} "
+            f"| {_formatear_valor(fila['efecto_prompt_exact_match_pp'])} |"
         )
     print()
-    if comparacion["mejor_remedido"]:
-        print(f"Mejor original re-medido: {comparacion['mejor_remedido']['modelo']} "
-              f"({comparacion['mejor_remedido']['exact_match_pct']:.1f}%)")
-    central = comparacion.get("comparacion_central")
-    if central:
+    titular_ = comparacion.get("titular")
+    if titular_:
         print(
-            f"Comparación central: {central['mejor_arquitectura_2026']['modelo']} "
-            f"({central['mejor_arquitectura_2026']['exact_match_pct']:.1f}%) vs "
-            f"{central['mejor_original_remedido']['modelo']} "
-            f"({central['mejor_original_remedido']['exact_match_pct']:.1f}%) -- "
-            f"Δ {central['delta_pp']:.1f} pp"
+            f"Titular (prompt {titular_['prompt']}): "
+            f"{titular_['mejor_arquitectura_2026']['modelo']} "
+            f"({titular_['mejor_arquitectura_2026']['exact_match_pct']:.1f}%) vs "
+            f"{titular_['mejor_generacion_anterior']['modelo']} "
+            f"({titular_['mejor_generacion_anterior']['exact_match_pct']:.1f}%) -- "
+            f"Δ {titular_['delta_pp']:.1f} pp"
         )
+    else:
+        print("Titular: pendiente (falta al menos una celda bajo el prompt 2026).")
     print()
-    print(f"NOTA sobre la columna publicada: {comparacion['nota_publicado']}")
+    print(f"NOTA sobre latencia: {comparacion['nota_latencia']}")
 
 
 def escribir_comparacion(comparacion: dict[str, Any], salida: Path) -> None:

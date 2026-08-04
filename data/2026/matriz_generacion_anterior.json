@@ -1,0 +1,73 @@
+{
+  "matriz": [
+    {
+      "modelo": "SmolLM2-360M-Instruct",
+      "prompt_original": {
+        "n": 32,
+        "exact_match_pct": 0.0,
+        "json_valido_pct": 100.0
+      },
+      "prompt_2026": {
+        "n": 32,
+        "exact_match_pct": 9.4,
+        "json_valido_pct": 25.0
+      },
+      "efecto_prompt_exact_match_pp": 9.4,
+      "efecto_prompt_json_valido_pp": -75.0
+    },
+    {
+      "modelo": "SmolLM2-1.7B-Instruct",
+      "prompt_original": {
+        "n": 32,
+        "exact_match_pct": 50.0,
+        "json_valido_pct": 100.0
+      },
+      "prompt_2026": {
+        "n": 32,
+        "exact_match_pct": 50.0,
+        "json_valido_pct": 100.0
+      },
+      "efecto_prompt_exact_match_pp": 0.0,
+      "efecto_prompt_json_valido_pp": 0.0
+    },
+    {
+      "modelo": "Qwen2.5-1.5B-Instruct",
+      "prompt_original": {
+        "n": 32,
+        "exact_match_pct": 56.2,
+        "json_valido_pct": 100.0
+      },
+      "prompt_2026": {
+        "n": 32,
+        "exact_match_pct": 65.6,
+        "json_valido_pct": 100.0
+      },
+      "efecto_prompt_exact_match_pp": 9.4,
+      "efecto_prompt_json_valido_pp": 0.0
+    },
+    {
+      "modelo": "Qwen2.5-0.5B-Instruct",
+      "prompt_original": null,
+      "prompt_2026": {
+        "n": 32,
+        "exact_match_pct": 21.9,
+        "json_valido_pct": 100.0
+      },
+      "efecto_prompt_exact_match_pp": null,
+      "efecto_prompt_json_valido_pp": null
+    }
+  ],
+  "titular": {
+    "prompt": "2026",
+    "mejor_arquitectura_2026": {
+      "modelo": "granite-4.0-1b",
+      "exact_match_pct": 90.6
+    },
+    "mejor_generacion_anterior": {
+      "modelo": "Qwen2.5-1.5B-Instruct",
+      "exact_match_pct": 65.6
+    },
+    "delta_pp": 25.0
+  },
+  "nota_latencia": "Las latencias de control_prompt_original/ y baseline_original/ se midieron con la maquina NO ociosa (trabajo concurrente del orquestador mientras corrian): no son validas para argumentar sobre latencia y por eso no se incluyen en esta matriz. Las latencias del paper provienen exclusivamente de data/2026/detalle/, corrido en secuencial estricto sobre maquina ociosa (RNF1)."
+}
