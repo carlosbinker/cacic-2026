@@ -8,10 +8,10 @@ de una interrupción retoma donde quedó: los modelos con su CSV de detalle ya
 completo los saltea `src/run_sweep_2026.py` (RF3), y `--desde` permite además
 arrancar directamente en el modelo que falló.
 
-Selecciona por defecto `roster_activo()` (12), no el registro completo (14):
-los dos modelos gated quedan fuera porque el acceso de descarga no fue
-otorgado. Retomar explícitamente desde uno de esos dos con `--desde` falla
-con `ValueError`.
+Selecciona por defecto `roster_activo()` (12) de un registro de **15**:
+tres modelos quedan excluidos, los dos gated de siempre más `Qwen3.5-2B`
+(compatibilidad no verificada bajo 5.14.1, Delta 2026-08-04). Retomar
+explícitamente desde uno de esos tres con `--desde` falla con `ValueError`.
 
 Credenciales (F11): el roster activo no tiene ningún modelo gated, así que
 corre sin credenciales. La invocación con `--env-file .env` se conserva tal
@@ -19,13 +19,26 @@ cual para los dos modelos gated del registro, por si alguno se reactiva; si
 la lista a correr incluyera algún gated y faltara `.env` o `HF_TOKEN`, este
 script aborta antes de correr nada; nunca imprime el valor del token.
 
+Núcleos (F11/RNF6): toda invocación agrega `--cpuset-cpus`, con el mismo
+valor (`CPUSET_POR_DEFECTO = "0-1"`) en las 12 corridas, para que la
+latencia no arrastre variabilidad por migración entre núcleos.
+
+Continuación ante fallo (F12.1/RF20c): el barrido **no corta al primer
+fallo** de un modelo. Cada fallo se registra con su error textual en
+`data/2026/fallos_barrido.json` (lista, siempre existe salvo en
+`--dry-run`) y se sigue con el siguiente modelo: el usuario no está
+disponible para desbloquear el barrido. La única excepción es un
+401/403 (AUTH-STOP), que corta de inmediato y sin reintentos.
+
 Uso:
-    python docker/run_sweep.py [--desde NOMBRE] [--force] [--dry-run]
+    python docker/run_sweep.py [--desde NOMBRE] [--force] [--dry-run] [--cpuset PAR]
 """
 
 import argparse
+import json
 import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 AQUI = Path(__file__).resolve().parent
@@ -42,6 +55,7 @@ from models_2026 import ModeloEvaluado2026, por_nombre, roster_activo  # noqa: E
 CLAVE_TOKEN = "HF_TOKEN"
 
 CPUSET_POR_DEFECTO = "0-1"
+FALLOS_PATH = RAIZ / "data" / "2026" / "fallos_barrido.json"
 
 
 # --------------------------------------------------------------------------
@@ -132,32 +146,65 @@ def seleccionar_modelos(desde: str | None) -> list[ModeloEvaluado2026]:
     return modelos[nombres.index(desde):]
 
 
-def _correr_modelo(modelo: ModeloEvaluado2026, posicion: str,
-                   force: bool, dry_run: bool) -> int:
-    """Corre el contenedor de un modelo y devuelve su código de salida."""
-    cmd = comando_run(modelo, RAIZ, force)
+def _correr_modelo(modelo: ModeloEvaluado2026, posicion: str, force: bool,
+                   dry_run: bool, cpuset: str) -> tuple[int, str]:
+    """Corre el contenedor de un modelo; devuelve (codigo de salida, stderr)."""
+    cmd = comando_run(modelo, RAIZ, force, cpuset)
     print(f"\n=== [{posicion}] {modelo.nombre} ({modelo.tier}) ===")
     print(" ".join(cmd))
     if dry_run:
-        return 0
-    return subprocess.run(cmd).returncode
+        return 0, ""
+    completado = subprocess.run(cmd, stderr=subprocess.PIPE, text=True)
+    if completado.stderr:
+        print(completado.stderr, file=sys.stderr)
+    return completado.returncode, completado.stderr or ""
 
 
-def ejecutar_barrido(modelos: list[ModeloEvaluado2026],
-                     force: bool, dry_run: bool) -> int:
-    """De a un contenedor por vez, en orden de roster; corta al primer fallo.
+def _registrar_fallo(modelo: ModeloEvaluado2026, codigo: int, error: str) -> dict:
+    """La fila de F5 que documenta un fallo irrecuperable de un modelo."""
+    return {
+        "modelo": modelo.nombre,
+        "hf_repo_id": modelo.hf_repo_id,
+        "transformers_pin": modelo.transformers_pin,
+        "codigo_salida": codigo,
+        "error_textual": error,
+        "momento_iso": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+    }
 
-    Cortar es lo correcto: los modelos ya terminados quedan en disco y el
-    harness los saltea, así que relanzar no rehace nada (RF3).
+
+def ejecutar_barrido(modelos: list[ModeloEvaluado2026], force: bool, dry_run: bool,
+                     cpuset: str = CPUSET_POR_DEFECTO) -> int:
+    """De a un contenedor por vez, en orden de roster; NO corta al primer fallo.
+
+    F12.1 / RF20c: si un modelo falla de forma irrecuperable se registra el
+    fallo con su error textual y se sigue con el siguiente. Bloquear el
+    barrido entero por un modelo no es una opcion: el usuario no esta
+    disponible para desbloquearlo, y los 11 restantes son datos que se
+    perderian. Los modelos ya terminados quedan en disco y el harness los
+    saltea, asi que relanzar no rehace nada (RF3).
     """
+    fallos: list[dict] = []
     for i, modelo in enumerate(modelos, 1):
-        codigo = _correr_modelo(modelo, f"{i}/{len(modelos)}", force, dry_run)
+        codigo, error = _correr_modelo(modelo, f"{i}/{len(modelos)}", force,
+                                       dry_run, cpuset)
         if codigo != 0:
-            print(f"FALLO {modelo.nombre} (código {codigo}). "
-                  f"Corregí y retomá con --desde \"{modelo.nombre}\"; los "
-                  f"modelos ya completos se saltean solos.", file=sys.stderr)
-            return codigo
-    print("\nBarrido completo.")
+            fallos.append(_registrar_fallo(modelo, codigo, error))
+            print(f"FALLO {modelo.nombre} (codigo {codigo}). Se registra y se "
+                  f"CONTINUA con el siguiente modelo.\n{error}", file=sys.stderr)
+
+    if not dry_run:
+        FALLOS_PATH.parent.mkdir(parents=True, exist_ok=True)
+        FALLOS_PATH.write_text(
+            json.dumps(fallos, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+        )
+
+    if fallos:
+        print(f"\nBarrido terminado con {len(fallos)} fallo(s): "
+              f"{', '.join(f['modelo'] for f in fallos)}. "
+              f"Detalle en {FALLOS_PATH}. Retomar un modelo puntual con "
+              f"--desde \"<nombre>\".", file=sys.stderr)
+        return 1
+    print("\nBarrido completo, sin fallos.")
     return 0
 
 
@@ -181,7 +228,7 @@ def main() -> int:
     args = _parsear_argumentos()
     modelos = seleccionar_modelos(args.desde)
     validar_credenciales(modelos, RAIZ)  # F11: antes de correr nada
-    return ejecutar_barrido(modelos, args.force, args.dry_run)
+    return ejecutar_barrido(modelos, args.force, args.dry_run, args.cpuset)
 
 
 if __name__ == "__main__":

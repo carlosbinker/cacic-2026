@@ -1,5 +1,6 @@
 """Tests de la orquestación Docker y del contrato de documentación de pines."""
 
+import json
 import re
 import subprocess
 import sys
@@ -81,6 +82,63 @@ def test_ninguna_invocacion_pide_gpu():
         cmd = " ".join(comando_run(m, RAIZ))
         for prohibido in ("--gpus", "--device", "nvidia"):
             assert prohibido not in cmd
+
+
+def test_ejecutar_barrido_no_corta_al_primer_fallo(monkeypatch, tmp_path):
+    """F12.1 / RF20c: un modelo que falla no puede bloquear a los 11 restantes.
+    El usuario no esta disponible para desbloquear el barrido."""
+    import run_sweep
+
+    corridos = []
+
+    class Resultado:
+        def __init__(self, returncode):
+            self.returncode = returncode
+            self.stderr = "boom textual" if returncode else ""
+
+    def falso_run(cmd, **kwargs):
+        nombre = cmd[cmd.index("--modelo") + 1]
+        corridos.append(nombre)
+        # El segundo modelo del roster falla; el resto anda.
+        return Resultado(1 if nombre == roster_activo()[1].nombre else 0)
+
+    monkeypatch.setattr(run_sweep.subprocess, "run", falso_run)
+    monkeypatch.setattr(run_sweep, "FALLOS_PATH", tmp_path / "fallos_barrido.json")
+
+    codigo = run_sweep.ejecutar_barrido(roster_activo(), force=False, dry_run=False)
+
+    assert [m.nombre for m in roster_activo()] == corridos, "se salteo algun modelo"
+    assert codigo == 1, "tiene que salir 1 si hubo al menos un fallo"
+
+    fallos = json.loads((tmp_path / "fallos_barrido.json").read_text(encoding="utf-8"))
+    assert len(fallos) == 1
+    assert fallos[0]["modelo"] == roster_activo()[1].nombre
+    assert set(fallos[0]) == {
+        "modelo", "hf_repo_id", "transformers_pin",
+        "codigo_salida", "error_textual", "momento_iso",
+    }
+
+
+def test_ejecutar_barrido_sin_fallos_escribe_lista_vacia(monkeypatch, tmp_path):
+    """F5: el archivo SIEMPRE existe, para no confundir 'no hubo fallos' con
+    'no se registro'."""
+    import run_sweep
+
+    class Ok:
+        returncode = 0
+        stderr = ""
+
+    monkeypatch.setattr(run_sweep.subprocess, "run", lambda cmd, **kw: Ok())
+    monkeypatch.setattr(run_sweep, "FALLOS_PATH", tmp_path / "fallos_barrido.json")
+    assert run_sweep.ejecutar_barrido(roster_activo(), force=False, dry_run=False) == 0
+    assert json.loads((tmp_path / "fallos_barrido.json").read_text(encoding="utf-8")) == []
+
+
+def test_dry_run_no_escribe_el_archivo_de_fallos(monkeypatch, tmp_path):
+    import run_sweep
+    monkeypatch.setattr(run_sweep, "FALLOS_PATH", tmp_path / "fallos_barrido.json")
+    assert run_sweep.ejecutar_barrido(roster_activo(), force=False, dry_run=True) == 0
+    assert not (tmp_path / "fallos_barrido.json").exists()
 
 
 def test_no_hay_credenciales_en_capas_ni_login_interactivo():
