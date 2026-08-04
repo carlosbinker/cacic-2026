@@ -1,0 +1,24 @@
+\begin{abstract}
+Los asistentes de domótica basados en modelos de lenguaje suelen depender de
+servicios en la nube, lo que introduce alta latencia, costos recurrentes y
+dependencia de conectividad. Los Small Language Models (SLMs) ejecutados
+localmente son una alternativa atractiva para hubs domóticos de bajo costo,
+pero evaluarlos a medida que aparecen nuevas familias exige un protocolo que
+no dependa de revisión manual. Este trabajo evalúa doce SLMs abiertos de
+menos de 2 mil millones de parámetros en la interpretación de comandos de
+domótica en español rioplatense, sobre un dataset de 32 comandos con
+anotación de referencia de cinco campos (intención, dispositivo, ubicación,
+valor y unidad). A diferencia de una evaluación clásica de coincidencia
+exacta, la verificación es totalmente automática en dos etapas: una
+comparación textual determinista campo a campo, seguida de un modelo de
+lenguaje que actúa como juez para clasificar cada respuesta incorrecta
+contra una taxonomía cerrada, sin ningún etiquetado manual. Se reportan dos
+métricas —exactitud estricta y exactitud laxa (semántica)—, cuya brecha
+cuantifica cuánto penaliza la coincidencia textual exacta a respuestas que
+un evaluador humano consideraría correctas. Todos los modelos se ejecutan en
+CPU, con 2 núcleos y 8 GB de memoria, en un contenedor aislado por modelo,
+para que el protocolo completo sea reproducible de punta a punta.
+
+\keywords{modelos de lenguaje pequeños, domótica, evaluación automática,
+LLM como juez, procesamiento del lenguaje natural, español rioplatense.}
+\end{abstract}

@@ -1,0 +1,78 @@
+\section{Trabajos relacionados}
+
+La tarea de convertir un comando en lenguaje natural en una estructura de
+intención y argumentos (slots) tiene una larga tradición en Natural Language
+Understanding (NLU). Weld et al. \cite{weld2023survey} relevan en detalle
+los modelos conjuntos de detección de intención y slot filling previos a la
+era de los LLMs, basados típicamente en arquitecturas recurrentes o
+transformers entrenados específicamente para el dominio; ese marco es el
+punto de comparación natural para el enfoque, cada vez más común, de
+resolver la misma tarea mediante la generación directa de una estructura
+(JSON) con un modelo de lenguaje general o pequeño, sin entrenamiento
+específico de slots.
+
+En cuanto a corpus específicos de domótica, Bouraoui et al.
+\cite{bouraoui2018french} construyeron y evaluaron un corpus de comandos de
+voz para hogar inteligente en francés, mostrando que los recursos de NLU
+para asistentes domóticos en inglés no transfieren bien a otros idiomas y
+que las particularidades léxicas y sintácticas de cada lengua requieren
+corpus propios. El presente trabajo sigue una lógica similar para el
+español rioplatense, aunque a escala más acotada (un dataset de evaluación,
+no de entrenamiento).
+
+El antecedente más cercano a este trabajo es el estudio sobre LLMs
+on-device para home assistants \cite{ondevice2025homeassistant}, que evalúa
+variantes cuantizadas (16-bit, 8-bit y 4-bit) de modelos locales en un doble
+rol de detección de intención y generación de respuesta, reportando entre
+80\% y 86\% de exactitud sobre prompts no sintéticos y latencias de 5 a 6
+segundos por consulta en el hardware utilizado. Este trabajo se diferencia
+en tres aspectos: explora el extremo inferior de tamaño de modelo (SLMs de
+menos de 2 mil millones de parámetros, sin cuantización agresiva), evalúa en
+español rioplatense en lugar de inglés, y se concentra en la tarea de
+interpretación estructurada (intent + slots) en lugar de la generación
+conversacional de respuestas.
+
+El survey de Lu et al. \cite{gupta2025slms} sobre SLMs mapea el estado del
+arte de modelos como Qwen, Llama 3.2, Phi, Gemma y SmolLM2, y documenta que
+modelos de pocos miles de millones de parámetros pueden alcanzar paridad de
+tarea específica frente a modelos mucho más grandes cuando se entrenan con
+datos de alta calidad, lo que motiva evaluarlos en tareas acotadas y de alto
+valor práctico como la interpretación de comandos domóticos. Los reportes
+técnicos de Qwen2.5 \cite{qwen2024report} y SmolLM2 \cite{allal2024smollm2}
+documentan las arquitecturas y el entrenamiento de dos de las familias
+evaluadas en este trabajo; el reporte técnico de OLMo 2 \cite{olmo2report}
+documenta, con el mismo nivel de detalle, una de las familias incorporadas
+en el roster ampliado de este estudio (junto con Granite 4.0, Qwen3.5 y
+LFM2.5).
+
+Un aspecto metodológico relevante para este trabajo es la decodificación
+restringida por gramática (grammar-constrained decoding), que fuerza al
+modelo a generar únicamente tokens compatibles con un esquema JSON o una
+gramática formal en cada paso, garantizando validez sintáctica
+independientemente de la capacidad del modelo
+\cite{beurerkellner2024guiding,dong2024xgrammar}. En este estudio se optó
+deliberadamente por no usar decodificación restringida, para medir la
+capacidad de seguimiento de instrucciones del modelo en un escenario de
+despliegue simple (sólo prompting, sin infraestructura adicional). Esta
+decisión metodológica es relevante para interpretar los resultados: las
+técnicas de decodificación restringida resuelven la validez de formato,
+pero no evitan que el modelo alucine un valor semánticamente incorrecto
+dentro de una estructura JSON perfectamente válida, que es uno de los
+patrones de error que la taxonomía cerrada de este trabajo distingue
+explícitamente (Sección 3.5).
+
+Finalmente, la técnica central que este trabajo incorpora respecto del
+estudio anterior es la evaluación automática con un modelo de lenguaje como
+juez (LLM-as-judge). Zheng et al. \cite{zheng2023judging} muestran que un
+LLM suficientemente capaz puede aproximar el juicio de un evaluador humano
+sobre la calidad de una respuesta en lenguaje natural con un acuerdo alto, y
+proponen esta técnica precisamente para los casos en que la coincidencia
+exacta contra una referencia subestima el desempeño real de un modelo —el
+caso de este trabajo, donde una respuesta puede ser semánticamente correcta
+sin coincidir textualmente con el ground truth (por ejemplo, un sinónimo
+válido de un dispositivo). La limitación conocida de la técnica es el sesgo
+de auto-favorecimiento: un juez tiende a puntuar mejor las respuestas
+generadas por un modelo de su misma familia o por sí mismo. Como en este
+estudio el juez es, por diseño, uno de los propios modelos evaluados, esa
+limitación aplica directamente y se retoma como amenaza a la validez en la
+Sección 6.

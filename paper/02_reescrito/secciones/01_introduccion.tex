@@ -1,0 +1,49 @@
+\section{Introducción}
+
+El crecimiento de los asistentes de voz y los sistemas domóticos ha
+popularizado el uso de modelos de lenguaje para interpretar comandos en
+lenguaje natural (``prendé la luz del living'', ``bajá el aire a 20
+grados''). La mayoría de las soluciones comerciales dependen de modelos de
+gran escala alojados en la nube, lo que introduce tres problemas recurrentes
+en el contexto de un hogar: latencia de red, costo recurrente por uso de
+API, y dependencia de conectividad — un comando tan simple como apagar una
+luz no debería fallar por una caída de internet.
+
+Una alternativa creciente es el uso de Small Language Models (SLMs) —
+modelos de lenguaje de entre unos cientos de millones y pocos miles de
+millones de parámetros — ejecutados localmente en el propio hub domótico
+(una Raspberry Pi, un mini-PC o un microcontrolador de gama alta). Trabajos
+recientes muestran que estos modelos pueden alcanzar, en tareas acotadas, un
+desempeño competitivo frente a modelos mucho más grandes \cite{gupta2025slms}.
+Sin embargo, la mayor parte de la literatura sobre SLMs y asistentes
+domóticos evalúa el inglés, y no está claro cómo se comportan estos modelos
+frente a estructuras propias del español rioplatense (voseo, diminutivos,
+expresiones relativas como ``bajale un toque'') ni cuál es el costo real en
+latencia de ejecutarlos en hardware modesto.
+
+Un estudio previo sobre esta misma tarea evaluó cuatro SLMs mediante
+coincidencia exacta contra un ground truth y clasificó a mano las 73
+respuestas incorrectas resultantes para identificar patrones de error. Ese
+etiquetado manual no escala: repetirlo sobre un roster de doce modelos
+multiplicaría el volumen de respuestas a revisar, y su resultado tampoco es
+reproducible por un tercero, porque depende del criterio del anotador en el
+momento de clasificar cada caso. Este trabajo reemplaza esa revisión manual
+por un pipeline de verificación completamente automático, y aprovecha la
+ampliación del roster para incorporar familias de modelos publicadas
+recientemente (LFM2.5, Granite 4.0, Qwen3.5 y OLMo-2) junto con dos tiers de
+tamaño (menos de 1000 millones y entre 1000 y 2000 millones de parámetros).
+
+Las contribuciones de este trabajo son: (1) la evaluación de un roster de
+doce modelos abiertos sub-2B —tomados de un registro de quince modelos
+candidatos, del que quedaron fuera tres: dos por acceso de descarga
+restringido no otorgado y uno por compatibilidad de versión no verificada,
+ninguno por una decisión metodológica—; (2) un pipeline de verificación
+automática en dos etapas, coincidencia textual determinista más un juez de
+lenguaje con una taxonomía cerrada, que elimina el etiquetado manual de
+respuestas incorrectas y de categorías lingüísticas; (3) el reporte conjunto
+de exactitud estricta y exactitud laxa, cuya brecha cuantifica el costo de
+exigir coincidencia textual exacta; (4) un protocolo de ejecución
+reproducible, con aislamiento por contenedor y versiones de librerías
+documentadas por grupo; y (5) la continuidad con el estudio anterior a
+través de tres modelos evaluados en ambos trabajos —antes dos—, que en
+conjunto cubren los dos tiers de tamaño y dos familias de modelos distintas.
