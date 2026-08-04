@@ -286,6 +286,17 @@ done
 
 ### Check C11 — Las tres amenazas nuevas de RF16 están escritas, y la de raw completion no
 **Covers AC:** AC10 (*`06_amenazas.tex` cubre explícitamente las tres amenazas de RF16*), RF18.
+**Nota de actualización (post-`8fa6380`, "saca menciones a exclusiones... documenta hardware
+real").** Ese commit reescribió `06_amenazas.tex` con una decisión deliberada del usuario ("Item 2":
+la selección de los 12 se presenta en positivo por sus tres criterios de inclusión en la Sección
+3.1, sin prosa de exclusión) y ("Item 7": la topología de procesadores no observable se documenta
+como amenaza nueva). Las tres amenazas nuevas de RF16 dejaron de ser (auto-favorecimiento, versiones
+divergentes, exclusión por causas ajenas al método) y pasaron a ser (auto-favorecimiento, versiones
+divergentes, **topología de procesadores no observable**) — la tercera cambió de contenido, no de
+cantidad. Este check reemplaza la exigencia de la amenaza de exclusión (y de la mención "no
+verificada" / `Qwen3.5-2B` en este archivo) por la de topología, que es la que el paper realmente
+escribe hoy. `docker/README.md` sigue siendo la única fuente textual de la documentación de
+exclusiones (ver C14) — el paper no revierte esa decisión, y este check tampoco.
 **Cost:** `cheap`
 **Run:**
 ```bash
@@ -293,54 +304,30 @@ python - <<'PY'
 import re
 from pathlib import Path
 texto = Path("paper/02_reescrito/secciones/06_amenazas.tex").read_text(encoding="utf-8").lower()
-# EXACTAMENTE TRES amenazas nuevas, no cuatro: el Delta 2026-08-04 no agrego una
-# cuarta, sino que amplio la (2) y la (3).
+# EXACTAMENTE TRES amenazas nuevas, no cuatro.
 amenazas = {
     "auto-favorecimiento del juez": (("juez",), ("favorec", "sesgo")),
-    # (2) ahora tiene que mencionar tambien la exclusion por compatibilidad no
-    # verificada, como evidencia de que el confusor de versiones no es teorico.
     "versiones de libreria como confusor de latencia": (("versi",), ("latencia",)),
-    # (3) ahora cubre DOS causas de exclusion: acceso no otorgado y compatibilidad
-    # no verificada, 3 de 15 en total.
-    # "metodológica" lleva tilde en el paper (ortografia correcta); se acepta
-    # tambien la forma sin tilde para no volver a quebrar el check si alguien
-    # escribe la variante ASCII en el futuro.
-    "exclusion por causas ajenas al metodo": (("acceso restringido", "gated"), ("metodologica", "metodológica")),
+    # (3) topologia de procesadores no observable (post-8fa6380): reemplaza a la
+    # amenaza de exclusion, que el paper ya no redacta como prosa (ver docker/README.md).
+    "topologia de procesadores no observable": (("topolog",), ("procesador", "hipervisor", "nucleos", "núcleos")),
 }
 faltan = [
     nombre
     for nombre, (anclas, extras) in amenazas.items()
     if not any(a in texto for a in anclas) or not any(e in texto for e in extras)
 ]
-if "no verificada" not in texto:
-    faltan.append("la exclusion por compatibilidad de version no verificada (Qwen3.5-2B)")
 assert not faltan, f"amenazas ausentes o incompletas: {faltan}"
 # Verificacion NEGATIVA (Delta 02): no puede quedar ninguna afirmacion de que un
 # modelo del roster se prompteo por raw completion; esa amenaza fue ELIMINADA.
 prohibido = re.search(r"(lfm2\.5-230m|lfm2\.5-350m|modelos base)[^.]{0,80}raw completion", texto)
 assert not prohibido, "sobrevive la amenaza eliminada de incomparabilidad por raw completion"
-# Verificacion NEGATIVA (Delta 2026-08-04): no se puede sobreafirmar sobre Qwen3.5-2B.
-# Su sonda bajo 5.14.1 nunca corrio, asi que no hay evidencia de que falle ahi.
-# Acotado a menciones cercanas a "qwen3.5-2b": una busqueda de substring sin
-# acotar tambien matcheaba la evidencia legitima y ya verificada de que
-# granite-4.0-350m "falla bajo 5.14.1" (linea 57 de 06_amenazas.tex), que no
-# tiene nada que ver con Qwen3.5-2B y no es una sobreafirmacion.
-for sobreafirmacion in ("falla bajo 5.14.1", "incompatible con 5.14.1",
-                        "no corre bajo ninguna", "falla en las dos versiones"):
-    patron = re.compile(
-        rf"qwen3\.5-2b[^.]{{0,200}}{re.escape(sobreafirmacion)}"
-        rf"|{re.escape(sobreafirmacion)}[^.]{{0,200}}qwen3\.5-2b"
-    )
-    assert not patron.search(texto), (
-        f"sobreafirmacion sobre Qwen3.5-2B: {sobreafirmacion!r} cerca de su mencion. "
-        f"Su compatibilidad bajo 5.14.1 es NO VERIFICADA, no demostradamente mala."
-    )
-print("las 3 amenazas de RF16 estan presentes (con las dos causas de exclusion), "
-      "sin afirmacion de raw completion y sin sobreafirmar sobre Qwen3.5-2B")
+print("las 3 amenazas de RF16 estan presentes (auto-favorecimiento, versiones, topologia), "
+      "sin afirmacion de raw completion")
 PY
 ```
-**Expected:** imprime `las 3 amenazas de RF16 estan presentes (con las dos causas de exclusion), sin afirmacion de raw completion y sin sobreafirmar sobre Qwen3.5-2B`, exit 0.
-**On failure indicates:** el paper omite una limitación conocida del diseño, o resucitó la amenaza de incomparabilidad por raw completion que el Delta 02 eliminó porque los 12 del roster activo usan `chat_template`, o **sobreafirma** sobre `Qwen3.5-2B`. La tercera amenaza (exclusión por causas ajenas al método) es la más fácil de dejar incompleta: el Delta 02 la introdujo con **2** modelos por acceso no otorgado, y el Delta 2026-08-04 le sumó un **tercero** por compatibilidad **no verificada** — son **3 de 15**, con dos causas distintas que hay que atribuir bien. Y siguen siendo **tres** amenazas nuevas: si alguien agrega una cuarta, este check y RF16 dejan de coincidir.
+**Expected:** imprime `las 3 amenazas de RF16 estan presentes (auto-favorecimiento, versiones, topologia), sin afirmacion de raw completion`, exit 0.
+**On failure indicates:** el paper omite una limitación conocida del diseño, o resucitó la amenaza de incomparabilidad por raw completion que el Delta 02 eliminó porque los 12 del roster activo usan `chat_template`. Siguen siendo **tres** amenazas nuevas: si alguien agrega una cuarta, este check y RF16 dejan de coincidir.
 
 ### Check C12 — Determinismo del juez
 **Covers AC:** AC5 (*reejecutar la etapa 2 sobre el mismo `detalle_2026.csv` reproduce `etiquetas_errores.csv` y `categorias_comandos.csv` byte a byte*).
@@ -393,8 +380,14 @@ PY
 **On failure indicates:** un CSV se produjo bajo una versión de `transformers` distinta de la fijada para ese modelo — por ejemplo, `granite-4.0-350m` corrido bajo 5.x por error. Ese CSV es inválido y debe rehacerse (ver protocolo de fallo del subtask 05). Un caso concreto a vigilar tras el Delta 2026-08-04: `data/2026/detalle/qwen2-5-1-5b-instruct.csv` es el CSV del modelo que entró, y su `transformers_version` **tiene que** empezar con `4.57.` — su pin es del grupo A, sondeado (`PROBE_OK|Qwen2.5-1.5B-Instruct|4.57.6|chat_template`), no inferido de la familia Qwen (que resuelve a grupo B en Qwen3.5).
 
 ### Check C14 — Exclusiones declaradas, con sus tres causas (Deltas 02, 2026-08-04 y 05)
-**Covers AC:** AC13 (*los **cuatro** modelos excluidos no aparecen en ninguna tabla ni figura de resultados, y sí aparecen en la tabla de exclusiones de `docker/README.md` y en el texto del paper como limitación, con sus **tres causas distintas** correctamente atribuidas*), RF18.
+**Covers AC:** AC13 (*los **cuatro** modelos excluidos no aparecen en ninguna tabla ni figura de resultados, y sí aparecen en la tabla de exclusiones de `docker/README.md`, con sus **tres causas distintas** correctamente atribuidas*), RF18.
 **Nota sobre el conteo (Delta 05).** `Qwen2.5-0.5B-Instruct` se sumó al registro (15 → 16) para completar el brazo de generación anterior del baseline original (`baseline_original=True`, `activo=False`); es una tercera causa de exclusión (baseline-completion, de alcance de roster), no una regresión de las dos causas ya cubiertas (acceso no otorgado / compatibilidad no verificada). El roster activo de 12 no cambia.
+**Nota de alcance (post-`8fa6380`).** El texto de AC13 original ("... y en el texto del paper como
+limitación") describía una prosa de exclusión en `03_metodologia.tex`/`06_amenazas.tex` que el commit
+`8fa6380` retiró deliberadamente (decisión del usuario, "Item 2": la selección de los 12 se presenta
+en positivo, por sus tres criterios de inclusión). Ese commit no tocó `docker/README.md`, que sigue
+siendo la única fuente textual obligatoria de la documentación de exclusiones — este check ya no
+exige la prosa duplicada en el paper (ver también C11).
 **Cost:** `cheap`
 **Run:**
 ```bash
@@ -436,20 +429,23 @@ for archivo in ("paper/02_reescrito/tablas/tabla1_modelos.tex",
     fallas += [f"{m.nombre}: aparece en {archivo} pese a estar excluido"
                for m in excluidos if m.nombre in texto]
 
+# Nota de actualizacion (post-8fa6380, "saca menciones a exclusiones... documenta
+# hardware real"): decision deliberada del usuario ("Item 2") de presentar la
+# seleccion de los 12 en POSITIVO, por sus tres criterios de inclusion (Sec. 3.1),
+# sin prosa de exclusion en 03_metodologia.tex/06_amenazas.tex. docker/README.md
+# (arriba) sigue siendo la UNICA fuente textual que documenta las exclusiones, sus
+# tres causas y el 403/no-verificada/baseline-completion -- eso ya se verifico mas
+# arriba y sigue siendo obligatorio. Lo que este check YA NO exige es que el propio
+# texto del paper repita esa prosa: exigirlo revertiria una decision de redaccion
+# tomada, no una regresion. Se conserva, en cambio, la verificacion NEGATIVA: si
+# alguien reintroduce una mencion a Qwen3.5-2B en estas dos secciones, no puede
+# sobreafirmar que falla bajo 5.14.1 (su sonda nunca corrio, es ausencia de
+# evidencia, no evidencia de fallo).
 for seccion in ("03_metodologia.tex", "06_amenazas.tex"):
     ruta = Path(f"paper/02_reescrito/secciones/{seccion}")
     if not ruta.exists():
         continue
     texto = ruta.read_text(encoding="utf-8").lower()
-    if "acceso restringido" not in texto and "gated" not in texto:
-        fallas.append(f"{seccion}: no declara la exclusion por acceso como limitacion")
-    if "no verificada" not in texto:
-        fallas.append(f"{seccion}: no declara la exclusion por compatibilidad no verificada")
-    # Verificacion NEGATIVA: no se puede afirmar que Qwen3.5-2B falle bajo 5.14.1.
-    # No hay evidencia de eso: la sonda nunca corrio. Solo ausencia de evidencia.
-    # Acotado a menciones cercanas a "qwen3.5-2b" (ver misma nota en C11): un
-    # substring sin acotar tambien matchea la evidencia legitima y ya verificada
-    # de que granite-4.0-350m "falla bajo 5.14.1", que no es sobre Qwen3.5-2B.
     for sobreafirmacion in ("falla bajo 5.14.1", "incompatible con 5.14.1",
                             "no corre bajo ninguna", "falla en las dos versiones"):
         patron = re.compile(
@@ -461,12 +457,12 @@ for seccion in ("03_metodologia.tex", "06_amenazas.tex"):
 
 assert not fallas, fallas
 print("exclusiones declaradas OK: 4 excluidos (2 por acceso, 1 por compatibilidad no "
-      "verificada, 1 por baseline-completion), fuera de tablas, dentro de "
-      "exclusiones/limitacion, sin sobreafirmar")
+      "verificada, 1 por baseline-completion) en docker/README.md, fuera de tablas, "
+      "sin sobreafirmar en el paper")
 PY
 ```
-**Expected:** imprime `exclusiones declaradas OK: 4 excluidos (2 por acceso, 1 por compatibilidad no verificada, 1 por baseline-completion), fuera de tablas, dentro de exclusiones/limitacion, sin sobreafirmar`, exit 0.
-**On failure indicates:** o bien un modelo excluido se coló en una tabla de resultados (contaminando una comparación que no corrió), o bien la exclusión no está documentada como limitación, o bien el paper **sobreafirma** sobre `Qwen3.5-2B`. Esto último es el error más fácil de cometer y el más caro: su sonda bajo 5.14.1 **nunca corrió** por un bloqueo de infraestructura de Docker, así que no hay evidencia de que falle bajo esa versión — solo ausencia de evidencia de que funcione. Escribir "incompatible con las dos versiones mayores" sería una afirmación empírica sin respaldo en un paper. La verificación negativa está acotada a menciones cercanas a `Qwen3.5-2B`: un substring sin acotar también dispara sobre la evidencia legítima de que `granite-4.0-350m` "falla bajo 5.14.1", que no tiene relación con `Qwen3.5-2B`.
+**Expected:** imprime `exclusiones declaradas OK: 4 excluidos (2 por acceso, 1 por compatibilidad no verificada, 1 por baseline-completion) en docker/README.md, fuera de tablas, sin sobreafirmar en el paper`, exit 0.
+**On failure indicates:** o bien un modelo excluido se coló en una tabla de resultados (contaminando una comparación que no corrió), o bien `docker/README.md` dejó de documentar alguna de las tres causas de exclusión, o bien el paper **sobreafirma** sobre `Qwen3.5-2B` si alguien reintrodujo su mención en `03_metodologia.tex`/`06_amenazas.tex`. Esto último es el error más fácil de cometer y el más caro: su sonda bajo 5.14.1 **nunca corrió** por un bloqueo de infraestructura de Docker, así que no hay evidencia de que falle bajo esa versión — solo ausencia de evidencia de que funcione. Escribir "incompatible con las dos versiones mayores" sería una afirmación empírica sin respaldo en un paper.
 
 ### Check C15 — Continuidad con la Tabla 2 publicada (RF19, Delta 2026-08-04)
 **Covers AC:** AC15 (*las dos columnas de continuidad de la Tabla 2 existen, sus valores coinciden dígito a dígito con `data/resultados_experimento_resumen.json` para los **3** modelos presentes en ambos estudios y son `--` para los otros **9**; §4 reporta la comparación y §5 la interpreta, incluida cualquier divergencia; y el texto declara que no es una réplica*), RF19.
@@ -497,9 +493,16 @@ fallas = []
 tabla2 = Path("paper/02_reescrito/tablas/tabla2_resultados_globales.tex")
 if tabla2.exists():
     tex = tabla2.read_text(encoding="utf-8")
-    for etiqueta in ("Estricta 2025", "Latencia 2025"):
-        if etiqueta not in tex:
-            fallas.append(f"tabla2: falta la columna {etiqueta!r}")
+    # Encabezados envueltos en \shortstack (fix de alineacion del item 1 de la
+    # revision de PDF): "Estricta 2025"/"Latencia 2025" ya no son substrings
+    # contiguos (quedan partidos por un \\ de \shortstack), asi que se busca
+    # por celda de encabezado en vez de por substring de la tabla completa.
+    encabezado = next(l for l in tex.splitlines() if "2025" in l)
+    celdas_enc = encabezado.split(" & ")
+    if not any("Estricta" in c and "2025" in c for c in celdas_enc):
+        fallas.append("tabla2: falta la columna 'Estricta 2025'")
+    if not any("Latencia" in c and "2025" in c for c in celdas_enc):
+        fallas.append("tabla2: falta la columna 'Latencia 2025'")
     for n in anclas:
         estricta = f"{por_pub[n]['exact_match_pct']:.1f}"
         if estricta not in tex and estricta.replace(".", ",") not in tex:
@@ -693,7 +696,7 @@ Ninguno de estos comandos arranca un contenedor de modelo, descarga pesos ni hac
 | 1 | `pytest -q` | exit 0, cero `failed` / `error` | `cheap` |
 | 2 | C1 + C2 (inmutabilidad de F0, árbol e historial) | ambas salidas vacías | `cheap` |
 | 3 | C3 + C4 + C5 (secretos, capas, untracked) | los cuatro mensajes `... OK` | `cheap` |
-| 4 | C6 + NF1 (plomería del token y envelope de recursos, vía `--dry-run`) | `15`, `2`, `12`, `3`, `12`, `0`, `sin GPU OK`, `12`, `9`, `3`, `12`, `1`, `12`, `12`, `cpuset registrado ... 0-1` (registro de quince, dos gated, doce activos, tres excluidos, doce invocaciones, cero `--env-file`, doce imágenes **distintas** en el plan de build, reparto 9/3, pinning en las doce con **un solo** valor, y ese valor documentado) | `cheap` |
+| 4 | C6 + NF1 (plomería del token y envelope de recursos, vía `--dry-run`) | `16`, `2`, `12`, `4`, `12`, `0`, `sin GPU OK`, `12`, `9`, `3`, `12`, `1`, `12`, `12`, `cpuset registrado ... 0-1` (registro de dieciséis tras el Delta 05, dos gated, doce activos, **cuatro** excluidos, doce invocaciones, cero `--env-file`, doce imágenes **distintas** en el plan de build, reparto 9/3, pinning en las doce con **un solo** valor, y ese valor documentado) | `cheap` |
 | 5 | NF3 (decodificación determinista) | `sin muestreo estocastico OK` | `cheap` |
 | 6 | C7 (trazabilidad de versiones) | `... OK` | `cheap` |
 | 7 | C8 (regeneración idempotente de tablas `.tex`) | `regeneracion idempotente OK` | `cheap` |
