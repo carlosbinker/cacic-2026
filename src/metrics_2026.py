@@ -46,6 +46,23 @@ CLAVES_RESUMEN = [
 ]
 
 
+def _como_bool(serie: pd.Series) -> pd.Series:
+    """Booleano robusto para columnas leidas de CSV.
+
+    pandas infiere dtype bool cuando el CSV trae los literales True/False sin
+    comillas, pero eso no esta garantizado (comillas, NaN mezclados, u otra
+    fuente que serialice como texto bajan la columna a dtype object). Castear
+    ese texto con `.astype(bool)` es un bug: `bool("False")` es `True` porque
+    cualquier string no vacio es verdadero en Python, y eso empuja el
+    porcentaje al 100% sin importar el contenido real.
+    """
+    if pd.api.types.is_bool_dtype(serie):
+        return serie
+    return serie.astype(str).str.strip().str.lower().map(
+        {"true": True, "false": False}
+    ).astype(bool)
+
+
 def _mapa_equivalentes(df_etiquetas: pd.DataFrame) -> set[tuple[str, int]]:
     """(modelo, idx) que el juez consideró semánticamente equivalentes."""
     equivalentes = set()
@@ -65,7 +82,7 @@ def calcular_resumen_2026(df_detalle: pd.DataFrame,
         df_m = df_detalle[df_detalle["modelo"] == modelo.nombre]
         if df_m.empty:
             continue
-        estricta = df_m["match_exact"].astype(bool)
+        estricta = _como_bool(df_m["match_exact"])
         laxa = estricta | df_m["idx"].map(
             lambda i: (modelo.nombre, int(i)) in equivalentes
         )
@@ -78,15 +95,15 @@ def calcular_resumen_2026(df_detalle: pd.DataFrame,
             "modo_prompting": modos[0] if len(modos) == 1 else "mixto",
             "transformers_pin": modelo.transformers_pin,
             "n": len(df_m),
-            "json_valido_pct": round(100 * df_m["json_valido"].astype(bool).mean(), 1),
+            "json_valido_pct": round(100 * _como_bool(df_m["json_valido"]).mean(), 1),
             "exact_match_pct": round(100 * estricta.mean(), 1),
             "exact_match_laxo_pct": round(100 * laxa.mean(), 1),
             "avg_latencia_s": round(df_m["latencia_s"].mean(), 3),
-            "acc_intent_pct": round(100 * df_m["match_intent"].astype(bool).mean(), 1),
-            "acc_dispositivo_pct": round(100 * df_m["match_dispositivo"].astype(bool).mean(), 1),
-            "acc_ubicacion_pct": round(100 * df_m["match_ubicacion"].astype(bool).mean(), 1),
-            "acc_valor_pct": round(100 * df_m["match_valor"].astype(bool).mean(), 1),
-            "acc_unidad_pct": round(100 * df_m["match_unidad"].astype(bool).mean(), 1),
+            "acc_intent_pct": round(100 * _como_bool(df_m["match_intent"]).mean(), 1),
+            "acc_dispositivo_pct": round(100 * _como_bool(df_m["match_dispositivo"]).mean(), 1),
+            "acc_ubicacion_pct": round(100 * _como_bool(df_m["match_ubicacion"]).mean(), 1),
+            "acc_valor_pct": round(100 * _como_bool(df_m["match_valor"]).mean(), 1),
+            "acc_unidad_pct": round(100 * _como_bool(df_m["match_unidad"]).mean(), 1),
         })
     return [{c: f[c] for c in CLAVES_RESUMEN} for f in filas]
 
@@ -99,7 +116,7 @@ def calcular_taxonomia_errores_2026(df_detalle: pd.DataFrame,
         df_m = df_detalle[df_detalle["modelo"] == modelo.nombre]
         if df_m.empty:
             continue
-        incorrectas = df_m[~df_m["match_exact"].astype(bool)]
+        incorrectas = df_m[~_como_bool(df_m["match_exact"])]
         eti_m = df_etiquetas[df_etiquetas["modelo"] == modelo.nombre]
         conteos = {e: 0 for e in ETIQUETAS_ERROR}
         for valor in eti_m["etiquetas"]:
@@ -133,7 +150,7 @@ def calcular_exactitud_por_categoria(df_detalle: pd.DataFrame,
         for nombre in modelos:
             df_cm = df_c[df_c["modelo"] == nombre]
             fila[nombre] = (
-                round(100 * df_cm["match_exact"].astype(bool).mean(), 1)
+                round(100 * _como_bool(df_cm["match_exact"]).mean(), 1)
                 if not df_cm.empty else 0.0
             )
         filas.append(fila)

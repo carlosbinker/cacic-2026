@@ -1,5 +1,6 @@
 """Tests de las métricas 2026: estricta vs laxa, taxonomía de 7, Tabla 3 (F6)."""
 
+import json
 import sys
 from pathlib import Path
 
@@ -10,6 +11,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from metrics_2026 import (  # noqa: E402
     CLAVES_RESUMEN,
+    PATH_DETALLE,
+    PATH_ETIQUETAS,
     calcular_exactitud_por_categoria,
     calcular_resumen_2026,
     calcular_taxonomia_errores_2026,
@@ -19,6 +22,8 @@ from run_sweep_2026 import COLUMNAS_DETALLE  # noqa: E402
 from taxonomia_2026 import ETIQUETAS_ERROR  # noqa: E402
 
 M1, M2 = roster_activo()[0].nombre, roster_activo()[1].nombre
+
+PATH_ETAPA1 = Path(__file__).resolve().parent.parent / "data" / "2026" / "resumen_etapa1.json"
 
 
 def _det(modelo, patron, latencia=1.0, modo="chat_template"):
@@ -86,6 +91,54 @@ def test_sin_etiquetas_de_equivalencia_ambas_metricas_coinciden():
     eti = _eti([(M1, 1, "confusion_dispositivo")])
     fila = calcular_resumen_2026(det, eti)[0]
     assert fila["exact_match_laxo_pct"] == fila["exact_match_pct"] == 50.0
+
+
+def test_json_valido_no_confia_en_bool_de_string():
+    """Regresion: bool("False") es True en Python. Si json_valido (o
+    cualquier columna booleana) llega como texto en vez de bool nativo
+    -p.ej. por una lectura de CSV que no infirio el dtype-, el computo no
+    debe tratar todas las filas como validas."""
+    det = _det(M1, [True, False, False, False])
+    det["json_valido"] = ["True", "False", "False", "True"]  # 2 de 4 validas, no 4 de 4
+    fila = calcular_resumen_2026(det, _eti([]))[0]
+    assert fila["json_valido_pct"] == 50.0
+
+
+def test_match_exact_no_confia_en_bool_de_string():
+    """Misma trampa que json_valido pero sobre match_exact: si llegara como
+    texto, bool("False") == True inflaria tanto la estricta como la laxa."""
+    det = _det(M1, [True, False, False, False])
+    det["match_exact"] = ["True", "False", "False", "False"]
+    det["match_intent"] = det["match_exact"]
+    det["match_dispositivo"] = det["match_exact"]
+    det["match_ubicacion"] = det["match_exact"]
+    det["match_valor"] = det["match_exact"]
+    det["match_unidad"] = det["match_exact"]
+    fila = calcular_resumen_2026(det, _eti([]))[0]
+    assert fila["exact_match_pct"] == 25.0
+    assert fila["acc_intent_pct"] == 25.0
+
+
+@pytest.mark.skipif(
+    not (PATH_DETALLE.exists() and PATH_ETIQUETAS.exists() and PATH_ETAPA1.exists()),
+    reason="requiere los artefactos reales de data/2026/ (etapas 1 y 2)",
+)
+def test_json_valido_coincide_con_resumen_etapa1_para_los_12_modelos():
+    """AC de Bug 1: detalle_2026.csv es la fuente autoritativa; el
+    json_valido_pct que agrega metrics_2026 tiene que coincidir exactamente
+    con el de resumen_etapa1.json modelo a modelo, y no pueden ser todos
+    100% (LFM2.5-230M y SmolLM2-360M-Instruct tienen fallos reales)."""
+    det = pd.read_csv(PATH_DETALLE)
+    eti = pd.read_csv(PATH_ETIQUETAS)
+    etapa1 = {
+        f["modelo"]: f["json_valido_pct"]
+        for f in json.loads(PATH_ETAPA1.read_text(encoding="utf-8"))
+    }
+    resumen = calcular_resumen_2026(det, eti)
+    assert len(resumen) == 12
+    for fila in resumen:
+        assert fila["json_valido_pct"] == etapa1[fila["modelo"]], fila["modelo"]
+    assert {f["json_valido_pct"] for f in resumen} != {100.0}
 
 
 def test_el_resumen_trae_metadatos_del_registro():
