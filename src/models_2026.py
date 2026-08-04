@@ -22,6 +22,23 @@ que Phase 3 refutó empíricamente:
    otorgado (403 en `/<id>/resolve/main/config.json`, aprobación manual
    pendiente al 2026-08-03). Reactivar uno es `activo=True` + vaciar
    `motivo_exclusion`, nunca una reescritura de código.
+
+Delta 2026-08-04 (corrige hacia adelante a `864c694`, sin editarlo). El
+REGISTRO pasa de 14 a 15 filas, a conteo de roster activo constante (12):
+3. `Qwen3.5-2B` sale del roster activo sin condición y queda `activo=False`
+   por compatibilidad NO VERIFICADA bajo transformers 5.14.1 (no incompatibilidad
+   demostrada: su sonda bajo 5.14.1 nunca corrió por un bloqueo de infraestructura
+   de Docker, no por evidencia sobre el modelo); conserva su `transformers_pin`
+   del grupo B y su `motivo_pin`, porque ese pin sigue siendo necesario por su
+   evidencia negativa propia bajo 4.57.6. `Qwen/Qwen2.5-1.5B-Instruct` entra al
+   roster activo, grupo A, por sonda propia
+   (`PROBE_OK|Qwen2.5-1.5B-Instruct|4.57.6|chat_template`), con pin HEREDADO
+   (`motivo_pin == ""`: la sonda bajo 5.14.1 no se corrió, así que no hay
+   evidencia de necesidad). El ID `Qwen/Qwen2.5-1.7B-Instruct` que se llegó a
+   mencionar NO EXISTE (HTTP 404) y no debe reintroducirse nunca; el ID
+   correcto es `Qwen/Qwen2.5-1.5B-Instruct`. El reingreso de este modelo
+   sostiene la línea de continuidad con la Tabla 2 publicada (RF19): los
+   modelos presentes en los dos estudios pasan de 2 a 3.
 """
 
 import re
@@ -70,6 +87,16 @@ _MOTIVO_EXCLUSION_GATED = (
     "Acceso de descarga no otorgado: 403 en /{repo}/resolve/main/config.json con "
     "$HF_TOKEN valido (repo gated:manual, aprobacion pendiente al 2026-08-03). "
     "Reactivar es poner activo=True y vaciar este campo, sin reescribir codigo."
+)
+_MOTIVO_EXCLUSION_QWEN35_2B = (
+    "Fuera del roster activo por decision del usuario (2026-08-04): su pin del grupo B es "
+    "necesario (falla bajo 4.57.6 con ValueError que pide 'pip install --upgrade "
+    "transformers'), pero su confirmacion positiva bajo 5.14.1 NUNCA SE OBTUVO -- la sonda no "
+    "llego a correr porque el almacenamiento del daemon de Docker quedo en modo solo lectura a "
+    "mitad de ronda (bloqueo de infraestructura, NO evidencia sobre el modelo). Compatibilidad "
+    "NO VERIFICADA, no incompatibilidad demostrada: no hay evidencia de que falle bajo 5.14.1. "
+    "El usuario eligio excluirlo en lugar de perseguir esa confirmacion. Reactivarlo es poner "
+    "activo=True, vaciar este campo y obtener la sonda positiva."
 )
 
 
@@ -219,8 +246,8 @@ MODELOS_2026: list[ModeloEvaluado2026] = [
         trust_remote_code=False,
         gated=False,
         motivo_pin=_MOTIVO_PIN_QWEN35,
-        activo=True,
-        motivo_exclusion="",
+        activo=False,
+        motivo_exclusion=_MOTIVO_EXCLUSION_QWEN35_2B,
     ),
     ModeloEvaluado2026(
         nombre="OLMo-2-0425-1B-Instruct",
@@ -257,6 +284,24 @@ MODELOS_2026: list[ModeloEvaluado2026] = [
         motivo_pin="",
         activo=False,
         motivo_exclusion=_MOTIVO_EXCLUSION_GATED.format(repo="meta-llama/Llama-3.2-1B-Instruct"),
+    ),
+    ModeloEvaluado2026(
+        nombre="Qwen2.5-1.5B-Instruct",
+        hf_repo_id="Qwen/Qwen2.5-1.5B-Instruct",
+        params_b=1.54,
+        tier="1-2B",
+        transformers_pin=BASELINE_TRANSFORMERS,
+        trust_remote_code=False,
+        gated=False,
+        # Pin HEREDADO: la sonda del 2026-08-04 confirma que 4.57.6 funciona
+        # (PROBE_OK|Qwen2.5-1.5B-Instruct|4.57.6|chat_template, ver
+        # .claude-scratch/logs/probe_qwen25_15b_groupA.log), pero NO se probo
+        # 5.14.1, asi que no hay evidencia de necesidad. Grupo determinado por
+        # sonda propia, nunca por inferencia de familia: Qwen3.5 resuelve a
+        # grupo B, o sea que "familia Qwen" no predice version.
+        motivo_pin="",
+        activo=True,
+        motivo_exclusion="",
     ),
 ]
 
