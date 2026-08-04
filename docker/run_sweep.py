@@ -41,22 +41,26 @@ from models_2026 import ModeloEvaluado2026, por_nombre, roster_activo  # noqa: E
 
 CLAVE_TOKEN = "HF_TOKEN"
 
+CPUSET_POR_DEFECTO = "0-1"
+
 
 # --------------------------------------------------------------------------
 # Construcción del comando (congelada en F11)
 # --------------------------------------------------------------------------
 
-def comando_run(modelo: ModeloEvaluado2026, raiz: Path,
-                force: bool = False) -> list[str]:
-    """El `docker run` congelado de ese modelo.
+def comando_run(modelo: ModeloEvaluado2026, raiz: Path, force: bool = False,
+                cpuset: str = CPUSET_POR_DEFECTO) -> list[str]:
+    """El `docker run` congelado de ese modelo (F11).
 
-    Los límites `--memory=8g --cpus=2` no son negociables (RNF1): reproducen
-    el hardware acotado del paper original y son lo que hace comparable la
-    tabla de latencia.
+    `--memory=8g --cpus=2` no son negociables (RNF1) y `--cpuset-cpus`
+    tampoco (RNF6): `--cpus` es una cuota del planificador CFS y permite
+    migracion entre nucleos, asi que sin pinning la latencia arrastra
+    variabilidad que no es del modelo. El valor tiene que ser el MISMO en
+    las 12 corridas y en la del juez; cual sea es secundario.
     """
     cmd = [
         "docker", "run", "--rm",
-        "--memory=8g", "--cpus=2",
+        "--memory=8g", "--cpus=2", f"--cpuset-cpus={cpuset}",
     ]
     if modelo.gated:
         # F11: exclusivamente estos dos modelos reciben el token, y solo así.
@@ -167,6 +171,9 @@ def _parsear_argumentos() -> argparse.Namespace:
                         help="rehacer aunque el CSV del modelo ya esté completo")
     parser.add_argument("--dry-run", action="store_true",
                         help="imprimir los comandos sin ejecutarlos")
+    parser.add_argument("--cpuset", default=CPUSET_POR_DEFECTO,
+                        help="par de nucleos al que se fija cada contenedor "
+                             "(--cpuset-cpus); el mismo para las 12 corridas")
     return parser.parse_args()
 
 

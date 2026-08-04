@@ -53,6 +53,36 @@ def test_comando_run_invoca_el_harness_con_el_nombre_del_modelo():
     assert cmd[-3:] == ["src/run_sweep_2026.py", "--modelo", modelo.nombre]
 
 
+def test_comando_run_fija_los_nucleos_con_cpuset():
+    """F11/RNF6: --cpus=2 es una cuota de CFS; --cpuset-cpus fija los nucleos."""
+    from run_sweep import CPUSET_POR_DEFECTO
+    cmd = comando_run(roster_activo()[0], RAIZ)
+    assert f"--cpuset-cpus={CPUSET_POR_DEFECTO}" in cmd
+    assert CPUSET_POR_DEFECTO == "0-1"
+
+
+def test_el_cpuset_es_el_mismo_en_las_doce_invocaciones():
+    """Lo que hace comparable la latencia es que sea el MISMO par en las 12."""
+    valores = set()
+    for m in roster_activo():
+        cmd = comando_run(m, RAIZ)
+        valores |= {a for a in cmd if a.startswith("--cpuset-cpus=")}
+    assert len(valores) == 1, valores
+
+
+def test_el_cpuset_se_puede_sobreescribir_por_host():
+    cmd = comando_run(roster_activo()[0], RAIZ, cpuset="2-3")
+    assert "--cpuset-cpus=2-3" in cmd
+    assert "--cpuset-cpus=0-1" not in cmd
+
+
+def test_ninguna_invocacion_pide_gpu():
+    for m in roster_activo():
+        cmd = " ".join(comando_run(m, RAIZ))
+        for prohibido in ("--gpus", "--device", "nvidia"):
+            assert prohibido not in cmd
+
+
 def test_no_hay_credenciales_en_capas_ni_login_interactivo():
     """F11: prohibido declarar HF_TOKEN en el Dockerfile, copiar .env, pasar el
     token por --build-arg o hacer login interactivo. NO prohibido: --env-file
