@@ -422,16 +422,17 @@ El `modo_prompting` de la tabla es la **expectativa**; el código lo decide en r
 | 06 | Consolidación de etapa 1 y selección del juez | [05] | `TODO_06_consolidacion-y-juez.md` | pendiente |
 | 07 | Juez LLM: taxonomía de errores y categorías lingüísticas | [06] | `TODO_07_juez-llm.md` | pendiente |
 | 08 | Ejecución de la etapa 2 | [07] | `TODO_08_ejecucion-juez.md` | pendiente |
-| 09 | Métricas 2026: estricta, laxa, Tablas 2/3/4 | [08] | `TODO_09_metricas-2026.md` | pendiente |
+| 09 | Métricas 2026: estricta, laxa, Tablas 2/3/4 | [08, 19] | `TODO_09_metricas-2026.md` | pendiente |
 | 10 | Figuras horizontales agrupadas por tier | [09] | `TODO_10_figuras-2026.md` | pendiente |
 | 11 | Generador de fragmentos `.tex` de tablas | [09] | `TODO_11_generador-tablas-tex.md` | pendiente |
 | 12 | Verificador de anonimato para envío ciego | [] | `TODO_12_verificador-anonimato.md` | implementado (`c1e360d`) |
 | 13 | Transcripción fiel del `.docx` a `paper/01_original/` | [] | `TODO_13_transcripcion-original.md` | implementado (`0593681`, `08ca4f4`) |
-| 14 | Paper reescrito: andamiaje y secciones 1–3 | [10, 11, 12, 13, 18] | `TODO_14_paper-secciones-1-3.md` | pendiente |
-| 15 | Paper reescrito: secciones 4–7, build y anonimato | [14, 18] | `TODO_15_paper-secciones-4-7.md` | pendiente |
+| 14 | Paper reescrito: andamiaje y secciones 1–3 | [10, 11, 12, 13, 18, 19] | `TODO_14_paper-secciones-1-3.md` | pendiente |
+| 15 | Paper reescrito: secciones 4–7, build y anonimato | [14, 18, 19] | `TODO_15_paper-secciones-4-7.md` | pendiente |
 | 16 | Roster activo de 12, pins de transformers por grupo y matriz documentada | [01, 04] | `TODO_16_roster-12-y-pins.md` | **implementado (`864c694`)** — su cola de builds de Docker se trasladó al nodo `17` (ver más abajo) |
 | 17 | Intercambio de roster (sale `Qwen3.5-2B`, entra `Qwen2.5-1.5B-Instruct`), pinning de núcleos y continuación ante fallo | [01, 04, 16] | `TODO_17_intercambio-roster-y-ejecucion.md` | pendiente |
 | 18 | Corrida de control con el prompt original sobre los tres anclajes | [05] | `TODO_18_corrida-de-control.md` | **implementado (`abce9f0`, `bd9887a`, `5938b14`)** — código y tests listos; la corrida real (`docker/run_control.py`) la lanza el orquestador después de este reporte |
+| 19 | Baseline re-medido de los 4 modelos del paper original (`Qwen2.5-0.5B-Instruct` + comparación) | [05, 18] | `TODO_19_baseline-original-completo.md` | **implementado (`8fb248f`, `95d1334`, `ab58049`, `44f7fd6`)** — código, imagen y tests listos; la corrida real (`docker/run_baseline.py`, sin `--dry-run`) la lanza el orquestador después de este reporte |
 
 **Reconciliación de bookkeeping (corregida el 2026-08-04).** La afirmación anterior de esta sección —*"ningún subtask tiene casillas tildadas"*— era **factualmente falsa** y queda corregida hacia adelante: `TODO_16_roster-12-y-pins.md` tiene **36 de 39** casillas tildadas. La convención de checkboxes **sí** se usó, en ese subtask. Regla vigente:
 
@@ -445,6 +446,8 @@ El `modo_prompting` de la tabla es la **expectativa**; el código lo decide en r
 **`16` → `17`, y por qué la cola de builds se movió.** `16` es correctiva de `01`/`04`; `17` es correctiva de `16`, así que `17.depends_on` **debe** incluir `16` (edita exactamente los seis archivos que `16` dejó commiteados). Las tres casillas de Docker que quedaban abiertas en `16` (reconstruir las imágenes del grupo B, confirmar la versión efectiva por grupo, no reconstruir las del grupo A) dependen del roster **posterior** al intercambio, o sea de `17`: dejarlas en `16` habría exigido `16.depends_on ∋ 17` **y** `17.depends_on ∋ 16`, que es un **ciclo**. Por eso esa cola se traslada a `17` con los conteos corregidos (**3** imágenes del grupo B a reconstruir, no 4; **1** imagen nueva del grupo A a construir, la de `Qwen2.5-1.5B-Instruct`; **8** del grupo A que no se reconstruyen), y `16` queda cerrado con una nota que apunta a `17`. El DAG queda acíclico.
 
 **`17` bloquea todo lo que consume el roster.** El barrido no puede correr contra el roster viejo: `05.depends_on` pasa de `[04, 16]` a `[04, 16, 17]`, y `06`–`11`, `14` y `15` heredan la dependencia por transitividad (`06←05`, `07←06`, `08←07`, `09←08`, `10←09`, `11←09`, `14←10,11`, `15←14`). Ningún nodo que lea `roster_activo()`, `MODELOS_2026` o `data/2026/**` puede ejecutarse antes de `17`.
+
+**`19` bloquea todo lo que compara contra el paper original.** `09.depends_on` pasa de `[08]` a `[08, 19]`, y `10`/`11` heredan la dependencia por transitividad (`10←09`, `11←09`), igual que con `17`. `14.depends_on` pasa de `[10, 11, 12, 13, 18]` a `[10, 11, 12, 13, 18, 19]` y `15.depends_on` de `[14, 18]` a `[14, 18, 19]`: ningún texto de `09`, `10`, `11`, `14` o `15` puede comparar contra la Tabla 2 publicada como si fuera un baseline validado. Ver el Delta 05 para la narrativa completa.
 
 ## 4. Frozen interfaces / contracts
 
@@ -1383,3 +1386,118 @@ escribirse antes de que `18` esté cerrado con la corrida real ejecutada.
 **Qué NO cambia.** El barrido principal (`data/2026/detalle/`, 12 CSV, `fallos_barrido.json == []`)
 es de solo lectura para todo este delta: no se reinterpreta, no se reejecuta, no se toca. La corrida
 de control es un experimento adicional y aislado, no una corrección del barrido.
+
+# Delta 05 — la corrida de control no reprodujo la Tabla 2 publicada; baseline re-medido (subtask 19)
+
+Decisión del usuario/root del 2026-08-04, tomada tras leer el resultado real de la corrida de
+control del subtask 18 (`docker/run_control.py`, sin `--dry-run`, ejecutada por el orquestador):
+**NO reprodujo** la Tabla 2 publicada para los tres anclajes de continuidad.
+
+| anclaje | publicado | control (prompt original) | nuevo (prompt 2026) |
+|---|---|---|---|
+| `Qwen2.5-1.5B-Instruct` | 50.0% | **56.2%** | 65.6% |
+| `SmolLM2-1.7B-Instruct` | 59.4% | **50.0%** | 50.0% |
+| `SmolLM2-360M-Instruct` | 18.8% | **0.0%** | 9.4% |
+
+Como el invariante de diseño del subtask 18 fijaba **exactamente una** variable distinta entre la
+corrida de control y el barrido principal (el prompt de sistema, `SYSTEM_PROMPT_PAPER` en vez de
+`SYSTEM_PROMPT_2026`) y el resto —dataset, decodificación greedy/temperatura 0, código de scoring,
+imágenes Docker, envolvente de recursos— se mantuvo idéntico, esta divergencia demuestra que **el
+prompt no fue la causa principal** de la brecha nuevo-vs-publicado que motivó el Delta 04: si lo
+fuera, la banda de control tendría que acercarse a la publicada, y en cambio la banda de control
+diverge de la publicada casi tanto como la banda nueva (y con signo distinto según el anclaje).
+
+**Causa, con evidencia (no la versión de `transformers` en sí, que es irrecuperable — no perseguirla):**
+el `requirements.txt` legacy del repo fija `transformers>=4.46.0` **sin cota superior**, y
+`data/resultados_experimento_detalle.csv` (F0, congelado) **no tiene columna `transformers_version`**.
+El entorno de la corrida original nunca quedó fijado en el momento de correrla ni registrado en sus
+resultados: no hay ningún dato en el repo del que se pueda recuperar qué versión de `transformers` (ni
+qué revisión exacta de los pesos de HuggingFace, silenciosamente actualizables) produjo la Tabla 2
+publicada. **Es irreproducibilidad del trabajo original, no un defecto del harness 2026.**
+
+**Acotación explícita — dónde NO está el problema.** `tests/test_metricas.py` sigue **verde** y
+recalcula los porcentajes publicados de la Tabla 2 a partir de los outputs **crudos** publicados
+(`data/resultados_experimento_detalle.csv`, F0): la ruta de *scoring* es fiel, byte a byte, a la
+lógica legacy. La divergencia está enteramente en la **generación** (versión de librería, revisiones
+de pesos actualizadas en silencio, configuración de decodificación no registrada), nunca en cómo se
+puntúan las respuestas. **No auditar ni modificar la ruta de scoring: no es ahí.**
+
+## Decisión: baseline re-medido e internamente consistente
+
+Las cifras publicadas dejan de ser un baseline **validado** y pasan a **referencia histórica, no
+reproducida** (así queda marcado explícitamente en `src/comparar_baseline.py:NOTA_PUBLICADO` y en el
+JSON que produce). Las comparaciones del paper usan en cambio un baseline **RE-MEDIDO** e
+internamente consistente: los **4** modelos del paper original, medidos bajo el mismo harness/prompt
+2026, misma máquina, temperatura 0 — mismas condiciones que el barrido de los 12, así que la
+comparación es de igual a igual. Tres de los 4 (`SmolLM2-360M-Instruct` 9.4%, `SmolLM2-1.7B-Instruct`
+50.0%, `Qwen2.5-1.5B-Instruct` 65.6%) ya existían en `data/2026/detalle/` (son las anclas de
+continuidad RF19, `activo=True`). El cuarto, `Qwen2.5-0.5B-Instruct` (publicado 43.8%), faltaba —
+subtask 19 lo agrega.
+
+**Qué implementó el subtask 19 (código y tests listos; la corrida real de
+`docker/run_baseline.py`, sin `--dry-run`, la lanza el orquestador después de este reporte):**
+
+1. **Sonda de grupo de versión, no inferida.** `Qwen2.5-0.5B-Instruct` se sondeó (no se asumió por
+   familia) dentro de la imagen ya construida del grupo A (`slm-domotica-2026:granite-4-0-350m`,
+   `transformers==4.57.6`): `PROBE_OK|Qwen2.5-0.5B-Instruct|4.57.6|chat_template`. Grupo A, pin
+   heredado (no se probó 5.14.1), mismo estándar de evidencia que `Qwen2.5-1.5B-Instruct`.
+2. **`src/models_2026.py`**: campo nuevo `baseline_original: bool` (default `False`, ortogonal a
+   `activo`) y `roster_baseline_original()` (los 4 modelos). Fila nueva de
+   `Qwen2.5-0.5B-Instruct` con `activo=False` + `motivo_exclusion` que aclara que es
+   baseline-completion (no un modelo nuevo del roster 2026, ni un bloqueo de acceso/versión — una
+   tercera causa de exclusión distinta de las dos ya existentes). Registro **15 → 16**; roster
+   activo se mantiene en **12** (decisión del usuario, no revisitada).
+3. **`docker/build_all.py`**: `seleccionar_modelos()` deja de rechazar un modelo `activo=False`
+   cuando además es `baseline_original=True`. Imagen construida por ese mismo path, sin build
+   ad-hoc: `slm-domotica-2026:qwen2-5-0-5b-instruct`. No se reconstruyó ninguna otra imagen.
+4. **`src/run_baseline_original.py`** (nuevo) + **`docker/run_baseline.py`** (nuevo): mismo patrón
+   que el subtask 18 (`run_control_prompt_original.py` / `run_control.py`), pero sin sustituir el
+   prompt — reusa `run_sweep_2026.evaluar_modelo` con su prompt 2026 por defecto — y restringido a
+   los `baseline_original` que **todavía no están activos** (hoy, solo `Qwen2.5-0.5B-Instruct`).
+   Escribe `data/2026/baseline_original/<slug>.csv` con el mismo `COLUMNAS_DETALLE` y el mismo
+   invariante de 32 filas/`idx`. Mismo envolvente de recursos (`--memory=8g --cpus=2
+   --cpuset-cpus=0-1`), mismos dos fixes ya probados (`encoding="utf-8", errors="replace"`;
+   continuación ante fallo con `data/2026/baseline_original/fallos_baseline.json`, siempre existe
+   salvo `--dry-run`), y el mismo montaje de `src/` de solo lectura que ya costó una corrida fallida
+   por su ausencia en el subtask 18.
+5. **`src/comparar_baseline.py`** (nuevo): publicado (histórico) vs re-medido para los 4 modelos,
+   con su delta; determina el **mejor original re-medido** y la **comparación central** (mejor
+   arquitectura 2026 vs mejor original re-medido) **por código**, leyendo el CSV real de
+   `granite-4.0-1b` en vez de afirmar un número a mano. Escribe
+   `data/2026/baseline_original/comparacion_baseline.json`.
+
+**Hallazgo a reportar, no a asumir.** Con los 3 CSV reales que ya existen (falta solo
+`Qwen2.5-0.5B-Instruct`), el **mejor original re-medido HOY es `Qwen2.5-1.5B-Instruct` al 65.6%**,
+no `SmolLM2-1.7B-Instruct` al 50.0%: `Qwen2.5-1.5B-Instruct` sube fuerte bajo el prompt 2026 (50.0%
+publicado → 65.6% re-medido). La comparación central resulta, con los datos de hoy, `granite-4.0-1b`
+(90.6%) vs `Qwen2.5-1.5B-Instruct` (65.6%) — delta **25.0 pp**, no 40.6 pp. Esto se recalcula
+automáticamente en cuanto corra el cuarto modelo (`python src/comparar_baseline.py` de nuevo): si
+`Qwen2.5-0.5B-Instruct` no supera 65.6%, el ganador no cambia; si lo hiciera, el script lo reflejaría
+sin que nadie tenga que tocar el número a mano.
+
+## Bookkeeping del DAG
+
+Subtask **19** (`depends_on: [05, 18]`) se agrega al DAG. `09.depends_on` pasa de `[08]` a `[08,
+19]` y `10`/`11` heredan la dependencia por transitividad (mismo patrón que `17`). `14.depends_on`
+pasa de `[10, 11, 12, 13, 18]` a `[10, 11, 12, 13, 18, 19]` y `15.depends_on` de `[14, 18]` a `[14,
+18, 19]`.
+
+**Los subtasks 09, 10, 11, 14 y 15 deben usar el baseline RE-MEDIDO, no las cifras publicadas.**
+Ningún texto ni tabla de esos cinco subtasks puede presentar la Tabla 2 publicada como si fuera un
+baseline validado contra el que comparar los 12 modelos del roster 2026: la comparación válida es
+contra `data/2026/baseline_original/comparacion_baseline.json` (o, equivalentemente, contra las
+métricas re-medidas de `roster_baseline_original()`). Donde la cifra publicada se mencione, debe ir
+acompañada de la nota de referencia histórica no reproducida (`comparar_baseline.NOTA_PUBLICADO`).
+
+**La irreproducibilidad es un aporte secundario para §5/§6, no una nota de Amenazas a la Validez.**
+El hallazgo de que la Tabla 2 publicada no es reproducible bajo un control con el prompt idéntico —y
+la evidencia de por qué (versión de dependencia sin cota superior, sin registro de entorno)— es en sí
+mismo un resultado metodológico del paper reescrito, no un matiz a enterrar en la sección de
+limitaciones. Debe discutirse en Resultados/Discusión (§5/§6) con la misma prioridad que la
+comparación de arquitecturas 2026, precisamente porque motiva por qué el paper usa un baseline
+re-medido en vez del publicado para su comparación central.
+
+**Qué NO cambia.** `data/2026/detalle/*.csv`, `data/2026/control_prompt_original/*.csv` y los F0
+congelados son de solo lectura para este delta: no se reinterpretan, no se reejecutan, no se tocan.
+La corrida de baseline-completion es un experimento adicional y aislado (un modelo, una vez), no una
+corrección del barrido principal ni de la corrida de control.
