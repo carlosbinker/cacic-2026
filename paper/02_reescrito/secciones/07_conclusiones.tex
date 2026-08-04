@@ -2,9 +2,9 @@
 
 Este trabajo evaluó automáticamente doce Small Language Models open-source de
 menos de 2 mil millones de parámetros en la interpretación de comandos de
-domótica en español rioplatense, organizados en dos tiers de tamaño y
-sostenidos, para tres de ellos, por continuidad directa con una ronda
-inicial de este mismo experimento. Bajo el mismo prompt de este trabajo, el mejor modelo evaluado,
+domótica en español rioplatense, organizados en dos tiers de tamaño, con
+\texttt{Qwen2.5-1.5B-Instruct} incorporado deliberadamente como
+representante de la generación anterior de SLMs. Bajo el mismo prompt de este trabajo, el mejor modelo evaluado,
 \texttt{granite-4.0-1b}, alcanza 90,6\% de exactitud estricta, 25,0 puntos
 porcentuales por encima del mejor modelo del brazo de generación anterior
 medido idénticamente (\texttt{Qwen2.5-1.5B-Instruct}, 65,6\%): la evidencia
@@ -35,13 +35,7 @@ automático, en dos etapas y con decodificación determinista en ambas. Ese
 pipeline es reproducible por construcción (mismo modelo de entrada, misma
 salida del juez) y escala a rosters de modelos mucho más grandes que los doce
 de este estudio sin que el costo de anotación crezca con el número de
-modelos evaluados, a diferencia del etiquetado manual de la ronda inicial de
-este experimento. La comparación de continuidad contra esa ronda inicial,
-sostenida sobre tres modelos evaluados con modelo constante, mostró además
-que buena parte de la divergencia entre la medición 2026 y la inicial es
-atribuible al protocolo y al entorno de ejecución y no al modelo en sí — la
-validación cruzada más directa disponible de que el arnés de este trabajo
-es, en ese sentido, consistente con esa ronda inicial.
+modelos evaluados.
 
 Como trabajo futuro se plantea: (1) incorporar un juez externo, de mayor
 escala y no perteneciente al roster evaluado, para mitigar el sesgo de

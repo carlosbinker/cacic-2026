@@ -3,9 +3,8 @@
 \textbf{Validez de constructo.} La métrica principal (exactitud estricta)
 exige coincidencia textual con el ground truth bajo un protocolo que declara
 explícitamente los sinónimos de valores categóricos cerrados como violación de
-formato (Sección \ref{sec:prompting}). Esta amenaza ya no es sólo una
-advertencia sin cuantificar, como en la ronda inicial de este experimento: queda
-\textbf{resuelta parcialmente} por la exactitud laxa y por la taxonomía de
+formato (Sección \ref{sec:prompting}). Esta amenaza queda \textbf{resuelta
+parcialmente} por la exactitud laxa y por la taxonomía de
 errores de la Sección \ref{sec:analisis-errores}, que separan explícitamente
 cuánta exactitud estricta perdida corresponde a \texttt{uso\_de\_sinonimos} o
 a \texttt{sin\_error\_semantico} en lugar de a un error de contenido real. La
@@ -19,9 +18,9 @@ validez interna sobre el sesgo del juez y la fragilidad de
 
 \textbf{Validez interna.}
 
-\emph{Sesgo de auto-favorecimiento del juez.} El juez de la etapa 2 es
-\texttt{granite-4.0-1b}, seleccionado por la regla congelada de mayor
-exactitud estricta en la etapa 1 (Sección \ref{sec:dos-etapas}), y ese mismo
+\emph{Sesgo de auto-favorecimiento del juez.} El juez de la etapa 2,
+seleccionado por la regla congelada de mayor exactitud estricta en la etapa 1
+(Sección \ref{sec:dos-etapas}), es \texttt{granite-4.0-1b}, y ese mismo
 modelo es uno de los doce evaluados: \textbf{juzga también sus propias
 respuestas de la etapa 1}. Un juez basado en LLM puede favorecer respuestas
 generadas por sí mismo o por modelos de su misma familia
@@ -89,8 +88,7 @@ sido.
 
 \textbf{Validez externa.}
 
-Se conservan además las amenazas de validez externa de la ronda inicial de
-este experimento: el dataset de evaluación es chico y desbalanceado (32
+Persisten además las siguientes amenazas de validez externa: el dataset de evaluación es chico y desbalanceado (32
 comandos, entre 3 y 8 por categoría lingüística), se usó un único prompt sin
 optimización específica por modelo, la entrada fue siempre texto limpio sin
 ruido de reconocimiento de voz (ASR), y sólo se cubrió una variante
@@ -99,8 +97,8 @@ dialectal (español rioplatense).
 \textbf{Validez de conclusión.} Con entre 3 y 8 comandos por categoría, las
 diferencias porcentuales entre modelos de la Tabla \ref{tab:categorias} y de
 la Tabla \ref{tab:globales} son indicativas, no estadísticamente
-significativas en sentido formal — la misma limitación de la ronda inicial
-de este experimento, que este trabajo no resuelve. Todas las corridas del
+significativas en sentido formal — una limitación que este trabajo no
+resuelve. Todas las corridas del
 barrido principal (Sección \ref{sec:entorno-repro}) se ejecutaron en una
 \textbf{única máquina}, de forma estrictamente secuencial y con
 procesadores fijos, para que la latencia fuera comparable entre modelos;

@@ -7,51 +7,37 @@
 Se seleccionaron doce modelos abiertos, organizados en dos tiers de tamaño
 de seis modelos cada uno: sub-1000 millones de parámetros y entre 1000 y
 2000 millones de parámetros (Tabla \ref{tab:modelos}). Los criterios de
-inclusión son tres, y los doce modelos evaluados los cumplen todos: (i) ser
+inclusión son dos, y los doce modelos evaluados los cumplen ambos: (i) ser
 un modelo abierto de menos de 2 mil millones de parámetros, publicado en un
 repositorio público de HuggingFace, sin restricción de licencia ni de token
-de acceso; (ii) resolver, bajo alguno de los dos grupos de versión de la
+de acceso; y (ii) resolver, bajo alguno de los dos grupos de versión de la
 librería de inferencia documentados en la Sección \ref{sec:entorno-repro},
-a una ejecución funcional verificada empíricamente; y (iii), para los tres
-modelos que además sostienen la continuidad de la Sección
-\ref{sec:continuidad}, haber sido parte de la ronda inicial de este mismo
-experimento. Los doce modelos son, en consecuencia, todos de repositorios
-públicos: reproducir el barrido reportado en este trabajo no exige aceptar
-ninguna licencia ni disponer de credenciales de acceso.
+a una ejecución funcional verificada empíricamente. Los doce modelos son,
+en consecuencia, todos de repositorios públicos: reproducir el barrido
+reportado en este trabajo no exige aceptar ninguna licencia ni disponer de
+credenciales de acceso.
 
-Un requisito adicional del roster es sostener la continuidad con la ronda
-inicial de este mismo experimento. Con ese fin, \texttt{Qwen2.5-1.5B-Instruct}
-se incorporó \textbf{deliberadamente} al roster activo. Los modelos
-presentes en \textbf{ambas} rondas son tres: \texttt{SmolLM2-360M-Instruct}
-(0,36\,B), \texttt{Qwen2.5-1.5B-Instruct} (1,54\,B) y
-\texttt{SmolLM2-1.7B-Instruct} (1,71\,B). \texttt{Qwen2.5-1.5B-Instruct} es,
-de las tres, la única del tier 1--2B y la única de una familia distinta de
-SmolLM2, de modo que las tres anclas cubren en conjunto ambos tiers de
-tamaño y dos familias de modelos.
+Dentro de ese roster, \texttt{Qwen2.5-1.5B-Instruct} (1,54\,B, tier 1--2B)
+se incorporó \textbf{deliberadamente} para representar la generación
+anterior de SLMs, evaluado bajo el mismo protocolo que el resto del roster:
+esa comparación de igual a igual es la que sostiene el resultado
+generacional reportado en la Sección 4.1.
 
-Vale una aclaración de identificador, porque un error de este tipo es fácil
-de reintroducir: existe un identificador de apariencia similar, con el
-mismo prefijo de familia y tier pero con el último dígito de tamaño mal
-escrito (un 7 en vez de un 5 antes de la ``B''), que no corresponde a
-ningún modelo publicado (resuelve HTTP 404); el identificador correcto,
-efectivamente usado en este estudio, es \texttt{Qwen/Qwen2.5-1.5B-Instruct}
-(HTTP 200). Ningún modelo de este roster se ejecutó por la ruta de
-\emph{raw completion}: los doce resuelven a \verb|chat_template|, como se
-detalla en la Sección \ref{sec:prompting}.
+Ningún modelo de este roster se ejecutó por la ruta de \emph{raw
+completion}: los doce resuelven a \verb|chat_template|, como se detalla en
+la Sección \ref{sec:prompting}.
 
 \subsection{Dataset de comandos}
 
-El dataset de evaluación no se modificó respecto de la ronda inicial de este
-experimento: los mismos 32 comandos de domótica en español rioplatense
-(voseo), organizados en seis categorías lingüísticas (encendido/apagado
-simple, ajuste con valor numérico explícito, ajuste relativo o cualitativo
-sin valor numérico, comandos sobre múltiples dispositivos, consultas de
-estado, y comandos con negación o contexto conversacional), y el mismo
-esquema de referencia (ground truth) de cinco campos: intent, dispositivo,
-ubicación, valor y unidad. La diferencia no está en el dataset sino en cómo
-se asigna la categoría lingüística de cada comando: en este trabajo esa
-asignación ya no es manual, sino que la produce el juez automático (Sección
-\ref{sec:dos-etapas}).
+El dataset de evaluación consiste en 32 comandos de domótica en español
+rioplatense (voseo), organizados en seis categorías lingüísticas
+(encendido/apagado simple, ajuste con valor numérico explícito, ajuste
+relativo o cualitativo sin valor numérico, comandos sobre múltiples
+dispositivos, consultas de estado, y comandos con negación o contexto
+conversacional), con un esquema de referencia (ground truth) de cinco
+campos: intent, dispositivo, ubicación, valor y unidad. La categoría
+lingüística de cada comando la asigna el juez automático (Sección
+\ref{sec:dos-etapas}), no un anotador humano.
 
 \subsection{Protocolo de prompting y esquema de salida}
 \label{sec:prompting}
@@ -79,11 +65,7 @@ correcta con otra palabra.
 
 La exactitud estricta reportada en la Sección 4 se calcula siempre bajo
 este mismo prompt para los doce modelos, de modo que la comparación entre
-arquitecturas de esa sección nunca mezcla prompts distintos. El efecto de
-este prompt, comparado contra el que usó la ronda inicial de este
-experimento, se aísla explícitamente y por separado en la Sección
-\ref{sec:continuidad}, que mantiene el modelo constante y cambia únicamente
-el prompt.
+arquitecturas de esa sección nunca mezcla prompts distintos.
 
 Un segundo aspecto del protocolo, ortogonal al anterior, es que el modo de
 prompting —\verb|chat_template| o \emph{raw completion}— se decide en tiempo de
@@ -102,10 +84,10 @@ hecho.
 
 \subsection{Métricas}
 
-Se reportan las cinco métricas de la ronda inicial de este experimento —tasa de JSON válido,
-coincidencia exacta, exactitud por campo, latencia promedio por comando y
-exactitud por categoría lingüística— más una sexta, nueva en este trabajo.
-Las dos métricas titulares se definen con precisión:
+Este trabajo reporta seis métricas: tasa de JSON válido, coincidencia
+exacta, exactitud por campo, latencia promedio por comando, exactitud por
+categoría lingüística, y la exactitud laxa semántica. Las dos métricas
+titulares se definen con precisión:
 
 \begin{itemize}
 \item \textbf{exactitud estricta}: los cinco campos de la respuesta
@@ -148,10 +130,9 @@ dado el mismo modelo de entrada, la salida del juez es siempre la misma.
 
 \textbf{Etapa 2, trabajo A — taxonomía de errores.} Cada respuesta con
 \texttt{match\_exact = False} se clasifica en un subconjunto \textbf{no
-vacío} de siete etiquetas cerradas: las cinco de la taxonomía de errores de
-la ronda inicial de este experimento —confusión de intención, confusión de dispositivo,
-confusión de ubicación, alucinación de valor o unidad, y valor numérico
-incorrecto— más dos nuevas, \texttt{sin\_error\_semantico} y
+vacío} de siete etiquetas cerradas: confusión de intención, confusión de
+dispositivo, confusión de ubicación, alucinación de valor o unidad, y valor
+numérico incorrecto, más \texttt{sin\_error\_semantico} y
 \texttt{uso\_de\_sinonimos}, que son precisamente las que definen la
 exactitud laxa. La salida del juez es cerrada: si no parsea contra ese
 vocabulario, se reintenta una vez con el mismo prompt; si vuelve a fallar,
@@ -160,8 +141,8 @@ esto ocurre se reporta como parte de los resultados.
 
 \textbf{Etapa 2, trabajo B — categorías lingüísticas.} Cada uno de los 32
 comandos del dataset se clasifica en \textbf{exactamente una} de las seis
-categorías lingüísticas cerradas, reemplazando la asignación manual de
-categoría de la ronda inicial de este experimento.
+categorías lingüísticas cerradas, mediante el juez automático en lugar de
+una asignación manual.
 
 El juez, al ser uno de los propios modelos evaluados, adjudica también sobre
 sus propias respuestas de la etapa 1; esa circunstancia y su implicancia

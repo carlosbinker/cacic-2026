@@ -4,10 +4,8 @@
 4 mostró que, para varios modelos, la exactitud laxa duplica o más que
 duplica a la exactitud estricta. Esa brecha es la medida directa de cuánto
 penaliza la coincidencia textual exacta a respuestas que un juez semántico
-considera correctas o equivalentes — exactamente la duda que el estudio
-anterior dejaba planteada como amenaza de validez de constructo pero no podía
-cuantificar, porque su verificación era manual y su métrica única. Aquí la
-brecha se cuantifica por modelo y se descompone en dos causas distintas
+considera correctas o equivalentes. Aquí la brecha se cuantifica por modelo
+y se descompone en dos causas distintas
 gracias a la taxonomía de siete etiquetas: respuestas sin ningún error
 semántico y respuestas que sólo cambian una palabra del vocabulario cerrado
 por un sinónimo válido. La Sección 4.4 mostró además que esa brecha no es
@@ -92,41 +90,3 @@ tope de recursos, lo que confirma que, sobre CPU con dos procesadores
 lógicos, la interpretación de comandos de domótica con SLMs sigue siendo un
 problema de compromiso entre exactitud y tiempo de respuesta, no un problema
 resuelto.
-
-\textbf{Continuidad con la ronda inicial de este experimento: validación
-cruzada del arnés y cuantificación del efecto del prompt.} La Sección
-\ref{sec:continuidad} reportó, a través de las dos columnas de continuidad
-de la Tabla \ref{tab:globales}, que la exactitud estricta y la latencia de
-los tres modelos con continuidad (\texttt{SmolLM2-360M-Instruct},
-\texttt{Qwen2.5-1.5B-Instruct} y \texttt{SmolLM2-1.7B-Instruct}) divergen de
-esa medición inicial, y no todas en la misma dirección. Con el modelo
-mantenido \textbf{constante} en cada una de las tres comparaciones,
-cualquier divergencia entre la medición 2026 y la inicial no puede
-atribuirse al modelo en sí — sólo puede deberse al protocolo y al arnés de
-ejecución: la cláusula taxativa agregada al prompt (Sección
-\ref{sec:prompting}), la versión de \texttt{transformers} resuelta en cada
-corrida, y el estado del host (fecha de ejecución, carga del momento). Esto
-es, precisamente, lo que convierte esta comparación en una \textbf{validación
-cruzada} del arnés de este trabajo contra esa medición inicial, y en la
-\textbf{única} forma disponible de cuantificar el efecto de haber endurecido
-el prompt en 2026 en lugar de simplemente enunciarlo: dado que el modelo no
-cambia, la parte de la divergencia que no se explica por la versión de
-\texttt{transformers} es atribuible al cambio de prompt. En cuanto a la
-latencia, la comparación con las tres anclas muestra que sigue siendo del
-mismo orden de magnitud que la de la medición inicial de 2025 (decenas de
-segundos por comando en las tres), lo que respalda que el hardware y el
-protocolo de medición de latencia (Sección \ref{sec:entorno-repro}) se
-mantuvieron comparables entre ambas rondas, aunque no idénticos en la
-versión de la librería de inferencia usada en cada grupo del roster
-(Sección 6). Corresponde cerrar con una aclaración explícita: esta
-comparación \textbf{no es una réplica}. La Sección \ref{sec:prompting} ya
-estableció que la exactitud estricta reportada en la Sección 4 usa siempre
-el mismo prompt para los doce modelos, y que el efecto de haber cambiado ese
-prompt respecto de la ronda inicial se aísla, precisamente, en esta
-comparación de continuidad; la latencia carga además el confusor de los dos
-grupos de versión de \texttt{transformers} descripto en la Sección
-\ref{sec:entorno-repro} y retomado como amenaza a la validez en la Sección 6.
-Lo que esta comparación ofrece no es una repetición de la ronda inicial bajo
-las mismas condiciones, sino una cota de cuánto de la diferencia observada
-es atribuible al cambio deliberado de protocolo frente a lo que podría
-deberse al entorno de ejecución.

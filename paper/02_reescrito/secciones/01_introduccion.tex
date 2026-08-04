@@ -21,17 +21,15 @@ frente a estructuras propias del español rioplatense (voseo, diminutivos,
 expresiones relativas como ``bajale un toque'') ni cuál es el costo real en
 latencia de ejecutarlos en hardware modesto.
 
-Una ronda inicial de este mismo experimento evaluó cuatro SLMs mediante
-coincidencia exacta contra un ground truth y clasificó a mano las 73
-respuestas incorrectas resultantes para identificar patrones de error. Ese
-etiquetado manual no escala: repetirlo sobre un roster de doce modelos
-multiplicaría el volumen de respuestas a revisar, y su resultado tampoco es
-reproducible por un tercero, porque depende del criterio del anotador en el
-momento de clasificar cada caso. Este trabajo reemplaza esa revisión manual
-por un pipeline de verificación completamente automático, y amplía el
-roster para incorporar familias de modelos publicadas recientemente
-(LFM2.5, Granite 4.0, Qwen3.5 y OLMo-2) junto con dos tiers de tamaño (menos
-de 1000 millones y entre 1000 y 2000 millones de parámetros).
+La clasificación manual de respuestas incorrectas para identificar patrones
+de error no escala a un roster de doce modelos: multiplica el volumen de
+respuestas a revisar a mano, y su resultado tampoco es reproducible por un
+tercero, porque depende del criterio del anotador en el momento de
+clasificar cada caso. Este trabajo evalúa doce SLMs mediante un pipeline de
+verificación completamente automático, sobre un roster que incorpora
+familias de modelos publicadas recientemente (LFM2.5, Granite 4.0, Qwen3.5
+y OLMo-2) junto con dos tiers de tamaño (menos de 1000 millones y entre
+1000 y 2000 millones de parámetros).
 
 Las contribuciones de este trabajo son: (1) la evaluación de un roster de
 doce modelos abiertos sub-2B, de acceso público y sin restricción de
@@ -43,7 +41,8 @@ etiquetado manual de respuestas incorrectas y de categorías lingüísticas;
 (3) el reporte conjunto de exactitud estricta y exactitud laxa, cuya
 brecha cuantifica el costo de exigir coincidencia textual exacta; (4) un
 protocolo de ejecución reproducible, con aislamiento por contenedor y
-versiones de librerías documentadas por grupo; y (5) la continuidad con la
-ronda inicial de este experimento a través de tres modelos evaluados en
-ambas rondas —antes dos—, que en conjunto cubren los dos tiers de tamaño y
-dos familias de modelos distintas.
+versiones de librerías documentadas por grupo; y (5) la inclusión
+deliberada de un modelo representativo de la generación anterior de SLMs
+(\texttt{Qwen2.5-1.5B-Instruct}), evaluado bajo el mismo protocolo que el
+resto del roster, que permite cuantificar cuánto cambió lo factible para
+esta tarea en el rango sub-2B respecto de esa generación.
