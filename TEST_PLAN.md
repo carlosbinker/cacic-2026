@@ -302,7 +302,10 @@ amenazas = {
     "versiones de libreria como confusor de latencia": (("versi",), ("latencia",)),
     # (3) ahora cubre DOS causas de exclusion: acceso no otorgado y compatibilidad
     # no verificada, 3 de 15 en total.
-    "exclusion por causas ajenas al metodo": (("acceso restringido", "gated"), ("metodologica",)),
+    # "metodológica" lleva tilde en el paper (ortografia correcta); se acepta
+    # tambien la forma sin tilde para no volver a quebrar el check si alguien
+    # escribe la variante ASCII en el futuro.
+    "exclusion por causas ajenas al metodo": (("acceso restringido", "gated"), ("metodologica", "metodológica")),
 }
 faltan = [
     nombre
@@ -318,11 +321,19 @@ prohibido = re.search(r"(lfm2\.5-230m|lfm2\.5-350m|modelos base)[^.]{0,80}raw co
 assert not prohibido, "sobrevive la amenaza eliminada de incomparabilidad por raw completion"
 # Verificacion NEGATIVA (Delta 2026-08-04): no se puede sobreafirmar sobre Qwen3.5-2B.
 # Su sonda bajo 5.14.1 nunca corrio, asi que no hay evidencia de que falle ahi.
+# Acotado a menciones cercanas a "qwen3.5-2b": una busqueda de substring sin
+# acotar tambien matcheaba la evidencia legitima y ya verificada de que
+# granite-4.0-350m "falla bajo 5.14.1" (linea 57 de 06_amenazas.tex), que no
+# tiene nada que ver con Qwen3.5-2B y no es una sobreafirmacion.
 for sobreafirmacion in ("falla bajo 5.14.1", "incompatible con 5.14.1",
                         "no corre bajo ninguna", "falla en las dos versiones"):
-    assert sobreafirmacion not in texto, (
-        f"sobreafirmacion sobre Qwen3.5-2B: {sobreafirmacion!r}. Su compatibilidad "
-        f"bajo 5.14.1 es NO VERIFICADA, no demostradamente mala."
+    patron = re.compile(
+        rf"qwen3\.5-2b[^.]{{0,200}}{re.escape(sobreafirmacion)}"
+        rf"|{re.escape(sobreafirmacion)}[^.]{{0,200}}qwen3\.5-2b"
+    )
+    assert not patron.search(texto), (
+        f"sobreafirmacion sobre Qwen3.5-2B: {sobreafirmacion!r} cerca de su mencion. "
+        f"Su compatibilidad bajo 5.14.1 es NO VERIFICADA, no demostradamente mala."
     )
 print("las 3 amenazas de RF16 estan presentes (con las dos causas de exclusion), "
       "sin afirmacion de raw completion y sin sobreafirmar sobre Qwen3.5-2B")
@@ -388,6 +399,7 @@ PY
 **Run:**
 ```bash
 python - <<'PY'
+import re
 from pathlib import Path
 import sys
 sys.path.insert(0, "src")
@@ -435,9 +447,16 @@ for seccion in ("03_metodologia.tex", "06_amenazas.tex"):
         fallas.append(f"{seccion}: no declara la exclusion por compatibilidad no verificada")
     # Verificacion NEGATIVA: no se puede afirmar que Qwen3.5-2B falle bajo 5.14.1.
     # No hay evidencia de eso: la sonda nunca corrio. Solo ausencia de evidencia.
+    # Acotado a menciones cercanas a "qwen3.5-2b" (ver misma nota en C11): un
+    # substring sin acotar tambien matchea la evidencia legitima y ya verificada
+    # de que granite-4.0-350m "falla bajo 5.14.1", que no es sobre Qwen3.5-2B.
     for sobreafirmacion in ("falla bajo 5.14.1", "incompatible con 5.14.1",
                             "no corre bajo ninguna", "falla en las dos versiones"):
-        if sobreafirmacion in texto:
+        patron = re.compile(
+            rf"qwen3\.5-2b[^.]{{0,200}}{re.escape(sobreafirmacion)}"
+            rf"|{re.escape(sobreafirmacion)}[^.]{{0,200}}qwen3\.5-2b"
+        )
+        if patron.search(texto):
             fallas.append(f"{seccion}: sobreafirma sobre Qwen3.5-2B ({sobreafirmacion!r})")
 
 assert not fallas, fallas
@@ -447,7 +466,7 @@ print("exclusiones declaradas OK: 4 excluidos (2 por acceso, 1 por compatibilida
 PY
 ```
 **Expected:** imprime `exclusiones declaradas OK: 4 excluidos (2 por acceso, 1 por compatibilidad no verificada, 1 por baseline-completion), fuera de tablas, dentro de exclusiones/limitacion, sin sobreafirmar`, exit 0.
-**On failure indicates:** o bien un modelo excluido se coló en una tabla de resultados (contaminando una comparación que no corrió), o bien la exclusión no está documentada como limitación, o bien el paper **sobreafirma** sobre `Qwen3.5-2B`. Esto último es el error más fácil de cometer y el más caro: su sonda bajo 5.14.1 **nunca corrió** por un bloqueo de infraestructura de Docker, así que no hay evidencia de que falle bajo esa versión — solo ausencia de evidencia de que funcione. Escribir "incompatible con las dos versiones mayores" sería una afirmación empírica sin respaldo en un paper.
+**On failure indicates:** o bien un modelo excluido se coló en una tabla de resultados (contaminando una comparación que no corrió), o bien la exclusión no está documentada como limitación, o bien el paper **sobreafirma** sobre `Qwen3.5-2B`. Esto último es el error más fácil de cometer y el más caro: su sonda bajo 5.14.1 **nunca corrió** por un bloqueo de infraestructura de Docker, así que no hay evidencia de que falle bajo esa versión — solo ausencia de evidencia de que funcione. Escribir "incompatible con las dos versiones mayores" sería una afirmación empírica sin respaldo en un paper. La verificación negativa está acotada a menciones cercanas a `Qwen3.5-2B`: un substring sin acotar también dispara sobre la evidencia legítima de que `granite-4.0-350m` "falla bajo 5.14.1", que no tiene relación con `Qwen3.5-2B`.
 
 ### Check C15 — Continuidad con la Tabla 2 publicada (RF19, Delta 2026-08-04)
 **Covers AC:** AC15 (*las dos columnas de continuidad de la Tabla 2 existen, sus valores coinciden dígito a dígito con `data/resultados_experimento_resumen.json` para los **3** modelos presentes en ambos estudios y son `--` para los otros **9**; §4 reporta la comparación y §5 la interpreta, incluida cualquier divergencia; y el texto declara que no es una réplica*), RF19.
@@ -532,8 +551,13 @@ python docker/run_sweep.py --dry-run | grep -cE 'gpus|--device|nvidia' ; test $?
 # imagenes de verdad, no apariciones de texto.
 python docker/build_all.py --dry-run | grep -oE 'slm-domotica-2026:[A-Za-z0-9._-]+' | sort -u | wc -l
 # Reparto por grupo de version en el plan de build: 9 del grupo A, 3 del grupo B.
-python docker/build_all.py --dry-run | grep -c 'transformers>=4.57.0,<5.0.0'
-python docker/build_all.py --dry-run | grep -c 'transformers>=5.0.0'
+# Mismo problema de duplicacion que el tag (arriba): "transformers>=X" aparece
+# en la linea de cabecera Y en la de "docker build --build-arg ...", asi que
+# contar lineas sin mas da 18/6, el doble del real. Se dedupea igual que el
+# tag: se extrae el par "<tag> | <pin>" (solo la linea de cabecera calza ese
+# patron; la linea --build-arg no) y se cuenta sobre las lineas unicas.
+python docker/build_all.py --dry-run | grep -oE 'slm-domotica-2026:[A-Za-z0-9._-]+ \| transformers[A-Za-z0-9.,<>=]+' | sort -u | grep -c 'transformers>=4.57.0,<5.0.0'
+python docker/build_all.py --dry-run | grep -oE 'slm-domotica-2026:[A-Za-z0-9._-]+ \| transformers[A-Za-z0-9.,<>=]+' | sort -u | grep -c 'transformers>=5.0.0'
 # Pinning de nucleos (Delta 2026-08-04): presente en las 12 y con UN SOLO valor.
 python docker/run_sweep.py --dry-run | grep -c -- '--cpuset-cpus'
 python docker/run_sweep.py --dry-run | grep -oE -- '--cpuset-cpus=[^ ]+' | sort -u | wc -l
