@@ -40,7 +40,7 @@ PATH_POR_CATEGORIA = DIR_2026 / "exactitud_por_categoria.csv"
 CLAVES_RESUMEN = [
     "modelo", "hf_repo_id", "params_b", "tier", "modo_prompting",
     "transformers_pin", "n", "json_valido_pct", "exact_match_pct",
-    "exact_match_laxo_pct", "avg_latencia_s", "acc_intent_pct",
+    "exact_match_laxo_pct", "laxo_json_invalido_n", "avg_latencia_s", "acc_intent_pct",
     "acc_dispositivo_pct", "acc_ubicacion_pct", "acc_valor_pct",
     "acc_unidad_pct",
 ]
@@ -83,9 +83,14 @@ def calcular_resumen_2026(df_detalle: pd.DataFrame,
         if df_m.empty:
             continue
         estricta = _como_bool(df_m["match_exact"])
-        laxa = estricta | df_m["idx"].map(
+        json_valido = _como_bool(df_m["json_valido"])
+        rescatada_laxa = df_m["idx"].map(
             lambda i: (modelo.nombre, int(i)) in equivalentes
         )
+        laxa = estricta | rescatada_laxa
+        # RF10b: cuantas filas laxas fueron creditadas pese a no tener JSON
+        # valido (ver hallazgo metodologico de SmolLM2-360M en el §6).
+        laxo_json_invalido_n = int((laxa & ~json_valido).sum())
         modos = df_m["modo_prompting"].unique()
         filas.append({
             "modelo": modelo.nombre,
@@ -95,9 +100,10 @@ def calcular_resumen_2026(df_detalle: pd.DataFrame,
             "modo_prompting": modos[0] if len(modos) == 1 else "mixto",
             "transformers_pin": modelo.transformers_pin,
             "n": len(df_m),
-            "json_valido_pct": round(100 * _como_bool(df_m["json_valido"]).mean(), 1),
+            "json_valido_pct": round(100 * json_valido.mean(), 1),
             "exact_match_pct": round(100 * estricta.mean(), 1),
             "exact_match_laxo_pct": round(100 * laxa.mean(), 1),
+            "laxo_json_invalido_n": laxo_json_invalido_n,
             "avg_latencia_s": round(df_m["latencia_s"].mean(), 3),
             "acc_intent_pct": round(100 * _como_bool(df_m["match_intent"]).mean(), 1),
             "acc_dispositivo_pct": round(100 * _como_bool(df_m["match_dispositivo"]).mean(), 1),

@@ -141,6 +141,31 @@ def test_json_valido_coincide_con_resumen_etapa1_para_los_12_modelos():
     assert {f["json_valido_pct"] for f in resumen} != {100.0}
 
 
+def test_laxa_credita_filas_con_json_invalido_si_el_juez_las_marco_equivalentes():
+    """Semantica fijada de la laxa (Bug 2, verdicto b): 'laxa' es
+    estricta OR etiqueta-de-equivalencia del juez, sin condicionar por
+    json_valido. Es comportamiento intencional -no un bug de computo-, pero
+    debe quedar fijado para que no derive en silencio, y el conteo de filas
+    creditadas con JSON invalido tiene que aparecer en el resumen."""
+    det = _det(M1, [False, False, False])
+    det.loc[det["idx"] == 0, "json_valido"] = False  # invalida, igual rescatada
+    det.loc[det["idx"] == 1, "json_valido"] = False  # invalida, no rescatada
+    det.loc[det["idx"] == 2, "json_valido"] = True   # valida, rescatada
+    eti = _eti([(M1, 0, "uso_de_sinonimos"), (M1, 2, "sin_error_semantico")])
+    fila = calcular_resumen_2026(det, eti)[0]
+    assert fila["exact_match_pct"] == 0.0
+    assert fila["exact_match_laxo_pct"] == round(100 * 2 / 3, 1)
+    assert fila["laxo_json_invalido_n"] == 1  # solo idx 0: invalida y rescatada
+
+
+def test_laxo_json_invalido_n_es_cero_cuando_toda_json_valida_es_rescatada():
+    det = _det(M1, [True, False])
+    eti = _eti([(M1, 1, "uso_de_sinonimos")])
+    fila = calcular_resumen_2026(det, eti)[0]
+    assert fila["exact_match_laxo_pct"] == 100.0
+    assert fila["laxo_json_invalido_n"] == 0
+
+
 def test_el_resumen_trae_metadatos_del_registro():
     det = _det(M1, [True], modo="raw_completion")
     fila = calcular_resumen_2026(det, _eti([]))[0]
