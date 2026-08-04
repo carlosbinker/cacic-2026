@@ -157,3 +157,12 @@ LFM2.5-1.2B-Instruct,31,confusion_intencion,confusion_intencion,True
 granite-4.0-1b,3,sin_error_semantico,sin_error_semantico,True
 granite-4.0-1b,7,uso_de_sinonimos,uso_de_sinonimos,True
 granite-4.0-1b,24,uso_de_sinonimos,uso_de_sinonimos,True
+granite-4.0-h-1b,5,sin_error_semantico,sin_error_semantico,True
+granite-4.0-h-1b,7,uso_de_sinonimos,uso_de_sinonimos,True
+granite-4.0-h-1b,14,sin_error_semantico,sin_error_semantico,True
+granite-4.0-h-1b,20,sin_error_semantico,sin_error_semantico,True
+granite-4.0-h-1b,22,sin_error_semantico,sin_error_semantico,True
+granite-4.0-h-1b,23,sin_error_semantico,sin_error_semantico,True
+granite-4.0-h-1b,24,confusion_dispositivo,confusion_dispositivo,True
+granite-4.0-h-1b,25,sin_error_semantico,sin_error_semantico,True
+granite-4.0-h-1b,31,sin_error_semantico,sin_error_semantico,True
