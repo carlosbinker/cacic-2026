@@ -1,6 +1,6 @@
 # Reejecución del experimento con roster 2026, verificación automática en dos etapas y reescritura del paper en LaTeX
 
-**Goal:** Rehacer el estudio comparativo de SLMs para interpretación de comandos de domótica con un registro de 15 modelos (roster activo de 12, tras el Delta 2026-08-04), reemplazar la clasificación manual de errores por un pipeline automático de dos etapas (coincidencia textual + juez LLM con categorías cerradas), aislar cada modelo en su propia imagen Docker, y reescribir el paper como un conjunto de archivos `.tex` LNCS listos para envío ciego a CACIC 2026.
+**Goal:** Rehacer el estudio comparativo de SLMs para interpretación de comandos de domótica con un registro de 16 modelos (roster activo de 12, tras los Deltas 2026-08-04 y 05), reemplazar la clasificación manual de errores por un pipeline automático de dos etapas (coincidencia textual + juez LLM con categorías cerradas), aislar cada modelo en su propia imagen Docker, y reescribir el paper como un conjunto de archivos `.tex` LNCS listos para envío ciego a CACIC 2026.
 
 **Architecture:** Todo el código nuevo vive en módulos `*_2026.py` paralelos a los existentes; los módulos legacy (`models.py`, `prompt.py`, `metrics.py`, `run_evaluation.py`, `generate_figures.py`), los resultados publicados (`data/resultados_experimento_*`) y `tests/test_metricas.py` quedan **congelados y verdes**. El barrido corre un modelo por contenedor, secuencialmente, escribiendo un CSV por modelo bajo `data/2026/detalle/` para que sea reanudable. Consolidado el barrido, se elige el juez de forma determinista (mejor exactitud estricta, desempate por tamaño) y ese mismo modelo etiqueta (a) cada respuesta incorrecta con una taxonomía cerrada de 7 etiquetas y (b) cada uno de los 32 comandos con una de 6 categorías lingüísticas. De ahí salen dos métricas titulares —exactitud estricta y laxa— cuya brecha es en sí misma un resultado. El paper se genera con tablas `.tex` emitidas por script desde los JSON de resultados.
 
@@ -428,19 +428,19 @@ El `modo_prompting` de la tabla es la **expectativa**; el código lo decide en r
 | 02 | Prompt taxativo 2026 y ruta de raw completion | [01] | `TODO_02_prompt-y-raw-completion.md` | implementado (`8c9287a`) |
 | 03 | Harness de barrido reanudable por modelo | [01, 02] | `TODO_03_harness-barrido-reanudable.md` | implementado (`996873a`) |
 | 04 | Imágenes Docker por modelo y matriz de versiones | [01, 03] | `TODO_04_docker-por-modelo.md` | implementado (`99c13aa`, `dfb8315`, `d6c7581`) |
-| 05 | Ejecución del barrido completo (12 modelos del roster activo) | [04, 16, 17] | `TODO_05_ejecucion-barrido.md` | pendiente |
-| 06 | Consolidación de etapa 1 y selección del juez | [05] | `TODO_06_consolidacion-y-juez.md` | pendiente |
-| 07 | Juez LLM: taxonomía de errores y categorías lingüísticas | [06] | `TODO_07_juez-llm.md` | pendiente |
-| 08 | Ejecución de la etapa 2 | [07] | `TODO_08_ejecucion-juez.md` | pendiente |
-| 09 | Métricas 2026: estricta, laxa, Tablas 2/3/4 | [08, 19] | `TODO_09_metricas-2026.md` | pendiente |
-| 10 | Figuras horizontales agrupadas por tier | [09] | `TODO_10_figuras-2026.md` | pendiente |
-| 11 | Generador de fragmentos `.tex` de tablas | [09] | `TODO_11_generador-tablas-tex.md` | pendiente |
+| 05 | Ejecución del barrido completo (12 modelos del roster activo) | [04, 16, 17] | `TODO_05_ejecucion-barrido.md` | implementado (`dba3512`…`9ae5a9e`, 12 commits `data(2026): barrido de <modelo>` uno por modelo; `a1c2252`/`c4d9593` logs; `eba28f7` fallos_barrido.json) |
+| 06 | Consolidación de etapa 1 y selección del juez | [05] | `TODO_06_consolidacion-y-juez.md` | implementado (`8cc0cfb`) |
+| 07 | Juez LLM: taxonomía de errores y categorías lingüísticas | [06] | `TODO_07_juez-llm.md` | implementado (`1c1b453`) |
+| 08 | Ejecución de la etapa 2 | [07] | `TODO_08_ejecucion-juez.md` | implementado (9 commits `data(2026): etapa 2 parcial de etiquetas_errores` por continuación ante fallo + `3668706`, `92e906f`, `416ed71`) |
+| 09 | Métricas 2026: estricta, laxa, Tablas 2/3/4 | [08, 19] | `TODO_09_metricas-2026.md` | implementado (`493fdcf`, `80b1111`, `adbe2be`, `8ba1140`) |
+| 10 | Figuras horizontales agrupadas por tier | [09] | `TODO_10_figuras-2026.md` | implementado (`9651ad6`, `a347bae`, `f3f3cf9`, `b072ae2`, `fb5fb89`) |
+| 11 | Generador de fragmentos `.tex` de tablas | [09] | `TODO_11_generador-tablas-tex.md` | implementado (`8183ebd`, `42a5d96`, `1b84a03`) |
 | 12 | Verificador de anonimato para envío ciego | [] | `TODO_12_verificador-anonimato.md` | implementado (`c1e360d`) |
 | 13 | Transcripción fiel del `.docx` a `paper/01_original/` | [] | `TODO_13_transcripcion-original.md` | implementado (`0593681`, `08ca4f4`) |
-| 14 | Paper reescrito: andamiaje y secciones 1–3 | [10, 11, 12, 13, 18, 19] | `TODO_14_paper-secciones-1-3.md` | pendiente |
-| 15 | Paper reescrito: secciones 4–7, build y anonimato | [14, 18, 19] | `TODO_15_paper-secciones-4-7.md` | pendiente |
+| 14 | Paper reescrito: andamiaje y secciones 1–3 | [10, 11, 12, 13, 18, 19] | `TODO_14_paper-secciones-1-3.md` | implementado (`0bf5500`, `e3c34f0`, `b8e7ac7`) |
+| 15 | Paper reescrito: secciones 4–7, build y anonimato | [14, 18, 19] | `TODO_15_paper-secciones-4-7.md` | implementado (`41ba9cb` + múltiples fixes posteriores de compilación/anonimato: `7372489`, `0bb1b48`, `969d92c`, `a1242bd`, `7c1cf34`, `222320d`, `6460d6d`, `8fa6380`, `7abec19`, `be7baff`, `0227a99`, `03413d1`, `8f0497d`) |
 | 16 | Roster activo de 12, pins de transformers por grupo y matriz documentada | [01, 04] | `TODO_16_roster-12-y-pins.md` | **implementado (`864c694`)** — su cola de builds de Docker se trasladó al nodo `17` (ver más abajo) |
-| 17 | Intercambio de roster (sale `Qwen3.5-2B`, entra `Qwen2.5-1.5B-Instruct`), pinning de núcleos y continuación ante fallo | [01, 04, 16] | `TODO_17_intercambio-roster-y-ejecucion.md` | pendiente |
+| 17 | Intercambio de roster (sale `Qwen3.5-2B`, entra `Qwen2.5-1.5B-Instruct`), pinning de núcleos y continuación ante fallo | [01, 04, 16] | `TODO_17_intercambio-roster-y-ejecucion.md` | implementado (`cbdce86`, `2be13d8`, `771a840`) |
 | 18 | Corrida de control con el prompt original sobre los tres anclajes | [05] | `TODO_18_corrida-de-control.md` | **implementado (`abce9f0`, `bd9887a`, `5938b14`)** — código y tests listos; la corrida real (`docker/run_control.py`) la lanza el orquestador después de este reporte |
 | 19 | Baseline re-medido de los 4 modelos del paper original (`Qwen2.5-0.5B-Instruct` + comparación) | [05, 18] | `TODO_19_baseline-original-completo.md` | **implementado (`8fb248f`, `95d1334`, `ab58049`, `44f7fd6`)** — código, imagen y tests listos; la corrida real (`docker/run_baseline.py`, sin `--dry-run`) la lanza el orquestador después de este reporte |
 
@@ -450,6 +450,8 @@ El `modo_prompting` de la tabla es la **expectativa**; el código lo decide en r
 - Las casillas de `TODO_16` son un registro válido y **más fino** que la columna `estado`: distinguen el núcleo de código (commiteado en `864c694`) de la cola de operaciones de Docker que quedó bloqueada por infraestructura.
 - El núcleo de `16` está **commiteado e inmutable** (`src/models_2026.py`, `docker/build_all.py`, `docker/run_sweep.py`, `docker/README.md` y sus tres archivos de test). Cualquier cambio sobre ese material va al nodo **17**, nunca como edición del texto ya commiteado de `16`.
 - No se reescribe historia por esta corrección: es documentación forward-only.
+
+**Reconciliación de estado (pasada confirmatoria final, 2026-08-04).** La columna `estado` de la tabla de arriba marcaba `05`–`11`, `14`, `15` y `17` como `pendiente` pese a que el árbol ya tenía sus commits — un desfasaje de bookkeeping, no de código: el DAG completo (barrido de los 12, etapa 2, métricas, figuras, tablas, los dos papers) ya estaba implementado y verificado en verde por `TEST_PLAN.md` antes de esta corrección. Se actualiza la columna para que coincida con la historia de git; no se tocó ningún commit ni ningún archivo de contenido.
 
 **Concurrencia.** `12` y `13` no tienen dependencias y sus conjuntos de archivos son disjuntos de todo lo demás y entre sí: pueden ejecutarse en cualquier momento, en paralelo con `01`–`11`. `10` y `11` dependen ambos de `09` pero tocan archivos disjuntos (`src/generate_figures_2026.py` + `figures/2026/` vs. `src/generate_tex_tables.py` + `paper/02_reescrito/tablas/`): pueden correr concurrentemente. El resto es una cadena estricta. `05` y `08` son las dos tareas de ejecución largas y bloquean todo lo que va después.
 
