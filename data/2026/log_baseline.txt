@@ -1,0 +1,42 @@
+=== Qwen2.5-0.5B-Instruct (Qwen/Qwen2.5-0.5B-Instruct) | transformers 4.57.6 ===
+  [ 0] exact=False lat=18.11s modo=chat_template 'Prendé la luz del living.'
+  [ 1] exact=True lat=13.28s modo=chat_template 'Apagá la luz de la cocina.'
+  [ 2] exact=False lat=14.06s modo=chat_template 'Encendé el aire acondicionado del dorm'
+  [ 3] exact=False lat=13.27s modo=chat_template 'Apagá la tele del living.'
+  [ 4] exact=False lat=13.61s modo=chat_template 'Prendé el ventilador del garage.'
+  [ 5] exact=False lat=14.22s modo=chat_template 'Apagá la calefacción del baño.'
+  [ 6] exact=False lat=13.26s modo=chat_template 'Encendé el parlante de la cocina.'
+  [ 7] exact=False lat=12.42s modo=chat_template 'Cerrá la cerradura de la entrada.'
+  [ 8] exact=False lat=13.54s modo=chat_template 'Poné el aire del dormitorio en 22 grad'
+  [ 9] exact=True lat=13.19s modo=chat_template 'Bajá la persiana del living al 50%.'
+  [10] exact=True lat=12.95s modo=chat_template 'Poné la luz del dormitorio al 30% de b'
+  [11] exact=False lat=12.72s modo=chat_template 'Configurá la calefacción de la cocina '
+  [12] exact=False lat=12.98s modo=chat_template 'Subí la cortina del patio al 100%.'
+  [13] exact=True lat=13.24s modo=chat_template 'Poné el volumen del parlante del livin'
+  [14] exact=False lat=12.54s modo=chat_template 'Dejá la luz del baño al 10%.'
+  [15] exact=False lat=13.46s modo=chat_template 'Poné el aire del living en 19 grados.'
+  [16] exact=True lat=13.09s modo=chat_template 'Bajale un poco a la luz del living.'
+  [17] exact=False lat=13.31s modo=chat_template 'Hace un poco más de calor en el dormit'
+  [18] exact=False lat=13.24s modo=chat_template 'Está muy fuerte el aire de la cocina, '
+  [19] exact=False lat=12.67s modo=chat_template 'Subí un poco el volumen del parlante d'
+  [20] exact=False lat=12.87s modo=chat_template 'La persiana del baño no cerró del todo'
+  [21] exact=False lat=12.51s modo=chat_template 'Subile más luz al living que está muy '
+  [22] exact=False lat=12.86s modo=chat_template 'Apagá todas las luces de la casa.'
+  [23] exact=False lat=13.45s modo=chat_template 'Prendé todos los aires acondicionados.'
+  [24] exact=False lat=13.48s modo=chat_template 'Bajá todas las persianas de la casa.'
+  [25] exact=False lat=12.88s modo=chat_template 'Apagá todo antes de dormir.'
+  [26] exact=True lat=12.28s modo=chat_template '¿Está prendida la luz del living?'
+  [27] exact=False lat=13.17s modo=chat_template '¿A cuántos grados está el aire del dor'
+  [28] exact=False lat=12.59s modo=chat_template '¿Quedó cerrada la cerradura de la entr'
+  [29] exact=True lat=13.81s modo=chat_template 'No dejes prendida la luz de la cocina,'
+  [30] exact=False lat=13.35s modo=chat_template 'Che, la tele del living quedó prendida'
+  [31] exact=False lat=12.45s modo=chat_template 'Antes me olvidé, prendé la luz del bañ'
+Listo: 32 filas en /app/data/2026/baseline_original/qwen2-5-0-5b-instruct.csv | exactas 7/32
+`torch_dtype` is deprecated! Use `dtype` instead!
+The following generation flags are not valid and may be ignored: ['top_k']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+
+
+=== [1/1] baseline::Qwen2.5-0.5B-Instruct ===
+docker run --rm --memory=8g --cpus=2 --cpuset-cpus=0-1 -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\data:/app/data -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\.hf_cache:/app/.hf_cache -v C:\Users\MSI THIN\Mi unidad (lautarolasorsa@gmail.com)\Proyectos de Investigaci�n\CACIC-2026\cacic-2026\src:/app/src:ro slm-domotica-2026:qwen2-5-0-5b-instruct python src/run_baseline_original.py --modelo Qwen2.5-0.5B-Instruct
+
+Corrida de baseline-completion completa, sin fallos.

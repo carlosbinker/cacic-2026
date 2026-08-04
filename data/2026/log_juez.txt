@@ -24,3 +24,5 @@ Juez: granite-4.0-1b (ibm-granite/granite-4.0-1b) | exact_match etapa 1 = 90.6%
 [feat/reescritura-experimento-2026 1adb6cb] data(2026): etapa 2 parcial de etiquetas_errores (juez granite-4.0-1b, temperatura 0)
  1 file changed, 9 insertions(+)
 time="2026-08-04T13:43:53-03:00" level=error msg="error waiting for container: unexpected EOF"
+[feat/reescritura-experimento-2026 416ed71] data(2026): etapa 2 - log_juez.txt del juez granite-4.0-1b (temperatura 0)
+ 1 file changed, 21 insertions(+)
