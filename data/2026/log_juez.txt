@@ -3,3 +3,24 @@ python: can't open file '/app/src/judge_2026.py': [Errno 2] No such file or dire
 docker run del juez termino con codigo 2
 ERROR: el juez termino con codigo != 0; ver data/2026/log_juez.txt
 Juez: granite-4.0-1b (ibm-granite/granite-4.0-1b) | exact_match etapa 1 = 90.6%
+`torch_dtype` is deprecated! Use `dtype` instead!
+[feat/reescritura-experimento-2026 48e4f04] data(2026): etapa 2 parcial de etiquetas_errores (juez granite-4.0-1b, temperatura 0)
+ 1 file changed, 31 insertions(+)
+ create mode 100644 data/2026/etiquetas_errores.csv
+[feat/reescritura-experimento-2026 d4dd526] data(2026): etapa 2 parcial de etiquetas_errores (juez granite-4.0-1b, temperatura 0)
+ 1 file changed, 32 insertions(+)
+[feat/reescritura-experimento-2026 fcbb036] data(2026): etapa 2 parcial de etiquetas_errores (juez granite-4.0-1b, temperatura 0)
+ 1 file changed, 23 insertions(+)
+[feat/reescritura-experimento-2026 926943e] data(2026): etapa 2 parcial de etiquetas_errores (juez granite-4.0-1b, temperatura 0)
+ 1 file changed, 19 insertions(+)
+[feat/reescritura-experimento-2026 31eb0a9] data(2026): etapa 2 parcial de etiquetas_errores (juez granite-4.0-1b, temperatura 0)
+ 1 file changed, 8 insertions(+)
+[feat/reescritura-experimento-2026 fcb5376] data(2026): etapa 2 parcial de etiquetas_errores (juez granite-4.0-1b, temperatura 0)
+ 1 file changed, 29 insertions(+)
+[feat/reescritura-experimento-2026 5938833] data(2026): etapa 2 parcial de etiquetas_errores (juez granite-4.0-1b, temperatura 0)
+ 1 file changed, 14 insertions(+)
+[feat/reescritura-experimento-2026 8b6f0fd] data(2026): etapa 2 parcial de etiquetas_errores (juez granite-4.0-1b, temperatura 0)
+ 1 file changed, 3 insertions(+)
+[feat/reescritura-experimento-2026 1adb6cb] data(2026): etapa 2 parcial de etiquetas_errores (juez granite-4.0-1b, temperatura 0)
+ 1 file changed, 9 insertions(+)
+time="2026-08-04T13:43:53-03:00" level=error msg="error waiting for container: unexpected EOF"
