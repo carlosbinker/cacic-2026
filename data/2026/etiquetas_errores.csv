@@ -140,3 +140,17 @@ SmolLM2-360M-Instruct,27,uso_de_sinonimos,uso_de_sinonimos,True
 SmolLM2-360M-Instruct,29,uso_de_sinonimos,uso_de_sinonimos,True
 SmolLM2-360M-Instruct,30,uso_de_sinonimos,uso_de_sinonimos,True
 SmolLM2-360M-Instruct,31,uso_de_sinonimos,uso_de_sinonimos,True
+LFM2.5-1.2B-Instruct,0,confusion_dispositivo,confusion_dispositivo,True
+LFM2.5-1.2B-Instruct,2,uso_de_sinonimos,uso_de_sinonimos,True
+LFM2.5-1.2B-Instruct,4,uso_de_sinonimos,uso_de_sinonimos,True
+LFM2.5-1.2B-Instruct,7,uso_de_sinonimos,uso_de_sinonimos,True
+LFM2.5-1.2B-Instruct,13,confusion_dispositivo,confusion_dispositivo,True
+LFM2.5-1.2B-Instruct,17,sin_error_semantico,sin_error_semantico,True
+LFM2.5-1.2B-Instruct,18,uso_de_sinonimos,uso_de_sinonimos,True
+LFM2.5-1.2B-Instruct,20,sin_error_semantico,sin_error_semantico,True
+LFM2.5-1.2B-Instruct,22,uso_de_sinonimos,uso_de_sinonimos,True
+LFM2.5-1.2B-Instruct,23,confusion_intencion,confusion_intencion,True
+LFM2.5-1.2B-Instruct,24,uso_de_sinonimos,uso_de_sinonimos,True
+LFM2.5-1.2B-Instruct,25,confusion_dispositivo,confusion_dispositivo;,True
+LFM2.5-1.2B-Instruct,27,uso_de_sinonimos,uso_de_sinonimos,True
+LFM2.5-1.2B-Instruct,31,confusion_intencion,confusion_intencion,True
