@@ -197,7 +197,13 @@ def generar_figuras(path_resumen: Path, dir_salida: Path, sufijo: str) -> list[P
         fig.tight_layout()
 
     ruta1 = dir_salida / f"fig1_exactitud_latencia_2026{sufijo}.png"
-    fig.savefig(ruta1, dpi=200)
+    # bbox_inches="tight" recorta el lienzo al bbox real de los artistas ya
+    # renderizados (incluida la etiqueta del tier a la izquierda del eje Y y
+    # la nota de pie de figura cuando existe), en vez de depender de un
+    # margen fijo: eso es lo que evita que la rama con nota al pie
+    # (subplots_adjust solo ajusta 'bottom') clipee la "O" inicial de las
+    # etiquetas largas como 'OLMo-2-0425-1B-Instruct' en el eje Y.
+    fig.savefig(ruta1, dpi=200, bbox_inches="tight")
     plt.close(fig)
     salidas.append(ruta1)
 
@@ -222,7 +228,7 @@ def generar_figuras(path_resumen: Path, dir_salida: Path, sufijo: str) -> list[P
 
     fig.tight_layout()
     ruta2 = dir_salida / f"fig2_exactitud_por_campo_2026{sufijo}.png"
-    fig.savefig(ruta2, dpi=200)
+    fig.savefig(ruta2, dpi=200, bbox_inches="tight")
     plt.close(fig)
     salidas.append(ruta2)
 
