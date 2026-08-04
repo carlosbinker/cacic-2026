@@ -55,9 +55,14 @@
         "json_valido_pct": 100.0,
         "nota": "Referencia histórica, NO reproducida: un control con el prompt original del paper no reprodujo estas cifras (ver Delta 05, subtask 18/19). La causa es irreproducibilidad del entorno original (transformers sin cota superior, sin columna de versión registrada), no un defecto del harness 2026."
       },
-      "remedido": null,
-      "delta_exact_match_pp": null,
-      "delta_json_valido_pp": null
+      "remedido": {
+        "n": 32,
+        "exact_match_pct": 21.9,
+        "json_valido_pct": 100.0,
+        "avg_latencia_s": 13.278
+      },
+      "delta_exact_match_pp": -21.9,
+      "delta_json_valido_pp": 0.0
     }
   ],
   "mejor_remedido": {
