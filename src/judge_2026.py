@@ -25,6 +25,7 @@ from typing import Callable
 
 import pandas as pd
 
+from metrics_2026 import _como_bool
 from models_2026 import por_nombre
 from taxonomia_2026 import (
     CATEGORIAS_DISPLAY,
@@ -127,7 +128,7 @@ def etiquetar_errores(df_detalle: pd.DataFrame, juez,
     None` reproduce exactamente el comportamiento anterior a este contrato.
     """
     filas = []
-    incorrectas = df_detalle[~df_detalle["match_exact"].astype(bool)]
+    incorrectas = df_detalle[~_como_bool(df_detalle["match_exact"])]
     for _, grupo in incorrectas.groupby("modelo", sort=False):
         for _, fila in grupo.iterrows():
             d = fila.to_dict()
@@ -275,9 +276,9 @@ def main() -> int:
     df_para_errores = df
     if base_etiquetas is not None:
         ya_hechos = set(map(tuple, base_etiquetas[["modelo", "idx"]].values))
-        incorrectas = df[~df["match_exact"].astype(bool)]
+        incorrectas = df[~_como_bool(df["match_exact"])]
         pendientes = filtrar_pendientes_errores(incorrectas, ya_hechos)
-        correctas = df[df["match_exact"].astype(bool)]
+        correctas = df[_como_bool(df["match_exact"])]
         df_para_errores = pd.concat([correctas, pendientes], ignore_index=True)
 
     df_para_categorias = df

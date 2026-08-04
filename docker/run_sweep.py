@@ -36,9 +36,8 @@ Uso:
 
 import argparse
 import json
-import subprocess
+import subprocess  # noqa: F401 -- expuesto para que los tests lo monkeypatcheen
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
 
 AQUI = Path(__file__).resolve().parent
@@ -49,6 +48,12 @@ RAIZ = AQUI.parent
 sys.path.insert(0, str(RAIZ / "src"))
 sys.path.insert(0, str(AQUI))
 
+from _runner_common import (  # noqa: E402
+    correr_contenedor,
+    docker_run_base,
+    mounts_datos_y_cache,
+    registrar_fallo,
+)
 from build_all import tag_imagen  # noqa: E402
 from models_2026 import ModeloEvaluado2026, por_nombre, roster_activo  # noqa: E402
 
@@ -72,19 +77,12 @@ def comando_run(modelo: ModeloEvaluado2026, raiz: Path, force: bool = False,
     variabilidad que no es del modelo. El valor tiene que ser el MISMO en
     las 12 corridas y en la del juez; cual sea es secundario.
     """
-    cmd = [
-        "docker", "run", "--rm",
-        "--memory=8g", "--cpus=2", f"--cpuset-cpus={cpuset}",
-    ]
+    cmd = docker_run_base(cpuset)
     if modelo.gated:
         # F11: exclusivamente estos dos modelos reciben el token, y solo así.
         cmd += ["--env-file", str(raiz / ".env")]
-    cmd += [
-        "-v", f"{raiz / 'data'}:/app/data",
-        "-v", f"{raiz / '.hf_cache'}:/app/.hf_cache",
-        tag_imagen(modelo),
-        "python",
-    ]
+    cmd += mounts_datos_y_cache(raiz)
+    cmd += [tag_imagen(modelo), "python"]
     if force:
         cmd += ["src/run_sweep_2026.py", "--force", "--modelo", modelo.nombre]
     else:
@@ -152,32 +150,10 @@ def _correr_modelo(modelo: ModeloEvaluado2026, posicion: str, force: bool,
     cmd = comando_run(modelo, RAIZ, force, cpuset)
     print(f"\n=== [{posicion}] {modelo.nombre} ({modelo.tier}) ===")
     print(" ".join(cmd))
-    if dry_run:
-        return 0, ""
-    # F12.1: el contenedor emite stderr en UTF-8 (barras de progreso, texto en
-    # espanol). Sin `encoding` explicito, `text=True` decodifica con la
-    # codificacion preferida del locale del HOST (cp1252 en Windows), que no
-    # tiene mapeo para bytes como 0x8d y revienta con UnicodeDecodeError,
-    # abortando el barrido entero. `errors="replace"` garantiza ademas que
-    # ningun byte de ningun contenedor pueda tirar abajo la corrida.
-    completado = subprocess.run(
-        cmd, stderr=subprocess.PIPE, encoding="utf-8", errors="replace"
-    )
-    if completado.stderr:
-        print(completado.stderr, file=sys.stderr)
-    return completado.returncode, completado.stderr or ""
+    return correr_contenedor(cmd, dry_run)
 
 
-def _registrar_fallo(modelo: ModeloEvaluado2026, codigo: int, error: str) -> dict:
-    """La fila de F5 que documenta un fallo irrecuperable de un modelo."""
-    return {
-        "modelo": modelo.nombre,
-        "hf_repo_id": modelo.hf_repo_id,
-        "transformers_pin": modelo.transformers_pin,
-        "codigo_salida": codigo,
-        "error_textual": error,
-        "momento_iso": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-    }
+_registrar_fallo = registrar_fallo
 
 
 def ejecutar_barrido(modelos: list[ModeloEvaluado2026], force: bool, dry_run: bool,

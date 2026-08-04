@@ -21,9 +21,8 @@ Uso:
 
 import argparse
 import json
-import subprocess
+import subprocess  # noqa: F401 -- expuesto para que los tests lo monkeypatcheen
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
 
 AQUI = Path(__file__).resolve().parent
@@ -31,6 +30,13 @@ RAIZ = AQUI.parent
 sys.path.insert(0, str(RAIZ / "src"))
 sys.path.insert(0, str(AQUI))
 
+from _runner_common import (  # noqa: E402
+    correr_contenedor,
+    csv_ya_completo,
+    docker_run_base,
+    mounts_datos_y_cache,
+    registrar_fallo,
+)
 from build_all import tag_imagen  # noqa: E402
 from models_2026 import ModeloEvaluado2026, por_nombre, roster_baseline_original  # noqa: E402
 from run_control_prompt_original import ANCLAS_CONTROL, ruta_control  # noqa: E402
@@ -72,11 +78,9 @@ def comando_run_control(modelo: ModeloEvaluado2026, raiz: Path, force: bool = Fa
     Ninguno de los tres anclajes es gated, así que no hay `--env-file`.
     Reusa la imagen ya construida del barrido principal: cero rebuild.
     """
-    cmd = [
-        "docker", "run", "--rm",
-        "--memory=8g", "--cpus=2", f"--cpuset-cpus={cpuset}",
-        "-v", f"{raiz / 'data'}:/app/data",
-        "-v", f"{raiz / '.hf_cache'}:/app/.hf_cache",
+    cmd = docker_run_base(cpuset)
+    cmd += mounts_datos_y_cache(raiz)
+    cmd += [
         # Las imágenes slm-domotica-2026:* hornean src/ al build time y por
         # eso no tienen `run_control_prompt_original.py` (postdata a esas
         # imágenes), ni las funciones aditivas de las que depende
@@ -96,26 +100,7 @@ def comando_run_control(modelo: ModeloEvaluado2026, raiz: Path, force: bool = Fa
     return cmd
 
 
-def _csv_ya_completo(ruta: Path) -> bool:
-    """Chequeo host-side liviano: evita levantar un contenedor si el CSV de
-    ese anclaje ya está completo y bien formado (mismo criterio que
-    `run_sweep_2026.debe_saltear`, sin necesitar `--force` a nivel host)."""
-    if not ruta.exists():
-        return False
-    import pandas as pd
-
-    from run_sweep_2026 import COLUMNAS_DETALLE, N_COMANDOS_ESPERADO
-    try:
-        df = pd.read_csv(ruta)
-    except Exception:
-        return False
-    if list(df.columns) != COLUMNAS_DETALLE or len(df) != N_COMANDOS_ESPERADO:
-        return False
-    try:
-        indices = sorted(int(i) for i in df["idx"])
-    except (TypeError, ValueError):
-        return False
-    return indices == list(range(N_COMANDOS_ESPERADO))
+_csv_ya_completo = csv_ya_completo
 
 
 def _correr_modelo(modelo: ModeloEvaluado2026, posicion: str, force: bool,
@@ -124,29 +109,10 @@ def _correr_modelo(modelo: ModeloEvaluado2026, posicion: str, force: bool,
     cmd = comando_run_control(modelo, RAIZ, force, cpuset)
     print(f"\n=== [{posicion}] control::{modelo.nombre} ===")
     print(" ".join(cmd))
-    if dry_run:
-        return 0, ""
-    # Mismo fix que docker/run_sweep.py: sin `encoding` explícito, `text=True`
-    # decodifica con la codificación preferida del locale del host (cp1252 en
-    # Windows), que revienta con bytes UTF-8 fuera de su rango.
-    completado = subprocess.run(
-        cmd, stderr=subprocess.PIPE, encoding="utf-8", errors="replace"
-    )
-    if completado.stderr:
-        print(completado.stderr, file=sys.stderr)
-    return completado.returncode, completado.stderr or ""
+    return correr_contenedor(cmd, dry_run)
 
 
-def _registrar_fallo(modelo: ModeloEvaluado2026, codigo: int, error: str) -> dict:
-    """La fila que documenta un fallo irrecuperable de un anclaje."""
-    return {
-        "modelo": modelo.nombre,
-        "hf_repo_id": modelo.hf_repo_id,
-        "transformers_pin": modelo.transformers_pin,
-        "codigo_salida": codigo,
-        "error_textual": error,
-        "momento_iso": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-    }
+_registrar_fallo = registrar_fallo
 
 
 def ejecutar_control(modelos: list[ModeloEvaluado2026], force: bool, dry_run: bool,
