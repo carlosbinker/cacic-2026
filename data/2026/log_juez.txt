@@ -1,0 +1,5 @@
+python: can't open file '/app/src/judge_2026.py': [Errno 2] No such file or directory
+=== juez v2 2026-08-04T14:47:34Z | imagen slm-domotica-2026:granite-4-0-1b ===
+docker run del juez termino con codigo 2
+ERROR: el juez termino con codigo != 0; ver data/2026/log_juez.txt
+Juez: granite-4.0-1b (ibm-granite/granite-4.0-1b) | exact_match etapa 1 = 90.6%
