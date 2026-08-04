@@ -11,7 +11,7 @@ import pytest
 RAIZ = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RAIZ / "src"))
 
-from models_2026 import MODELOS_2026  # noqa: E402
+from models_2026 import MODELOS_2026, roster_activo  # noqa: E402
 from taxonomia_2026 import (  # noqa: E402
     CATEGORIAS_LINGUISTICAS,
     ETIQUETAS_ERROR,
@@ -25,7 +25,7 @@ CATEGORIAS = DIR_2026 / "categorias_comandos.csv"
 RESUMEN = DIR_2026 / "resumen_2026.json"
 
 N_COMANDOS = 32
-N_FILAS = len(MODELOS_2026) * N_COMANDOS  # 448
+N_FILAS = len(roster_activo()) * N_COMANDOS  # 384 (12 x 32): registro tiene 15, roster activo 12
 
 requiere_barrido = pytest.mark.skipif(
     not DETALLE.exists(), reason=f"falta {DETALLE.name}: requiere el subtask 06"
@@ -40,10 +40,10 @@ requiere_resumen = pytest.mark.skipif(
 
 
 @requiere_barrido
-def test_el_consolidado_tiene_448_filas_del_roster_completo():
+def test_el_consolidado_tiene_384_filas_del_roster_activo():
     df = pd.read_csv(DETALLE)
     assert len(df) == N_FILAS
-    assert sorted(df["modelo"].unique()) == sorted(m.nombre for m in MODELOS_2026)
+    assert sorted(df["modelo"].unique()) == sorted(m.nombre for m in roster_activo())
     for nombre, grupo in df.groupby("modelo"):
         assert sorted(grupo["idx"]) == list(range(N_COMANDOS)), f"{nombre}: idx incompletos o duplicados"
 
