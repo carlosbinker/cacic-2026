@@ -106,12 +106,17 @@ def _escapar(texto: object) -> str:
 
 
 def _tabla(caption: str, label: str, spec: str, encabezado: list[str],
-           filas: list[list[str]], nota: str = "", ancho_completo: bool = False) -> str:
+           filas: list[list[str]], nota: str = "", ancho_completo: bool = False,
+           fuente_pequena: bool = False) -> str:
     """Arma un bloque table+tabular con booktabs, en el estilo LNCS.
 
-    `ancho_completo=True` envuelve el `tabular` en `\\resizebox{\\textwidth}{!}{...}`
-    para las tablas que se salen del ancho de página (Tablas 3, 4 y 5: muchas
-    columnas o texto largo en `motivo_pin`)."""
+    `ancho_completo=True` envuelve el `tabular` en `\\resizebox{\\textwidth}{!}{...}`;
+    reservado como último recurso (ninguna de las 5 tablas del paper lo usa
+    hoy -- `resizebox` no tiene piso de tamaño de letra y fue la causa real de
+    que las tablas transpuestas se vieran comprimidas/ilegibles). Preferí
+    `fuente_pequena=True` (envuelve en `{\\small ... }`, sin escalar) cuando
+    la tabla entra a ancho de columna pero apretada con el cuerpo de texto
+    normal."""
     cuerpo = [
         r"\toprule",
         " & ".join(encabezado) + r" \\",
@@ -122,6 +127,8 @@ def _tabla(caption: str, label: str, spec: str, encabezado: list[str],
     tabular = [f"\\begin{{tabular}}{{{spec}}}", *cuerpo, r"\end{tabular}"]
     if ancho_completo:
         tabular = [r"\resizebox{\textwidth}{!}{%", *tabular, "}"]
+    elif fuente_pequena:
+        tabular = [r"{\small", *tabular, "}"]
     lineas = [
         r"\begin{table}[htbp]",
         r"\centering",
@@ -213,28 +220,35 @@ def tabla2_resultados(resumen: list[dict]) -> str:
 
 
 def tabla3_por_categoria(df: pd.DataFrame) -> str:
-    """Tabla 3: exactitud por categoría lingüística, una columna por modelo, en
-    el orden canónico del paper (item 3 de la revisión de PDF: la Tabla 3
-    sigue a la Fig. 1, ya aprobada visualmente, y no al revés)."""
+    """Tabla 3: exactitud estricta por categoría lingüística, una FILA por
+    modelo (orden canónico, item 3 de la revisión de PDF) y una columna por
+    categoría, con su `n` en el encabezado -- transpuesta (corrección del
+    item 1: la orientación con doce modelos en columnas exigía `resizebox`
+    y comprimía los nombres de modelo hasta ilegibles; con sólo 3
+    categorías como columnas entra sin `resizebox`)."""
     orden = {m.nombre: i for i, m in enumerate(orden_canonico(roster_activo()))}
-    columnas_modelo = sorted(
-        (c for c in df.columns if c not in ("categoria", "n")),
-        key=lambda c: orden.get(c, len(orden)),
-    )
-    encabezado = ["Categoría (n)"] + [_escapar(c) for c in columnas_modelo]
+    columnas_modelo_orig = [c for c in df.columns if c not in ("categoria", "n")]
+    modelos = sorted(columnas_modelo_orig, key=lambda c: orden.get(c, len(orden)))
+    encabezado = ["Modelo"] + [
+        f"{_escapar(CATEGORIAS_DISPLAY.get(fila['categoria'], fila['categoria']))} ({fila['n']})"
+        for _, fila in df.iterrows()
+    ]
     filas = []
-    for _, fila in df.iterrows():
-        nombre_cat = CATEGORIAS_DISPLAY.get(fila["categoria"], fila["categoria"])
-        celda_cat = f"{_escapar(nombre_cat)} ({fila['n']})"
-        filas.append([celda_cat] + [f"{fila[c]:.1f}" for c in columnas_modelo])
-    spec = "l" + "r" * len(columnas_modelo)
+    for m in modelos:
+        fila = [_escapar(m)] + [f"{fila_df[m]:.1f}" for _, fila_df in df.iterrows()]
+        filas.append(fila)
+    # Encabezados de categoría en `p{}` (no `r`): el nombre de categoría más
+    # su `n` ("Encendido / apagado simple (15)") es más largo que cualquier
+    # dato de la columna, y una columna `r`/`l` no envuelve texto -- eso
+    # producía un desborde de más de 5 cm. `p{}` sí envuelve, en la propia
+    # celda de encabezado.
+    spec = "l" + "p{2.2cm}" * len(df)
     return _tabla(
         caption="Exactitud estricta por categoría lingüística",
         label="tab:categorias",
         spec=spec,
         encabezado=encabezado,
         filas=filas,
-        ancho_completo=True,
     )
 
 
@@ -270,48 +284,49 @@ def tabla4_taxonomia(df: pd.DataFrame) -> str:
 
 
 def tabla5_versiones() -> str:
-    """Tabla 5: matriz de versiones de transformers (RF5), transpuesta (item 1
-    de la revisión de PDF): un modelo por columna (encabezado rotado 90°,
-    orden canónico del item 3) y una fila por atributo, en vez de un modelo
-    por fila con una columna `Motivo` en texto libre que sólo entraba con
-    `p{4cm}` + `resizebox`. El motivo de cada pin necesario se resume acá en
-    el lenguaje del paper, sin texto crudo de excepción ni rutas de archivo
-    (item 5 de la revisión de PDF: esas rutas son ruido y, en un envío ciego,
-    una filtración de estructura de directorios local); el motivo completo,
-    con su evidencia y la ruta del log, sigue documentado en
-    `docker/README.md`, que no forma parte del envío."""
+    """Tabla 5: matriz de versiones de transformers (RF5), un modelo por FILA
+    (orden canónico, item 3 de la revisión de PDF), con `Motivo` en una
+    columna `p{}` que envuelve el texto -- corrección: la orientación con
+    doce modelos en columnas (encabezados rotados 90°) dejaba la fila de
+    `Motivo` en celdas de 1/13 del ancho, ilegible. El motivo de cada pin
+    necesario se resume en el lenguaje del paper, sin texto crudo de
+    excepción ni rutas de archivo (item 5 de la revisión de PDF: esas rutas
+    son ruido y, en un envío ciego, una filtración de estructura de
+    directorios local); el motivo completo, con su evidencia y la ruta del
+    log, sigue documentado en `docker/README.md`, que no forma parte del
+    envío. Sin `resizebox`: entra a ancho de columna LNCS sin comprimir
+    letra."""
     modelos = orden_canonico(roster_activo())
-    encabezado = ["Atributo"] + [
-        r"\rotatebox{90}{" + _escapar(m.nombre) + "}" for m in modelos
-    ]
     grupo_de = {BASELINE_TRANSFORMERS: "A", TRANSFORMERS_5X: "B"}
-    fila_grupo = ["Grupo \\texttt{transformers}"] + [grupo_de[m.transformers_pin] for m in modelos]
-    fila_version = ["Versión resuelta"] + [_VERSION_RESUELTA[m.transformers_pin] for m in modelos]
-    fila_necesario = ["¿Necesario?"] + ["Sí" if m.motivo_pin else "Heredado" for m in modelos]
-    fila_motivo = ["Motivo (si necesario)"] + [
-        _escapar(_MOTIVO_EXPLICACION_PAPER[m.nombre]) if m.motivo_pin else "—"
-        for m in modelos
-    ]
-    filas = [fila_grupo, fila_version, fila_necesario, fila_motivo]
+    filas = []
+    for m in modelos:
+        version_resuelta = _VERSION_RESUELTA[m.transformers_pin]
+        necesario = "Sí" if m.motivo_pin else "Heredado"
+        motivo = _escapar(_MOTIVO_EXPLICACION_PAPER[m.nombre]) if m.motivo_pin else "—"
+        filas.append([
+            _escapar(m.nombre),
+            grupo_de[m.transformers_pin],
+            version_resuelta,
+            necesario,
+            motivo,
+        ])
     nota = (
         f"Grupo A (\\texttt{{{_escapar(BASELINE_TRANSFORMERS)}}}, resuelve "
         f"{_VERSION_RESUELTA[BASELINE_TRANSFORMERS]}) y grupo B "
         f"(\\texttt{{{_escapar(TRANSFORMERS_5X)}}}, resuelve "
         f"{_VERSION_RESUELTA[TRANSFORMERS_5X]}) son necesarios y mutuamente "
         "excluyentes sobre el roster: no existe una única versión mayor que "
-        "sirva para las 12 columnas. El motivo completo de cada pin necesario, "
-        "con su evidencia y referencia de log, está documentado en "
-        "\\texttt{docker/README.md}."
+        "sirva para las 12 filas activas. El motivo completo de cada pin "
+        "necesario, con su evidencia y referencia de log, está documentado "
+        "en \\texttt{docker/README.md}."
     )
-    spec = "l" + "c" * len(modelos)
     return _tabla(
         caption="Pines de \\texttt{transformers} por modelo",
         label="tab:versiones",
-        spec=spec,
-        encabezado=encabezado,
+        spec="llllp{3.1cm}",
+        encabezado=["Modelo", "Grupo", "Versión resuelta", "¿Necesario?", "Motivo"],
         filas=filas,
         nota=nota,
-        ancho_completo=True,
     )
 
 

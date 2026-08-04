@@ -143,6 +143,18 @@ lingüística de la Sección 4.3, quedó con \texttt{juez\_parse\_ok = False}: e
 juez no necesitó ningún reintento ni ninguna etiqueta de respaldo en esta
 corrida.
 
+Dos de las siete etiquetas de la Tabla \ref{tab:taxonomia} merecen una
+aclaración explícita sobre el espacio de errores observado, no un defecto
+de la taxonomía: \emph{alucinación de valor/unidad} no se instanció en
+ninguna de las 225 respuestas incorrectas de los doce modelos, y
+\emph{valor numérico incorrecto} se instanció una única vez, en
+\texttt{OLMo-2-0425-1B-Instruct}. La columna se conserva en la tabla porque
+la categoría sí se consideró al clasificar cada respuesta —el juez pudo
+haberla usado y no lo hizo—, y su ausencia casi total es en sí misma un
+dato: los errores de este roster se concentran en confusión de dispositivo
+y en uso de sinónimos, no en alucinar valores o unidades fuera del rango
+esperado.
+
 La métrica laxa rescató, en conjunto, \textbf{123} de las 225 respuestas
 incorrectas bajo el protocolo estricto (etiquetadas \texttt{sin\_error\_semantico}
 o \texttt{uso\_de\_sinonimos}), es decir algo menos de un tercio de las 384
