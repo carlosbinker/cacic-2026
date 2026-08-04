@@ -427,10 +427,11 @@ El `modo_prompting` de la tabla es la **expectativa**; el código lo decide en r
 | 11 | Generador de fragmentos `.tex` de tablas | [09] | `TODO_11_generador-tablas-tex.md` | pendiente |
 | 12 | Verificador de anonimato para envío ciego | [] | `TODO_12_verificador-anonimato.md` | implementado (`c1e360d`) |
 | 13 | Transcripción fiel del `.docx` a `paper/01_original/` | [] | `TODO_13_transcripcion-original.md` | implementado (`0593681`, `08ca4f4`) |
-| 14 | Paper reescrito: andamiaje y secciones 1–3 | [10, 11, 12, 13] | `TODO_14_paper-secciones-1-3.md` | pendiente |
-| 15 | Paper reescrito: secciones 4–7, build y anonimato | [14] | `TODO_15_paper-secciones-4-7.md` | pendiente |
+| 14 | Paper reescrito: andamiaje y secciones 1–3 | [10, 11, 12, 13, 18] | `TODO_14_paper-secciones-1-3.md` | pendiente |
+| 15 | Paper reescrito: secciones 4–7, build y anonimato | [14, 18] | `TODO_15_paper-secciones-4-7.md` | pendiente |
 | 16 | Roster activo de 12, pins de transformers por grupo y matriz documentada | [01, 04] | `TODO_16_roster-12-y-pins.md` | **implementado (`864c694`)** — su cola de builds de Docker se trasladó al nodo `17` (ver más abajo) |
 | 17 | Intercambio de roster (sale `Qwen3.5-2B`, entra `Qwen2.5-1.5B-Instruct`), pinning de núcleos y continuación ante fallo | [01, 04, 16] | `TODO_17_intercambio-roster-y-ejecucion.md` | pendiente |
+| 18 | Corrida de control con el prompt original sobre los tres anclajes | [05] | `TODO_18_corrida-de-control.md` | **implementado (`abce9f0`, `bd9887a`, `5938b14`)** — código y tests listos; la corrida real (`docker/run_control.py`) la lanza el orquestador después de este reporte |
 
 **Reconciliación de bookkeeping (corregida el 2026-08-04).** La afirmación anterior de esta sección —*"ningún subtask tiene casillas tildadas"*— era **factualmente falsa** y queda corregida hacia adelante: `TODO_16_roster-12-y-pins.md` tiene **36 de 39** casillas tildadas. La convención de checkboxes **sí** se usó, en ese subtask. Regla vigente:
 
@@ -1317,3 +1318,68 @@ Insertadas por `/create-test-plan`. **No son nodos del DAG de §3**: son tareas 
 
 - [ ] **Después del subtask 09**, reejecutar y confirmar que ya **no** saltea:
   `pytest -q -rs tests/test_integracion_2026.py` → `5 passed`, cero `skipped`.
+
+# Delta 04 — corrida de control con el prompt original (subtask 18, BLOQUEANTE)
+
+Decisión del usuario/root del 2026-08-04, tomada tras cerrar el barrido de los 12 modelos
+(`fallos_barrido.json == []`, 384 filas en `data/2026/detalle/`): los tres anclajes de continuidad
+con la Tabla 2 publicada (RF19) divergen del barrido 2026 con **signo opuesto** según el modelo:
+
+| anclaje | estricta publicada | estricta nueva (prompt 2026) | delta | json publicado → nuevo |
+|---|---|---|---|---|
+| `SmolLM2-360M-Instruct` | 18.8% | 9.4% | **−9.4 pp** | 100% → **25%** |
+| `Qwen2.5-1.5B-Instruct` | 50.0% | 65.6% | **+15.6 pp** | 100% → 100% |
+| `SmolLM2-1.7B-Instruct` | 59.4% | 50.0% | **−9.4 pp** | 100% → 100% |
+
+Como el signo varía por modelo, **ninguna** comparación nuevo-vs-publicado puede aislar el efecto
+del prompt endurecido (RF1) del efecto del modelo: el sesgo no se puede argumentar siquiera en una
+única dirección con los datos que había hasta el 2026-08-04. Se decide una corrida de **control**
+que aísla esa variable.
+
+**Invariante de diseño, y es todo el punto:** la corrida de control difiere del barrido 2026 en
+**exactamente una variable** — el prompt de sistema. Mismo dataset, mismos 32 comandos en el mismo
+orden, misma decodificación (greedy, temperatura 0), mismo código de scoring, mismas imágenes
+Docker, mismo envolvente de recursos. Solo `SYSTEM_PROMPT_PAPER` (el prompt original del paper,
+importado tal cual de `src/prompt.py`, F0 congelado) reemplaza a `SYSTEM_PROMPT_2026`.
+
+**Qué se implementó (código y tests; la corrida real la lanza el orquestador después de este
+reporte):**
+
+- `src/run_control_prompt_original.py` (nuevo): entrypoint que corre dentro del contenedor. Reusa
+  `run_sweep_2026.evaluar_modelo` tal cual — no lo copia — vía un `ConstructorEntrada` inyectable
+  (factorización mínima y aditiva de `run_sweep_2026.py` y `prompt_2026.py`, con default idéntico al
+  comportamiento actual del barrido principal). Restringido a los tres anclajes
+  (`ANCLAS_CONTROL`); escribe `data/2026/control_prompt_original/<slug>.csv` con el mismo esquema
+  `COLUMNAS_DETALLE` y el mismo invariante de 32 filas/`idx` que el barrido principal.
+- `docker/run_control.py` (nuevo): runner host-side, mirroring `docker/run_sweep.py` y sus dos fixes
+  ya probados (`subprocess.run(..., encoding="utf-8", errors="replace")`; continuación-ante-fallo con
+  `data/2026/control_prompt_original/fallos_control.json`, que siempre existe salvo `--dry-run`).
+  Secuencial, un anclaje a la vez, mismo `--memory=8g --cpus=2 --cpuset-cpus=0-1`. **No reconstruye
+  ninguna imagen**: reusa `slm-domotica-2026:{smollm2-360m-instruct,smollm2-1-7b-instruct,
+  qwen2-5-1-5b-instruct}` tal cual del barrido principal (los tres anclajes son grupo A).
+- `src/comparar_control.py` (nuevo): genera
+  `data/2026/control_prompt_original/comparacion_tres_bandas.json` con las tres bandas (publicado,
+  control, nuevo) y sus tres deltas de exactitud estricta y de tasa de JSON válido, por anclaje. Cifras
+  publicadas leídas de `data/resultados_experimento_resumen.json` (F0), nunca hardcodeadas. La
+  latencia promedio se reporta con una nota explícita: no es comparable entre bandas si la máquina no
+  estuvo ociosa durante la corrida de control.
+- `tests/test_control_prompt_original.py` (nuevo, TDD): cubre las tres piezas de arriba con dobles de
+  tokenizer y filesystem aislado (`tmp_path`/`monkeypatch`), sin inferencia real y sin escribir bajo
+  `data/2026/`.
+
+**Por qué es BLOQUEANTE para el paper.** La corrida de control (`docker/run_control.py`, sin
+`--dry-run`) tiene que ejecutarse y su resultado tiene que leerse **antes** de escribir la Sección 4
+del paper reescrito: si la banda de control reproduce la cifra publicada (dentro de un margen
+razonable), la divergencia nuevo-vs-publicado es atribuible al endurecimiento del prompt y así se
+redacta. **Si la banda de control NO reproduce la cifra publicada, hay un defecto del harness que hay
+que encontrar y corregir antes de redactar cualquier interpretación de RF19** — escribir la Sección 4
+sobre datos de un harness no validado sería presentar como hallazgo lo que podría ser un bug. Por eso
+el subtask **18** (`depends_on: [05]`) se agrega al DAG y los subtasks **14** y **15** (paper
+reescrito, secciones 1–3 y 4–7) pasan a depender también de **18**, además de sus dependencias
+previas: `14.depends_on` pasa de `[10, 11, 12, 13]` a `[10, 11, 12, 13, 18]`, y `15.depends_on` pasa
+de `[14]` a `[14, 18]`. Ningún texto de resultados o discusión sobre los tres anclajes puede
+escribirse antes de que `18` esté cerrado con la corrida real ejecutada.
+
+**Qué NO cambia.** El barrido principal (`data/2026/detalle/`, 12 CSV, `fallos_barrido.json == []`)
+es de solo lectura para todo este delta: no se reinterpreta, no se reejecuta, no se toca. La corrida
+de control es un experimento adicional y aislado, no una corrección del barrido.
