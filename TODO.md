@@ -1501,3 +1501,84 @@ re-medido en vez del publicado para su comparación central.
 congelados son de solo lectura para este delta: no se reinterpretan, no se reejecutan, no se tocan.
 La corrida de baseline-completion es un experimento adicional y aislado (un modelo, una vez), no una
 corrección del barrido principal ni de la corrida de control.
+
+# Delta 06 — corrección de framing: borrador (no publicado), auditoría retirada, titular con prompt fijo
+
+Decisión del usuario/root del 2026-08-04, que corrige hacia adelante los Deltas 04 y 05 **sin
+editarlos**: `paper_cacic_LNCS_word.docx` es un **BORRADOR** del paper que se está escribiendo, no
+trabajo publicado. Los Deltas 04/05 lo trataban como si fuera la Tabla 2 publicada de un paper ya
+existente ("publicado", "referencia histórica no reproducida", "auditoría de reproducibilidad");
+esa premisa era incorrecta y sus consecuencias, todas vinculantes, son estas:
+
+1. Las cifras del borrador (`SmolLM2-360M-Instruct` 18.8, `Qwen2.5-0.5B-Instruct` 43.8,
+   `Qwen2.5-1.5B-Instruct` 50.0, `SmolLM2-1.7B-Instruct` 59.4) son valores de **borrador SUPERADOS**,
+   no una base de comparación. No hay "publicado vs re-medido" que reportar.
+2. **La irreproducibilidad-como-aporte queda RETIRADA.** El Delta 05 afirmaba ("La irreproducibilidad
+   es un aporte secundario para §5/§6, no una nota de Amenazas a la Validez") que no reproducir la
+   Tabla 2 publicada era en sí mismo un resultado metodológico a discutir en Resultados/Discusión. Eso
+   presuponía que había algo publicado que "fallar en reproducir" — no lo hay: es un borrador propio,
+   todavía sin someter. No se puede publicar "no reprodujimos nuestro propio borrador" como
+   contribución. Ese texto del Delta 05 no se edita (forward-only); este delta lo anula hacia adelante.
+3. Los 4 modelos de `roster_baseline_original()` (`SmolLM2-360M-Instruct`, `SmolLM2-1.7B-Instruct`,
+   `Qwen2.5-1.5B-Instruct`, `Qwen2.5-0.5B-Instruct`) son el **brazo de generación ANTERIOR** de este
+   mismo experimento, no "anclas de continuidad con la literatura": se miden bajo el mismo harness,
+   prompt, máquina, versiones fijadas y decodificación greedy que los modelos más nuevos (Granite 4 /
+   Qwen3.5 / LFM2.5 / OLMo-2). Eso hace que la comparación **generacional** sea internamente válida
+   sin apoyarse en ningún número del borrador.
+4. El control (`control_prompt_original/`) y la baseline-completion (`baseline_original/`) sobreviven
+   solo como justificación **metodológica** de por qué se re-midió en vez de reusar las cifras del
+   borrador — un párrafo de método, nunca una sección de resultados.
+
+## El titular se calcula con el prompt fijo, nunca mezclando bandas
+
+Un error real ya cometido: comparar una celda medida bajo el prompt 2026 (`granite-4.0-1b`, 90.6%)
+contra una celda del brazo anterior medida bajo el prompt ORIGINAL producía un delta de ~40 pp que no
+correspondía a nada real — el prompt no era la misma variable a ambos lados. La comparación central
+del paper es, en cambio, **mejor arquitectura 2026 vs mejor generación anterior, ambas bajo el mismo
+prompt 2026**:
+
+| modelo | prompt original | prompt 2026 |
+|---|---|---|
+| `SmolLM2-360M-Instruct` | 0.0% | 9.4% |
+| `SmolLM2-1.7B-Instruct` | 50.0% | 50.0% |
+| `Qwen2.5-1.5B-Instruct` | 56.2% | **65.6%** |
+| `Qwen2.5-0.5B-Instruct` | pendiente | 21.9% |
+
+Bajo el prompt 2026, el mejor de los 4 es `Qwen2.5-1.5B-Instruct` (65.6%). Titular:
+`granite-4.0-1b` (90.6%) vs `Qwen2.5-1.5B-Instruct` (65.6%) — delta **25.0 pp, no 40 pp**.
+`src/comparar_baseline.py:comparar_celdas()` es una guardia explícita que **RECHAZA**
+(`raise ValueError`) comparar celdas de distinto prompt, para que ese error no se pueda repetir en
+silencio.
+
+## Qué implementó este delta (código y tests, en verde)
+
+1. **`src/run_control_prompt_original.py` / `docker/run_control.py`**: la validación del entrypoint
+   de control se amplía de los tres anclajes hardcodeados a los 4 modelos de
+   `roster_baseline_original()`; `docker/run_control.py` suma `--modelo` para correr solo el modelo
+   faltante (`Qwen2.5-0.5B-Instruct`) sin tocar ni recomputar los tres CSV de control ya existentes.
+   Ninguna imagen Docker se reconstruye.
+2. **`src/comparar_baseline.py`**: reemplaza la comparación "publicado vs re-medido" por la matriz
+   4×2 real (4 modelos × {prompt original, prompt 2026}), con exact-match y json_válido por celda, el
+   efecto de prompt por modelo y el titular calculado por código con el prompt fijo. Sin lenguaje de
+   auditoría. El artefacto se renombra de `data/2026/baseline_original/comparacion_baseline.json`
+   (borrado) a `data/2026/matriz_generacion_anterior.json`.
+3. **`driver_control_05b.sh`** (scratchpad, no versionado): corre
+   `docker/run_control.py --modelo "Qwen2.5-0.5B-Instruct"`, la única celda pendiente de la matriz.
+
+## Limitación conocida para §6 (no se persigue)
+
+`attn_implementation` y la `revision` de cada modelo de HuggingFace quedaron **sin pinnear** en todo
+el barrido 2026 (roster activo, control y baseline-completion): cada corrida usó lo que
+`transformers` resolviera por defecto en el momento de ejecutarse, y ningún CSV registra qué
+implementación de atención ni qué revisión exacta de pesos se usó. Pinnearlos ahora exigiría
+re-correr el barrido completo (32 comandos × 12 modelos activos, más control y baseline-completion)
+para que la comparación siga siendo de igual a igual — no vale la pena: se documenta como limitación
+explícita en §6, no se corrige.
+
+## Qué NO cambia
+
+`data/2026/detalle/*.csv`, `data/2026/control_prompt_original/*.csv` (los tres ya existentes) y
+`data/2026/baseline_original/qwen2-5-0-5b-instruct.csv` son de solo lectura para este delta: no se
+reinterpretan, no se reejecutan, no se tocan. La única corrida real pendiente es la que completa la
+matriz (`Qwen2.5-0.5B-Instruct` bajo el prompt original), que lanza el orquestador después de este
+reporte.
