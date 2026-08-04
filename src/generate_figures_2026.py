@@ -37,11 +37,12 @@ matplotlib.use("Agg")
 import matplotlib.patches as mpatches  # noqa: E402
 import matplotlib.pyplot as plt  # noqa: E402
 
+from models_2026 import ORDEN_TIERS, clave_orden_canonico  # noqa: E402
+
 RAIZ = Path(__file__).resolve().parent.parent
 PATH_RESUMEN = RAIZ / "data" / "2026" / "resumen_2026.json"
 DIR_FIGURAS = RAIZ / "figures" / "2026"
 
-ORDEN_TIERS = ["sub-1B", "1-2B"]
 SEPARACION_ENTRE_TIERS = 1.0   # en unidades de barra
 
 CAMPOS_FIG2 = [
@@ -70,10 +71,15 @@ ESTILOS_FIG2 = [
 
 
 def ordenar_para_grafico(resumen: list[dict]) -> list[dict]:
-    """sub-1B primero, y dentro de cada tier por tamaño creciente."""
+    """sub-1B primero, y dentro de cada tier por tamaño creciente.
+
+    Delega en `models_2026.clave_orden_canonico` -- el mismo orden canónico
+    que usa `generate_tex_tables.py` para la Tabla 3 y el resto de las tablas
+    que listan modelos (RF/item 3 de la revisión de PDF), para que la figura y
+    las tablas nunca puedan desincronizarse en el criterio de orden."""
     return sorted(
         resumen,
-        key=lambda f: (ORDEN_TIERS.index(f["tier"]), f["params_b"], f["modelo"]),
+        key=lambda f: clave_orden_canonico(f["tier"], f["params_b"], f["modelo"]),
     )
 
 

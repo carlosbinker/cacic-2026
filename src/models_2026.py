@@ -407,3 +407,28 @@ def por_tier(tier: Tier) -> list[ModeloEvaluado2026]:
 def gated() -> list[ModeloEvaluado2026]:
     """Los modelos que requieren $HF_TOKEN para descargarse, en orden de registro."""
     return [m for m in MODELOS_2026 if m.gated]
+
+
+# Orden canónico del paper (Delta 2026-08-04, item 3 de la revisión de PDF):
+# agrupado por tier (sub-1B antes que 1-2B) y, dentro de cada tier, por
+# params_b creciente, con empate alfabético por nombre. Es el mismo criterio
+# que ya usaba `generate_figures_2026.ordenar_para_grafico` sobre el resumen
+# JSON (fig. 1, ya aprobada visualmente); se expone acá como única fuente de
+# verdad para que `generate_tex_tables.py` ordene la Tabla 3 -- y el resto de
+# las tablas que listan modelos -- exactamente igual que la figura, en vez de
+# duplicar el criterio de orden en dos módulos. No reemplaza `roster_activo()`
+# (que sigue en orden de registro: gobierna la secuencia real de
+# `docker/run_sweep.py`), es un orden de PRESENTACIÓN aparte.
+ORDEN_TIERS: tuple[Tier, ...] = ("sub-1B", "1-2B")
+
+
+def clave_orden_canonico(tier: str, params_b: float, nombre: str) -> tuple[int, float, str]:
+    """Clave de orden canónico (tier, params_b, nombre): la misma tupla de
+    comparación para cualquier fuente (objetos `ModeloEvaluado2026` o filas de
+    dict/CSV con esas tres columnas)."""
+    return (ORDEN_TIERS.index(tier), params_b, nombre)
+
+
+def orden_canonico(modelos: list[ModeloEvaluado2026]) -> list[ModeloEvaluado2026]:
+    """Los modelos dados, reordenados según el orden canónico del paper."""
+    return sorted(modelos, key=lambda m: clave_orden_canonico(m.tier, m.params_b, m.nombre))
