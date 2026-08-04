@@ -71,20 +71,32 @@ la evidencia de ambos grupos activos la refuta en las dos direcciones.
 \textbf{Validez externa.}
 
 \emph{Exclusión de modelos por razones externas al método.} El registro de
-modelos considerado para este estudio incluye 15 candidatos, de los cuales
-\textbf{3} quedaron fuera del roster evaluado, por \textbf{dos causas}
+modelos considerado para este estudio incluye \textbf{16} candidatos, de los
+cuales \textbf{3} quedaron excluidos del estudio, por \textbf{dos causas}
 distintas, y ninguna de las tres responde a una decisión metodológica (en el
 sentido de que ninguna fue elegida por diseño experimental, sino impuesta por
-una restricción externa). Dos modelos quedaron fuera por acceso
+una restricción externa). Dos modelos quedaron excluidos por acceso
 restringido: sus repositorios de HuggingFace están marcados como
 \emph{gated} y la aprobación manual de acceso de descarga no llegó a
-otorgarse. El tercero quedó fuera porque su compatibilidad de versión con la
-librería de inferencia quedó no verificada, sin evidencia de que falle bajo
-ninguna versión mayor probada, sólo ausencia de confirmación positiva. Ninguna
-de las tres exclusiones responde a un criterio de diseño experimental, pero
-acota el alcance de toda comparación de este trabajo a los doce modelos
-efectivamente evaluados: no puede afirmarse nada sobre el desempeño relativo
-de los tres excluidos frente al resto del roster.
+otorgarse. El tercero, \texttt{Qwen3.5-2B}, quedó excluido porque su
+compatibilidad de versión con la librería de inferencia quedó no verificada,
+sin evidencia de que falle bajo ninguna versión mayor probada, sólo ausencia
+de confirmación positiva. Ninguna de las tres exclusiones responde a un
+criterio de diseño experimental, y acotan el alcance de toda comparación de
+este trabajo a los doce modelos del roster activo: no puede afirmarse nada
+sobre el desempeño relativo de los tres excluidos frente al resto del roster.
+
+Un cuarto modelo del registro, \texttt{Qwen2.5-0.5B-Instruct}, no integra el
+roster activo de doce, pero no debe contarse como una cuarta exclusión: a
+diferencia de los tres anteriores, sí fue medido bajo el harness y el prompt
+de este trabajo, como el último de los cuatro modelos del estudio original
+necesario para completar, de forma internamente consistente, el brazo de
+comparación contra esa generación anterior (corridas de
+\emph{baseline-completion}, ver más abajo). Que no forme parte del roster
+activo es una decisión del usuario sobre el alcance del barrido principal, no
+una restricción externa ni una falla de compatibilidad; presentarlo como una
+exclusión más sería, en sentido inverso, tan impreciso como omitir las tres
+anteriores.
 
 Se conservan además las amenazas de validez externa del estudio original: el
 dataset de evaluación es chico y desbalanceado (32 comandos, entre 3 y 8 por

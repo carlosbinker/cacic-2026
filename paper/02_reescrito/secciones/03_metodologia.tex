@@ -7,19 +7,23 @@
 Se seleccionaron doce modelos abiertos, organizados en dos tiers de tamaño
 de seis modelos cada uno: sub-1000 millones de parámetros y entre 1000 y
 2000 millones de parámetros (Tabla \ref{tab:modelos}). Este roster de doce
-modelos es un subconjunto de un registro más amplio de quince modelos
-candidatos, del que quedaron fuera tres, por dos causas distintas que no
-deben mezclarse: dos modelos (\texttt{gemma-3-270m-it} y
-\texttt{Llama-3.2-1B-Instruct}) por acceso restringido: el acceso de
-descarga no fue otorgado —sus repositorios están marcados como
-\emph{gated} y la aprobación manual del acceso quedó pendiente—, y uno
-(\texttt{Qwen3.5-2B}) porque su compatibilidad de versión con la librería
-de inferencia quedó no verificada.
+modelos es un subconjunto de un registro más amplio de dieciséis modelos
+candidatos. De los cuatro que no integran el roster activo, tres quedaron
+excluidos del estudio, por dos causas distintas que no deben mezclarse: dos
+modelos (\texttt{gemma-3-270m-it} y \texttt{Llama-3.2-1B-Instruct}) por
+acceso restringido: el acceso de descarga no fue otorgado —sus repositorios
+están marcados como \emph{gated} y la aprobación manual del acceso quedó
+pendiente—, y uno (\texttt{Qwen3.5-2B}) porque su compatibilidad de versión
+con la librería de inferencia quedó no verificada. El cuarto,
+\texttt{Qwen2.5-0.5B-Instruct}, no es una exclusión: es el último de los
+cuatro modelos del estudio original que faltaba medir bajo el harness y el
+prompt de este trabajo, y por decisión del usuario no se incorporó al roster
+activo de doce.
 Ninguna de las tres exclusiones es una decisión metodológica; el detalle de
-cada causa y su relación con la reproducibilidad del estudio se retoma en la
-Sección \ref{sec:entorno-repro}. Los doce modelos efectivamente evaluados
-son, en cambio, todos de repositorios públicos, sin restricción de licencia
-ni de token de acceso.
+cada causa, y el motivo por el que el cuarto modelo no cuenta como una
+exclusión, se retoma en la Sección \ref{sec:entorno-repro}. Los doce modelos
+efectivamente evaluados son, en cambio, todos de repositorios públicos, sin
+restricción de licencia ni de token de acceso.
 
 Un requisito adicional del roster es sostener la continuidad con la Tabla 2
 del estudio anterior. Con ese fin, \texttt{Qwen2.5-1.5B-Instruct} se
@@ -226,22 +230,33 @@ taxonomía de errores y la equivalencia semántica no dependen de ella, porque
 se calculan sobre una decodificación determinista a temperatura 0 en ambas
 etapas.
 
-\textbf{Modelos fuera del barrido y reproducibilidad.} De los quince modelos
-del registro considerado para este estudio, tres quedaron fuera del
-barrido, por dos causas independientes entre sí. Dos modelos
-—\texttt{gemma-3-270m-it} y \texttt{Llama-3.2-1B-Instruct}— quedaron fuera
-por acceso restringido: el acceso de descarga no fue otorgado; sus
+\textbf{Modelos fuera del barrido y reproducibilidad.} De los dieciséis
+modelos del registro considerado para este estudio, tres quedaron
+excluidos del estudio, por dos causas independientes entre sí. Dos modelos
+—\texttt{gemma-3-270m-it} y \texttt{Llama-3.2-1B-Instruct}— quedaron
+excluidos por acceso restringido: el acceso de descarga no fue otorgado; sus
 repositorios exigirían aceptar una licencia propia y disponer de
 credenciales de acceso para descargarse, y esa aprobación no llegó a
 completarse; no es una decisión metodológica. El tercero,
-\texttt{Qwen3.5-2B}, quedó fuera porque su compatibilidad de versión con la
-librería de inferencia quedó \textbf{no verificada}: falla bajo la versión
+\texttt{Qwen3.5-2B}, quedó excluido porque su compatibilidad de versión con
+la librería de inferencia quedó \textbf{no verificada}: falla bajo la versión
 del grupo A, pero no existe evidencia de
 que falle ni de que funcione bajo la versión del grupo B —nunca se obtuvo
 la confirmación positiva—, así que la formulación correcta es que su
 compatibilidad con esa versión quedó sin verificar, no que sea incompatible
 con ella. Ninguna de las tres exclusiones responde a un criterio
-metodológico. Estas tres exclusiones son, además, irrelevantes para
+metodológico.
+
+El cuarto modelo del registro que no integra el roster activo,
+\texttt{Qwen2.5-0.5B-Instruct}, no es una exclusión en ese mismo sentido:
+a diferencia de los tres anteriores, sí fue medido bajo el harness y el
+prompt de este trabajo, como el último de los cuatro modelos del estudio
+original necesario para completar, de forma internamente consistente, el
+brazo de comparación contra esa generación anterior (corridas de
+\emph{baseline-completion}, Sección 6). Que no
+forme parte del roster activo de doce es una decisión del usuario sobre el
+alcance del barrido principal, no una restricción externa ni una falla de
+compatibilidad. Estas tres exclusiones son, además, irrelevantes para
 reproducir \emph{este} estudio: los doce modelos efectivamente evaluados son
 todos de repositorios públicos, así que reproducir el barrido reportado en
 este trabajo no exige aceptar ninguna licencia ni disponer de credenciales
