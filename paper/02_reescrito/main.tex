@@ -1,7 +1,11 @@
-% Paper para CACIC 2026 --- ENVÍO CIEGO.
-% No agregar autores, afiliaciones, agradecimientos, financiamiento, URL del
-% repositorio ni ORCID. La anonimización usa placeholders entre corchetes,
-% que el verificador de anonimato reconoce como tales.
+% Paper para CACIC 2026.
+% Envío firmado, no ciego (cambio de premisa, 2026-08-05): el "Call for Short
+% Papers" del CACIC 2025 pide explícitamente título, datos de autores y
+% directores, e información de la universidad, y ninguna edición 2023-2025
+% exige ni menciona anonimización (evidencia y URLs en TEST_PLAN.md, Check
+% C10). La plantilla oficial del CACIC es el paquete Springer LNCS
+% (llncs.cls), verificada descargando el ZIP oficial del CACIC 2023; no hay
+% migración de plantilla pendiente.
 % Sin "runningheads": las Instructions for Authors of Proceedings (CS) de
 % Springer piden no incluir numero de pagina ni running head en el envio
 % ("There is no need to include page numbers or running heads; this will
@@ -20,11 +24,13 @@
 \usepackage{array}
 % NOTA DE IMPLEMENTACION (subtask 14): llncs.cls de "LaTeX2e (1)/" NO carga
 % hyperref pese a lo asumido en el plan ("que llncs ya carga"); sin este
-% \usepackage, \hypersetup produce "Undefined control sequence" y no hay
-% forma de forzar vacios los metadatos del PDF (requisito de envio ciego).
+% \usepackage, \hypersetup produce "Undefined control sequence".
 \usepackage[hidelinks]{hyperref}
 
-\hypersetup{pdfauthor={},pdfsubject={},pdfkeywords={}}
+% Envío firmado (2026-08-05): los metadatos del PDF reflejan a los autores
+% reales en vez de forzarse vacíos, como correspondía bajo el supuesto de
+% envío ciego ya descartado (ver nota de cabecera).
+\hypersetup{pdfauthor={Carlos Binker, Lautaro Lasorsa, Hugo Tantignone, Guillermo Buranits, Eliseo Zurdo, Maximiliano Frattini},pdfsubject={},pdfkeywords={}}
 
 % Los identificadores de modelo largos (p.ej. OLMo-2-0425-1B-Instruct) en
 % \texttt{} dentro de prosa justificada producen Overfull \hbox puntuales;
@@ -70,9 +76,13 @@
 \title{Modelos de Lenguaje Pequeños para la Interpretación de Comandos de
 Domótica en Español: Evaluación Automática de Doce Modelos Sub-2B}
 \titlerunning{SLMs para Comandos de Domótica en Español}
-\author{[Nombre y Apellido del autor/a]}
-\authorrunning{[Nombre y Apellido del autor/a]}
-\institute{[Afiliación / Institución]\\ \email{[correo@institucion.edu.ar]}}
+\author{Carlos Binker \and Lautaro Lasorsa \and Hugo Tantignone \and
+Guillermo Buranits \and Eliseo Zurdo \and Maximiliano Frattini}
+\authorrunning{C. Binker et al.}
+\institute{Universidad Nacional de La Matanza, Florencio Varela 1903
+(B1754JEC), San Justo, Buenos Aires, Argentina\\
+\email{\{cbinker, laulasorsa, htantignone, gburanits, eazurdo,
+mfrattini\}@unlam.edu.ar}}
 \maketitle
 
 \input{secciones/00_abstract}
