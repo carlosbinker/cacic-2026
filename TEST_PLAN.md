@@ -300,21 +300,83 @@ done
 **Expected:** dos líneas: `paper/01_original compila OK` y `paper/02_reescrito compila OK`, exit 0, y ambos `main.pdf` existen.
 **On failure indicates:** un fragmento `.tex` generado tiene LaTeX inválido (falló el escapador `_escapar` de F8 sobre `& % $ # _ { } ~ ^ \`), falta un `\input`, o el árbol no es autocontenido (`llncs.cls` / `splncs03.bst` no se copiaron desde `LaTeX2e (1)/`). Correr con `-interaction=nonstopmode` sin `>/dev/null` para leer el error real.
 
-### Check C10 — Envío ciego
-**Covers AC:** AC8 (*`python scripts/check_anonimato.py paper/02_reescrito` sale con código 0, incluyendo la revisión de metadatos del `main.pdf` ya construido*), RF15.
+### Check C10 — Autoría firmada presente (invertido, 2026-08-05; antes "Envío ciego")
+**Nota de cambio de premisa (2026-08-05).** Este proyecto asumió hasta ahora que CACIC era de
+revisión doble ciego. Ese supuesto era nuestro y era **incorrecto**: el "Call for Short Papers" del
+CACIC 2025 pide explícitamente incluir «título, datos de autores y directores, información de la
+universidad» (<https://cacic2025.unrn.edu.ar/call-for-short-papers/>), y ninguna de las tres
+ediciones más recientes menciona ni exige anonimización — ni el CACIC 2024
+(<https://cacic2024.info.unlp.edu.ar/call-for-papers-2/>) ni el CACIC 2023
+(<https://cacic2023.unlu.edu.ar/congreso/callForPapers.html>). Además, la plantilla LaTeX oficial
+del CACIC **es el paquete Springer LNCS** (`llncs.cls`), verificado descargando el ZIP oficial del
+CACIC 2023 (<https://cacic2023.unlu.edu.ar/congreso/formatos/LaTeX2e.zip>): el formato ya vigente en
+este árbol es el correcto y no hay migración de plantilla pendiente. El CFP del CACIC 2026 **todavía
+no está publicado** — el sitio de UTN FRCU devolvió 403 al intentar consultarlo — así que todo esto
+es una inferencia consistente de tres ediciones seguidas, a reconfirmar en cuanto el CFP 2026 salga.
+Como consecuencia, este check deja de exigir anonimización en `02_reescrito` (el paper que sí se
+envía) y pasa a exigir lo contrario: que la autoría firmada esté completa y correcta. Se conserva el
+número "C10" para no romper referencias cruzadas de otros checks/documentos.
+
+**Covers AC:** AC8 revisado (*el bloque de autoría de `02_reescrito` — los seis autores en su orden
+exacto, la afiliación única y el bloque de emails agrupado — está presente en `main.tex` y sobrevive
+al PDF ya construido*), RF15 revisado (ya no exige envío ciego).
 **Cost:** `cheap`
 **Run:**
 ```bash
-for d in paper/02_reescrito paper/01_original; do
-  python scripts/check_anonimato.py "$d" ; echo "$d exit=$?"
-done
-```
-**Expected:** ninguno imprime `Hallazgo`, y **ambos** terminan en `exit=0`. **Debe correrse después de C9**, para que `main.pdf` exista y sus metadatos entren en la revisión.
-**On failure indicates:** hay datos identificatorios en el árbol de envío — autores, afiliación, agradecimientos, financiamiento, ORCID, URL del repositorio, o metadatos `/Author` `/Creator` en el PDF. Es motivo de rechazo administrativo en CACIC; no es un detalle cosmético.
+python - <<'PY'
+import re
+from pathlib import Path
 
-**Actualizado (recorte a 10 páginas).** Dos cambios en el alcance de este check:
-1. `02_reescrito` adoptó **la misma convención de anonimización que `01_original`**: placeholders entre corchetes en `\author`, `\authorrunning` e `\institute` (`[Nombre y Apellido del autor/a]`, `[Afiliación / Institución]`, `[correo@institucion.edu.ar]`), en vez del texto `Anonimizado por revisión ciega`.
-2. `01_original` **entra en alcance y también debe dar exit 0**. Antes fallaba por su `[correo@institucion.edu.ar]` y se trataba como fallo preexistente fuera de alcance: era un **falso positivo**, no una fuga. `check_anonimato.py` ahora acepta como placeholder válido un correo, ORCID o URL **literalmente delimitado por `[` y `]`**, y sigue fallando ante cualquiera de los tres sin corchetes. La excepción es deliberadamente estrecha para no vaciar el check.
+AUTORES = ["Carlos Binker", "Lautaro Lasorsa", "Hugo Tantignone",
+           "Guillermo Buranits", "Eliseo Zurdo", "Maximiliano Frattini"]
+AFILIACION = ("Universidad Nacional de La Matanza, Florencio Varela 1903 "
+              "(B1754JEC), San Justo, Buenos Aires, Argentina")
+EMAILS = r"\{cbinker, laulasorsa, htantignone, gburanits, eazurdo, mfrattini\}@unlam.edu.ar"
+
+tex = Path("paper/02_reescrito/main.tex").read_text(encoding="utf-8")
+normalizado = re.sub(r"\s+", " ", tex)
+
+fallas = [f"falta el autor {a!r} en main.tex" for a in AUTORES if a not in normalizado]
+
+posiciones = [normalizado.find(a) for a in AUTORES]
+if posiciones != sorted(posiciones) or -1 in posiciones:
+    fallas.append(f"el orden de los autores en main.tex no respeta el orden exigido: {posiciones}")
+
+if AFILIACION not in normalizado:
+    fallas.append("falta la afiliacion textual exacta en \\institute")
+if EMAILS not in normalizado:
+    fallas.append("falta el bloque de emails agrupado (o no coincide literalmente)")
+
+assert not fallas, fallas
+
+pdf = Path("paper/02_reescrito/main.pdf")
+if pdf.exists():
+    from pypdf import PdfReader
+    texto_pdf = (PdfReader(str(pdf)).pages[0].extract_text() or "")
+    faltan_pdf = [a.split()[-1] for a in AUTORES if a.split()[-1] not in texto_pdf]
+    assert not faltan_pdf, f"apellidos ausentes en la pagina 1 del PDF: {faltan_pdf}"
+
+print("autoria firmada OK: 6 autores en orden, afiliacion y emails presentes "
+      "en main.tex y en la pagina 1 del PDF")
+PY
+```
+**Expected:** imprime `autoria firmada OK: 6 autores en orden, afiliacion y emails presentes en main.tex y en la pagina 1 del PDF`, exit 0. **Debe correrse después de C9**, para que `main.pdf` exista.
+**On failure indicates:** un borrado o reordenamiento accidental del bloque de autoría — el escenario real que este check ahora previene — o una regresión de compilación que hizo desaparecer la página 1 del PDF.
+
+**`01_original` (el paper 2025) no entra en el alcance de este check.** No se reenvía a ningún
+congreso, así que no hay "autoría firmada" que verificarle. Su verificación **se deja como estaba
+antes de este cambio**: `python scripts/check_anonimato.py paper/01_original` sigue corriendo y
+debe seguir dando `exit=0`, porque ese árbol conserva sus placeholders entre corchetes
+(`\author{[Nombre y Apellido del autor/a]}`, etc.) sin cambios. Es una decisión explícita de dejarlo
+igual, no un olvido: `scripts/check_anonimato.py` no se modificó y sus tests en
+`tests/test_check_anonimato.py` (que operan sobre fixtures sintéticas, no sobre el árbol real) siguen
+verdes sin tocarlos.
+```bash
+python scripts/check_anonimato.py paper/01_original ; echo "exit=$?"
+```
+**Expected:** `exit=0`, sin `Hallazgo`.
+**On failure indicates:** alguien agregó datos identificatorios reales a `01_original`, que sigue sin
+ser parte del envío y no debería llevarlos.
 
 ### Check C11 — Las tres amenazas nuevas de RF16 están escritas, y la de raw completion no
 **Covers AC:** AC10 (*`06_amenazas.tex` cubre explícitamente las tres amenazas de RF16*), RF18.

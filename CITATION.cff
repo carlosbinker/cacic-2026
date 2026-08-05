@@ -2,15 +2,36 @@ cff-version: 1.2.0
 message: "Si usás este código, por favor citá el paper original."
 title: "SLMs para interpretación de comandos de domótica en español rioplatense"
 type: software
-authors:
-  - name: "[Nombre y Apellido del autor/a]"
-    affiliation: "[Afiliación / Institución]"
+authors: &autores
+  - given-names: "Carlos"
+    family-names: "Binker"
+    affiliation: "Universidad Nacional de La Matanza"
+    email: "cbinker@unlam.edu.ar"
+  - given-names: "Lautaro"
+    family-names: "Lasorsa"
+    affiliation: "Universidad Nacional de La Matanza"
+    email: "laulasorsa@unlam.edu.ar"
+  - given-names: "Hugo"
+    family-names: "Tantignone"
+    affiliation: "Universidad Nacional de La Matanza"
+    email: "htantignone@unlam.edu.ar"
+  - given-names: "Guillermo"
+    family-names: "Buranits"
+    affiliation: "Universidad Nacional de La Matanza"
+    email: "gburanits@unlam.edu.ar"
+  - given-names: "Eliseo"
+    family-names: "Zurdo"
+    affiliation: "Universidad Nacional de La Matanza"
+    email: "eazurdo@unlam.edu.ar"
+  - given-names: "Maximiliano"
+    family-names: "Frattini"
+    affiliation: "Universidad Nacional de La Matanza"
+    email: "mfrattini@unlam.edu.ar"
 license: MIT
 preferred-citation:
   type: conference-paper
-  title: "Modelos de Lenguaje Pequeños para la Interpretación de Comandos de Domótica en Español: Un Estudio Comparativo"
-  authors:
-    - name: "[Nombre y Apellido del autor/a]"
+  title: "Modelos de Lenguaje Pequeños para la Interpretación de Comandos de Domótica en Español: Evaluación Automática de Doce Modelos Sub-2B"
+  authors: *autores
   conference:
     name: "XXXII Congreso Argentino de Ciencias de la Computación (CACIC 2026)"
   year: 2026

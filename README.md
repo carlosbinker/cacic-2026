@@ -137,16 +137,17 @@ python src/generate_tex_tables.py    # regenera paper/02_reescrito/tablas/*.tex 
 ```bash
 # transcripción del estudio original (4 modelos)
 (cd paper/01_original && latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex)
-# paper reescrito con el roster ampliado de 12 modelos (envío ciego a CACIC 2026)
+# paper reescrito con el roster ampliado de 12 modelos (envío firmado a CACIC 2026, no ciego)
 (cd paper/02_reescrito && latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex)
-python scripts/check_anonimato.py paper/02_reescrito   # puerta de envío ciego, código 0 esperado
 ```
+El CACIC no es de revisión doble ciego (ver `TEST_PLAN.md`, Check C10, nota del 2026-08-05): `01_original`
+sigue verificado con `python scripts/check_anonimato.py paper/01_original`, código 0 esperado.
 
 ## Cómo citar
 
 Ver `CITATION.cff`. Citación en texto:
 
-> [Autor/a]. "Modelos de Lenguaje Pequeños para la Interpretación de Comandos de Domótica en Español: Un Estudio Comparativo". XXXII Congreso Argentino de Ciencias de la Computación (CACIC 2026).
+> Binker, C., Lasorsa, L., Tantignone, H., Buranits, G., Zurdo, E., Frattini, M. "Modelos de Lenguaje Pequeños para la Interpretación de Comandos de Domótica en Español: Evaluación Automática de Doce Modelos Sub-2B". XXXII Congreso Argentino de Ciencias de la Computación (CACIC 2026).
 
 ## Licencia
 
