@@ -138,9 +138,13 @@ def test_tabla4_tiene_las_siete_etiquetas_con_nombre_legible():
     assert _es_bloque_table(tex)
     assert r"\label{tab:taxonomia}" in tex
     for e in ETIQUETAS_ERROR:
-        assert ETIQUETAS_ERROR_DISPLAY[e] in tex
-    assert "Alucinación de valor/unidad" in tex
-    assert "Valor numérico incorrecto" in tex
+        # Case-insensitive: el nombre completo vive en el caption como
+        # leyenda de siglas, con minúscula inicial (tipografía castellana
+        # correcta tras los dos puntos); el test garantiza la presencia del
+        # nombre, no su capitalización.
+        assert ETIQUETAS_ERROR_DISPLAY[e].lower() in tex.lower()
+    assert "alucinación de valor/unidad" in tex.lower()
+    assert "valor numérico incorrecto" in tex.lower()
 
 
 def test_tabla4_omite_la_etiqueta_que_quedo_en_cero_pero_no_la_de_una_ocurrencia():
@@ -159,7 +163,9 @@ def test_tabla4_omite_la_etiqueta_que_quedo_en_cero_pero_no_la_de_una_ocurrencia
     df.loc[:, nunca] = 0
     tex = tabla4_taxonomia(df)
     assert ETIQUETAS_ERROR_DISPLAY[nunca] not in tex
-    assert ETIQUETAS_ERROR_DISPLAY[una_vez] in tex
+    # Case-insensitive por el mismo motivo que en el test anterior: el
+    # nombre completo aparece en el caption con minúscula inicial.
+    assert ETIQUETAS_ERROR_DISPLAY[una_vez].lower() in tex.lower()
     encabezado = next(l for l in tex.splitlines() if "Modelo" in l)
     # Modelo + Incorrectas + 6 etiquetas con al menos una ocurrencia
     assert encabezado.count("&") == 1 + len(ETIQUETAS_ERROR) - 1

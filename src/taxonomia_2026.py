@@ -38,6 +38,7 @@ ETIQUETAS_ERROR_SIGLA: dict[str, str] = {
     "confusion_intencion": "CI",
     "confusion_dispositivo": "CD",
     "confusion_ubicacion": "CU",
+    "alucinacion_valor_unidad": "AV",
     "valor_numerico_incorrecto": "VN",
     "sin_error_semantico": "SE",
     "uso_de_sinonimos": "US",
