@@ -2,7 +2,16 @@
 % No agregar autores, afiliaciones, agradecimientos, financiamiento, URL del
 % repositorio ni ORCID. La anonimización usa placeholders entre corchetes,
 % que el verificador de anonimato reconoce como tales.
-\documentclass[runningheads]{llncs}
+% Sin "runningheads": las Instructions for Authors of Proceedings (CS) de
+% Springer piden no incluir numero de pagina ni running head en el envio
+% ("There is no need to include page numbers or running heads; this will
+% be done at our end." -- Springer, Instructions for Authors of Proceedings,
+% Computer Science, seccion de formato). \if@runhead en llncs.cls es lo
+% unico que decide entre \ps@headings (numero de pagina + titulo/autor
+% abreviados en la cabecera) y \ps@empty (cabecera vacia); sin la opcion
+% "runningheads" la clase cae en \ps@empty en las 10 paginas, incluida
+% la primera (que ya usaba \thispagestyle{empty} de por si).
+\documentclass{llncs}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[spanish,es-tabla,es-noquoting]{babel}
