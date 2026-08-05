@@ -11,23 +11,23 @@ comandos domóticos en francés, que los recursos de NLU en inglés no se
 transfieren bien a otras lenguas. El antecedente más cercano evalúa LLMs en
 el dispositivo para asistentes domóticos \cite{ondevice2025homeassistant}:
 variantes cuantizadas de 16, 8 y 4 bits, con 80\%--86\% de exactitud y
-latencias de 5 a 6 segundos. Este trabajo se diferencia por el extremo
-inferior de tamaño (sub-2B, sin cuantización), el idioma y la interpretación
-estructurada en lugar de la generación conversacional.
+latencias de 5 a 6 segundos. Este trabajo se diferencia por el tamaño
+(sub-2B, sin cuantización), el idioma y la interpretación estructurada en
+lugar de la generación conversacional.
 
 Gupta et al. \cite{gupta2025slms} documentan que modelos de pocos miles de
 millones de parámetros igualan a modelos mucho mayores en tareas específicas;
 los reportes técnicos de Qwen2.5 \cite{qwen2024report}, SmolLM2
 \cite{allal2025smollm2} y OLMo 2 \cite{olmo2report} describen tres de las
 familias evaluadas. La decodificación restringida por gramática garantiza
-validez sintáctica \cite{beurerkellner2024guiding,dong2024xgrammar}; en este
-trabajo no se la empleó, tanto para medir el seguimiento de instrucciones en
-un despliegue simple como porque garantiza la validez del formato sin impedir
-que el modelo produzca un valor incorrecto dentro de un JSON válido.
+validez sintáctica \cite{beurerkellner2024guiding,dong2024xgrammar}; no se la
+empleó aquí, para medir el seguimiento de instrucciones en un despliegue
+simple y porque esa garantía cubre el formato sin impedir un valor incorrecto
+dentro de un JSON válido.
 
-Zheng et al. \cite{zheng2023judging} muestran que un LLM suficientemente
-capaz aproxima el juicio humano con acuerdo alto, y proponen usarlo como juez
-donde la coincidencia exacta subestima el desempeño real, como en la brecha
-estricta/laxa de este trabajo (Sección 3.4). Su limitación conocida es el sesgo de
-auto-favorecimiento; como aquí el juez es uno de los modelos evaluados, ese
-sesgo es directamente aplicable (Sección 6).
+Zheng et al. \cite{zheng2023judging} muestran que un LLM capaz aproxima el
+juicio humano con acuerdo alto, y proponen usarlo como juez donde la
+coincidencia exacta subestima el desempeño real, como en la brecha
+estricta/laxa de este trabajo (Sección 3.4). Su limitación conocida, el sesgo
+de auto-favorecimiento, es directamente aplicable aquí porque el juez es uno
+de los modelos evaluados (Sección 6).

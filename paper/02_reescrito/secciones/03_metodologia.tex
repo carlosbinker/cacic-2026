@@ -4,10 +4,10 @@
 
 \input{tablas/tabla1_modelos}
 
-Se evaluaron doce modelos abiertos en dos franjas de seis: sub-1000 millones
-de parámetros y entre 1000 y 2000 millones (Tabla \ref{tab:modelos}). Los
-doce están disponibles públicamente en HuggingFace, sin restricción de
-licencia ni de token. \texttt{Qwen2.5-1.5B-Instruct} (1,54\,B) se incorporó
+Se evaluaron doce modelos abiertos, públicos en HuggingFace y sin
+restricción de licencia ni de token, en dos franjas de seis: sub-1000
+millones de parámetros y entre 1000 y 2000 millones (Tabla
+\ref{tab:modelos}). \texttt{Qwen2.5-1.5B-Instruct} (1,54\,B) se incorporó
 deliberadamente como representante de la generación anterior de SLMs bajo el
 mismo protocolo (Sección 4.1).
 
@@ -25,10 +25,10 @@ o contexto conversacional—, que asigna el juez automático (Sección
 \subsection{Protocolo de prompting y esquema de salida}
 \label{sec:prompting}
 
-El prompt de sistema es único y fijo para los doce modelos, y se aplica a
-cada uno mediante la plantilla de conversación de su propio \emph{tokenizer}.
-Se transcribe íntegro a continuación junto con el prompt de usuario; ambos
-provienen de constantes del código, no de una transcripción manual.
+El prompt de sistema es único y fijo para los doce modelos, aplicado
+mediante la plantilla de conversación del propio \emph{tokenizer} de cada
+uno. Se transcribe íntegro junto con el prompt de usuario; ambos provienen
+de constantes del código, no de una transcripción manual.
 
 \input{tablas/prompt_sistema}
 
@@ -56,13 +56,13 @@ latencia promedio.
 \label{sec:dos-etapas}
 
 En la \textbf{etapa 1} cada respuesta se compara campo a campo, de forma
-determinista, contra la referencia; de allí se obtiene la exactitud estricta,
-sin ningún modelo adicional. El juez de la \textbf{etapa 2} se determina por
+determinista, contra la referencia, sin ningún modelo adicional, y de ahí
+sale la exactitud estricta. El juez de la \textbf{etapa 2} se determina por
 una regla fijada de antemano: el modelo con mayor exactitud estricta en la
-etapa 1, con los empates resueltos por mayor cantidad de parámetros y luego
-por el orden del listado. Ambas etapas se ejecutan con decodificación
-\emph{greedy} (\texttt{do\_sample=False}, temperatura 0), y de ello —no de
-fijar el identificador del juez de antemano— depende la reproducibilidad.
+etapa 1, con empates resueltos por mayor cantidad de parámetros y luego por
+el orden del listado. Ambas etapas usan decodificación \emph{greedy}
+(\texttt{do\_sample=False}, temperatura 0); de eso —no de fijar el
+identificador del juez de antemano— depende la reproducibilidad.
 
 El juez clasifica cada respuesta con \texttt{match\_exact = False} en un
 subconjunto no vacío de siete etiquetas cerradas —confusión de intención, de

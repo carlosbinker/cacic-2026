@@ -4,19 +4,18 @@ servicios en la nube, lo que introduce alta latencia, costos recurrentes y
 dependencia de conectividad. Los Small Language Models (SLMs) ejecutados
 localmente constituyen una alternativa viable para hubs domóticos de bajo
 costo, pero su capacidad para interpretar comandos en español rioplatense no
-ha sido evaluada en profundidad: el voseo, los diminutivos y las expresiones
-relativas de la variedad (``bajale un toque'') no aparecen en los corpus de
-domótica en inglés sobre los que se entrenan y evalúan estos modelos, y su
-tratamiento no puede suponerse transferido. Este trabajo evalúa doce SLMs
-abiertos de menos de 2 mil millones de parámetros sobre un dataset de 32
-comandos en español rioplatense, con anotación de referencia de cinco campos
-(intención, dispositivo, ubicación, valor y unidad). La verificación,
-íntegramente automática, consta de dos etapas: una comparación textual
-determinista campo a campo, seguida de un modelo de lenguaje que actúa como
-juez y clasifica cada respuesta incorrecta contra una taxonomía cerrada. Se
-reportan exactitud estricta y exactitud laxa (semántica): su brecha
-cuantifica en qué medida la coincidencia textual exacta penaliza respuestas
-que un evaluador humano consideraría correctas.
+ha sido evaluada: el voseo, los diminutivos y las expresiones relativas de la
+variedad (``bajale un toque'') no aparecen en los corpus de domótica en
+inglés usados para entrenar y evaluar estos modelos, y su tratamiento no
+puede suponerse transferido. Este trabajo evalúa doce SLMs abiertos de menos
+de 2 mil millones de parámetros sobre un dataset de 32 comandos en español
+rioplatense, con anotación de referencia de cinco campos (intención,
+dispositivo, ubicación, valor y unidad). La verificación es automática en dos
+etapas: comparación textual determinista campo a campo y un modelo de
+lenguaje que actúa de juez, clasificando cada respuesta incorrecta contra una
+taxonomía cerrada. Se reportan exactitud estricta y exactitud laxa
+(semántica): su brecha cuantifica cuánto penaliza la coincidencia textual
+exacta a respuestas que un evaluador humano consideraría correctas.
 
 \keywords{modelos de lenguaje pequeños, domótica, evaluación automática,
 LLM como juez, procesamiento del lenguaje natural, español rioplatense.}
