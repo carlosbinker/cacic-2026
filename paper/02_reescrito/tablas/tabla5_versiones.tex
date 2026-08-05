@@ -3,24 +3,14 @@
 \caption{Pines de \texttt{transformers} por modelo}
 \label{tab:versiones}
 {\footnotesize
-\begin{tabular}{lllp{3.6cm}}
+\begin{tabular}{lllrp{4.2cm}}
 \toprule
-Modelo & Grupo & Versión resuelta & Motivo \\
+Grupo & Pin & Versión resuelta & Modelos & Motivos \\
 \midrule
-LFM2.5-230M & B & 5.14.1 & tokenizer no soportado en 4.57.6 \\
-granite-4.0-h-350m & A & 4.57.6 & — \\
-LFM2.5-350M & B & 5.14.1 & íd. (mismo tokenizer) \\
-granite-4.0-350m & A & 4.57.6 & regresión de caché en la versión 5.14.1 \\
-SmolLM2-360M-Instruct & A & 4.57.6 & — \\
-Qwen3.5-0.8B & B & 5.14.1 & arquitectura no reconocida en 4.57.6 \\
-OLMo-2-0425-1B-Instruct & A & 4.57.6 & — \\
-LFM2.5-1.2B-Instruct & A & 4.57.6 & — \\
-granite-4.0-h-1b & A & 4.57.6 & — \\
-Qwen2.5-1.5B-Instruct & A & 4.57.6 & — \\
-granite-4.0-1b & A & 4.57.6 & — \\
-SmolLM2-1.7B-Instruct & A & 4.57.6 & — \\
+A & \texttt{>=4.57.0,<5.0.0} & 4.57.6 & 9 & regresión de caché en la versión 5.14.1 (\texttt{granite-4.0-350m}) \\
+B & \texttt{>=5.0.0} & 5.14.1 & 3 & tokenizer no soportado en 4.57.6 (\texttt{LFM2.5-230M}); íd. (mismo tokenizer) (\texttt{LFM2.5-350M}); arquitectura no reconocida en 4.57.6 (\texttt{Qwen3.5-0.8B}) \\
 \bottomrule
 \end{tabular}
 }
-\\[2pt]\footnotesize{Grupo A (\texttt{transformers>=4.57.0,<5.0.0}, resuelve 4.57.6) y grupo B (\texttt{transformers>=5.0.0}, resuelve 5.14.1) son necesarios y mutuamente excluyentes sobre el conjunto evaluado: no existe una única versión mayor que sirva para las 12 filas activas. Un motivo en blanco (—) indica que el modelo no impuso ningún requisito propio y quedó en el grupo por omisión.}
+\\[2pt]\footnotesize{Grupo A (\texttt{transformers>=4.57.0,<5.0.0}, resuelve 4.57.6) y grupo B (\texttt{transformers>=5.0.0}, resuelve 5.14.1) son necesarios y mutuamente excluyentes sobre el conjunto evaluado: no existe una única versión mayor que sirva para las 12 filas activas. Grupo A (9 modelos): \texttt{granite-4.0-h-350m}, \texttt{granite-4.0-350m}, \texttt{SmolLM2-360M-Instruct}, \texttt{OLMo-2-0425-1B-Instruct}, \texttt{LFM2.5-1.2B-Instruct}, \texttt{granite-4.0-h-1b}, \texttt{Qwen2.5-1.5B-Instruct}, \texttt{granite-4.0-1b}, \texttt{SmolLM2-1.7B-Instruct}. Grupo B (3 modelos): \texttt{LFM2.5-230M}, \texttt{LFM2.5-350M}, \texttt{Qwen3.5-0.8B}.}
 \end{table}

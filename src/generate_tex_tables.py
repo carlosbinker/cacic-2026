@@ -311,45 +311,64 @@ def tabla4_taxonomia(df: pd.DataFrame) -> str:
 
 
 def tabla5_versiones() -> str:
-    """Tabla 5: matriz de versiones de transformers (RF5), un modelo por FILA
-    (orden canónico, item 3 de la revisión de PDF), con `Motivo` en una
-    columna `p{}` que envuelve el texto -- corrección: la orientación con
-    doce modelos en columnas (encabezados rotados 90°) dejaba la fila de
-    `Motivo` en celdas de 1/13 del ancho, ilegible. El motivo de cada pin
-    necesario se resume en el lenguaje del paper, sin texto crudo de
-    excepción ni rutas de archivo: esas rutas son ruido y, en un envío ciego,
-    una filtración de estructura de directorios local. Sin columna
-    `¿Necesario?`: su valor `Heredado` no respondía la pregunta del
-    encabezado y era redundante con `Motivo`, donde un motivo no vacío ya
-    significa que ese modelo forzó el pin. Sin `resizebox`: entra a ancho de
+    """Tabla 5: matriz de versiones de transformers (RF5), colapsada a **2
+    FILAS por grupo** (item de la revisión de PDF sobre recorte a 10
+    páginas): las 12 filas originales (un modelo por fila) sólo llevaban 2
+    valores distintos de versión resuelta y 4 motivos reales -- las otras 8
+    filas repetían "—". Una fila por grupo (pin, versión resuelta, cantidad
+    de modelos, motivos concatenados de los modelos que sí forzaron el pin)
+    dice lo mismo sin la repetición. El pin se abrevia sin el prefijo
+    `transformers` (ya está en el caption) para que la columna entre a ancho
+    LNCS; la cadena completa (`BASELINE_TRANSFORMERS`/`TRANSFORMERS_5X`, con
+    el prefijo) sigue citada en la nota para C7. Los 12 nombres del roster no
+    desaparecen: se listan agrupados por grupo en la nota, que hace de
+    leyenda -- así C7 (`m.nombre in texto`) sigue satisfecho y el lector
+    conserva la trazabilidad completa. Sin `resizebox`: entra a ancho de
     columna LNCS sin comprimir letra."""
     modelos = orden_canonico(roster_activo())
     grupo_de = {BASELINE_TRANSFORMERS: "A", TRANSFORMERS_5X: "B"}
-    filas = []
+    por_grupo: dict[str, list] = {"A": [], "B": []}
     for m in modelos:
-        version_resuelta = _VERSION_RESUELTA[m.transformers_pin]
-        motivo = _escapar(_MOTIVO_EXPLICACION_PAPER[m.nombre]) if m.motivo_pin else "—"
-        filas.append([
-            _escapar(m.nombre),
-            grupo_de[m.transformers_pin],
-            version_resuelta,
-            motivo,
-        ])
+        por_grupo[grupo_de[m.transformers_pin]].append(m)
+
+    def motivos_de(grupo: str) -> str:
+        motivos = [
+            f"{_escapar(_MOTIVO_EXPLICACION_PAPER[m.nombre])} "
+            f"(\\texttt{{{_escapar(m.nombre)}}})"
+            for m in por_grupo[grupo] if m.motivo_pin
+        ]
+        return "; ".join(motivos) if motivos else "—"
+
+    def pin_corto(pin: str) -> str:
+        return _escapar(pin.removeprefix("transformers"))
+
+    filas = [
+        ["A", f"\\texttt{{{pin_corto(BASELINE_TRANSFORMERS)}}}",
+         _VERSION_RESUELTA[BASELINE_TRANSFORMERS], str(len(por_grupo["A"])),
+         motivos_de("A")],
+        ["B", f"\\texttt{{{pin_corto(TRANSFORMERS_5X)}}}",
+         _VERSION_RESUELTA[TRANSFORMERS_5X], str(len(por_grupo["B"])),
+         motivos_de("B")],
+    ]
+    roster_por_grupo = {
+        grupo: ", ".join(f"\\texttt{{{_escapar(m.nombre)}}}" for m in miembros)
+        for grupo, miembros in por_grupo.items()
+    }
     nota = (
         f"Grupo A (\\texttt{{{_escapar(BASELINE_TRANSFORMERS)}}}, resuelve "
         f"{_VERSION_RESUELTA[BASELINE_TRANSFORMERS]}) y grupo B "
         f"(\\texttt{{{_escapar(TRANSFORMERS_5X)}}}, resuelve "
         f"{_VERSION_RESUELTA[TRANSFORMERS_5X]}) son necesarios y mutuamente "
         "excluyentes sobre el conjunto evaluado: no existe una única versión mayor que "
-        "sirva para las 12 filas activas. Un motivo en blanco (—) indica que "
-        "el modelo no impuso ningún requisito propio y quedó en el grupo por "
-        "omisión."
+        "sirva para las 12 filas activas. "
+        f"Grupo A ({len(por_grupo['A'])} modelos): {roster_por_grupo['A']}. "
+        f"Grupo B ({len(por_grupo['B'])} modelos): {roster_por_grupo['B']}."
     )
     return _tabla(
         caption="Pines de \\texttt{transformers} por modelo",
         label="tab:versiones",
-        spec="lllp{3.6cm}",
-        encabezado=["Modelo", "Grupo", "Versión resuelta", "Motivo"],
+        spec="lllrp{4.2cm}",
+        encabezado=["Grupo", "Pin", "Versión resuelta", "Modelos", "Motivos"],
         filas=filas,
         nota=nota,
         fuente_pequena=True,
