@@ -59,7 +59,16 @@
 \renewcommand{\topfraction}{0.9}
 \renewcommand{\bottomfraction}{0.7}
 \renewcommand{\textfraction}{0.08}
-\renewcommand{\floatpagefraction}{0.8}
+% floatpagefraction sube de 0.8 a 0.92 (2026-08-05, tercera pasada): medido
+% con \sbox, la Tabla 2 (222pt) y fig1 (216pt) miden 438pt de contenido
+% puro sobre \textheight=549pt (79.9%); con la separación entre flotantes y
+% hacia el texto que sigue (\floatsep + \textfloatsep, ~8-16pt cada una)
+% quedan por encima del 0.8 anterior, así que LaTeX las trataba como
+% "página de flotantes" dedicada -- sin una sola línea de prosa -- en vez
+% de ponerlas juntas al tope de una página normal con texto debajo (que sí
+% entra: 0.9 de \topfraction ya lo permitía). Subir el umbral a 0.92 hace
+% que valga más la pena intercalar texto que dedicarles una página entera.
+\renewcommand{\floatpagefraction}{0.92}
 % Las referencias van sin aire extra entre entradas: es espacio en blanco, no
 % contenido, y cuenta contra el limite de paginas. (llncs.cls ya fija \small
 % en \thebibliography por su cuenta; no hace falta repetirlo aqui.)

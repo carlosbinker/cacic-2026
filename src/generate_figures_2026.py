@@ -18,10 +18,12 @@ y no quede por debajo del piso de legibilidad. La barra de exactitud (eje
 inferior, 0-100%) se dibuja 100% apilada en vez de paralela: estricta, luego
 el incremento de laxa con JSON válido, luego -- rayado -- el incremento de
 laxa con JSON inválido (`laxo_json_invalido_n`, siempre subconjunto de la
-laxa: `estricta ⊆ (laxa ∧ JSON válido) ⊆ laxa`), y el resto hasta 100% queda
-sin relleno para que el blanco se lea como error. La barra de latencia
-comparte el eje Y pero cuelga de un eje X propio arriba (`ax.twiny()`, 0-140
-s). El orden ya no agrupa por tier: es exactitud estricta decreciente (ver
+laxa: `estricta ⊆ (laxa ∧ JSON válido) ⊆ laxa`), y el resto hasta 100% no se
+dibuja: queda como hueco de eje contra `set_xlim(0, 100)`, sin parche ni
+borde delimitador (segunda pasada, 2026-08-05: se retiró el contenedor
+0-100% para no agregar ruido visual). La barra de latencia comparte el eje
+Y pero cuelga de un eje X propio arriba (`ax.twiny()`, 0-140 s). El orden ya
+no agrupa por tier: es exactitud estricta decreciente (ver
 `ordenar_fig1_por_exactitud`), así que la separación de banda sub-1B/1-2B se
 elimina sólo en esta figura -- la Tabla 1 conserva la suya. El pie de figura
 con "*" y la anotación in-situ del cociente h/densa de latencia (atención
@@ -29,6 +31,9 @@ híbrida) del diseño anterior se retiran de esta figura: el primero es
 redundante con la prosa de la Sección 4 (`laxo_json_invalido_n` por modelo ya
 está citado ahí) y el segundo con la Sección 5
 (`sec:discusion-latencia-hibrida`, que cita los mismos cocientes en prosa).
+La leyenda es un recuadro apilado a la derecha del área de ploteo (segunda
+pasada, 2026-08-05): angosta el área de datos en vez de ensanchar el
+lienzo, que se mantiene en 4.42in de ancho impreso.
 
 Uso:
     python src/generate_figures_2026.py [--resumen R] [--sufijo S] [--salida-dir D]
@@ -199,10 +204,14 @@ def generar_figuras(path_resumen: Path, dir_salida: Path, sufijo: str) -> list[P
     # 2026-08-05: la leyenda in-situ se superponía con las barras y consigo
     # misma -- se mueve fuera de los ejes, debajo del label "Exactitud").
     PAD_SUPERIOR, PAD_INFERIOR = 0.5, 0.5
-    # Alto de lienzo mayor que el original (2.4in) para pagar, sin recortar
-    # fuente ni leyenda, el espacio de la leyenda externa: ancho fijo al
-    # impreso, alto el que la leyenda exige.
-    fig1, ax_acc = plt.subplots(figsize=(4.42, 2.85), dpi=300)
+    # Corrección 2026-08-05 (segunda pasada): la leyenda pasa de una fila
+    # externa debajo del eje a un recuadro apilado a la derecha del área de
+    # ploteo. Eso devuelve el alto de lienzo a los 2.4in originales -- el
+    # espacio de la leyenda ahora se paga angostando el área de datos
+    # (`right` en subplots_adjust), no agrandando el lienzo -- porque el
+    # ancho impreso (4.42in) es fijo y ensancharlo reescala todo el texto
+    # hacia abajo.
+    fig1, ax_acc = plt.subplots(figsize=(4.42, 2.4), dpi=300)
     ax_lat = ax_acc.twiny()
 
     y_acc = [p + DESPLAZ for p in pos1]
@@ -216,12 +225,12 @@ def generar_figuras(path_resumen: Path, dir_salida: Path, sufijo: str) -> list[P
     ax_acc.barh(y_acc, seg["laxa_invalida_incr"], height=ALTO_BARRA,
                 left=inicio_laxa_invalida, color="#90cdf4", hatch="////",
                 edgecolor="#4a1010", linewidth=0.5, zorder=3)
-    # Contenedor sin relleno que delimita la barra completa (0-100%),
-    # dibujado último para que su borde quede nítido sobre los rellenos: el
-    # tramo que queda en blanco hasta el borde derecho ES la proporción de
-    # error, no un margen decorativo.
-    ax_acc.barh(y_acc, [100.0] * len(pos1), height=ALTO_BARRA, left=0,
-                facecolor="none", edgecolor="#666666", linewidth=0.6, zorder=4)
+    # Sin contenedor 0-100%: el usuario decidió que dibujar el borde del
+    # tramo en blanco (el resto hasta el eje, que SÍ es la proporción de
+    # error) agregaba ruido visual. El eje de exactitud sigue fijo en
+    # `set_xlim(0, 100)` más abajo, así que el hueco entre el final de la
+    # barra apilada y el 100% se sigue leyendo directamente contra el eje --
+    # no se dibuja ningún parche (ni siquiera sin relleno) para ese tramo.
 
     ax_lat.barh(y_lat, [f["avg_latencia_s"] for f in resumen1],
                 height=ALTO_BARRA, color="#dd6b20", zorder=2)
@@ -242,14 +251,14 @@ def generar_figuras(path_resumen: Path, dir_salida: Path, sufijo: str) -> list[P
     # Leyenda con parches proxy explícitos (mismo motivo que en el diseño
     # anterior: los parches reales de la serie "laxa, JSON inv." tienen
     # ancho 0 en 10 de los 12 modelos, así que tomar el estilo de un patch
-    # real al azar sería frágil). Corrección 2026-08-05: la leyenda dentro
-    # del área de datos se superponía con las barras y sus propias entradas
-    # se pisaban entre sí a 5,5pt -- se mueve FUERA de los ejes, debajo del
-    # label "Exactitud" (orden vertical: barras -> ticks -> label ->
-    # leyenda), con `fig.legend` en vez de `ax.legend` para que ancle en
-    # coordenadas de figura y no de ejes. Sin la entrada "error": el usuario
-    # decidió que el blanco hasta 100% se lee solo, con la cláusula del
-    # caption como única explicación textual.
+    # real al azar sería frágil). Corrección 2026-08-05 (segunda pasada): la
+    # fila externa debajo del eje obligaba a agrandar el lienzo; ahora es un
+    # recuadro apilado verticalmente (una entrada por línea, `ncol=1`) a la
+    # derecha del área de ploteo, fuera de los ejes (`fig.legend` con
+    # coordenadas de figura). Apiladas en vertical no compiten por ancho
+    # entre sí -- lo que las aplastaba en la fila horizontal. Sin la entrada
+    # "error": el usuario decidió que el hueco hasta el 100% del eje de
+    # exactitud se lee solo.
     handles1 = [
         mpatches.Patch(facecolor="#2b6cb0", label="estricta"),
         mpatches.Patch(facecolor="#90cdf4", label="laxa, JSON OK"),
@@ -257,16 +266,18 @@ def generar_figuras(path_resumen: Path, dir_salida: Path, sufijo: str) -> list[P
                         linewidth=0.5, label="laxa, JSON inv."),
         mpatches.Patch(facecolor="#dd6b20", label="latencia"),
     ]
-    fig1.legend(handles=handles1, loc="lower center", bbox_to_anchor=(0.5, 0.02),
+    fig1.legend(handles=handles1, loc="center left", bbox_to_anchor=(0.735, 0.5),
                 bbox_transform=fig1.transFigure, fontsize=FUENTE_LEYENDA,
-                ncol=len(handles1), handlelength=1.2, handletextpad=0.4,
-                columnspacing=1.0, labelspacing=0.6, borderpad=0.5)
+                ncol=1, handlelength=1.2, handletextpad=0.4,
+                labelspacing=0.7, borderpad=0.5, frameon=True)
 
     # Márgenes ajustados para que entren, sin recorte: el nombre de modelo
     # más largo a la izquierda, los dos ejes X (ticks + label) arriba y
-    # abajo, y ahora la leyenda externa por debajo del label "Exactitud" --
-    # verificado con Figure.get_tightbbox() contra el lienzo de 4.42x2.85in.
-    fig1.subplots_adjust(left=0.31, right=0.90, top=0.87, bottom=0.30)
+    # abajo, y ahora el recuadro de leyenda a la derecha -- se paga
+    # angostando el área de datos (`right` baja de 0.90 a 0.72) en vez de
+    # ensanchar el lienzo, que debe seguir en 4.42in de ancho impreso.
+    # Verificado con Figure.get_tightbbox() contra el lienzo de 4.42x2.4in.
+    fig1.subplots_adjust(left=0.31, right=0.72, top=0.83, bottom=0.22)
 
     ruta1 = dir_salida / f"fig1_exactitud_latencia_2026{sufijo}.png"
     # Sin bbox_inches="tight": el lienzo se autora a propósito al ancho final
