@@ -2,20 +2,21 @@
 
 \textbf{Constructo.} La exactitud laxa y la taxonomía separan qué parte de la
 exactitud estricta perdida es de vocabulario y qué parte es de contenido,
-pero sólo resuelven la amenaza parcialmente: la brecha es una cota superior
-semántica, no una medición con un evaluador humano, y es poco confiable donde
+pero sólo resuelven la amenaza parcialmente: la brecha es poco confiable donde
 el formato es débil (Sección \ref{sec:analisis-errores}).
 
 \textbf{Interna.} \emph{Sesgo de auto-favorecimiento del juez.} El juez es
 \texttt{granite-4.0-1b}, uno de los doce modelos evaluados: juzga también sus
-propias respuestas. Un juez basado en LLM puede favorecer las respuestas
-propias o las de su familia \cite{zheng2023judging}, y este diseño no lo
+propias respuestas. Un juez basado en LLM puede favorecer las suyas
+\cite{zheng2023judging}, y este diseño no lo
 controla con un juez externo ni con un segundo evaluador. Como atenuante, es
 el modelo con menos respuestas incorrectas involucradas (3 de 32, Tabla
 \ref{tab:taxonomia}). No obstante, se trata de un modelo sub-2B que adjudica
 equivalencia semántica, tarea más exigente que clasificar campos
 estructurados: los 0 casos de \texttt{juez\_parse\_ok = False} dan cuenta de
-salidas parseables, no de la calidad del criterio.
+salidas parseables, no de la calidad del criterio. La exactitud del juez no se
+validó contra anotación humana: la métrica laxa es una cota superior
+dependiente de un instrumento no validado.
 
 \emph{La versión de la librería como factor de confusión.} Como los doce
 modelos se ejecutan repartidos 9/3 entre los dos grupos de versión de
@@ -35,8 +36,9 @@ alcanzable en este hardware. Los cocientes \texttt{$\times$4,10} y
 que son robustos a esta amenaza.
 
 \textbf{Externa y de conclusión.} El dataset es reducido y desbalanceado (32
-comandos, entre 3 y 8 por categoría), se usó un único prompt sin optimización
-por modelo, la entrada fue texto limpio sin ruido de reconocimiento
+comandos distribuidos 15, 14 y 3 en tres de seis categorías), se usó un único
+prompt sin optimización por modelo, la entrada fue texto limpio sin ruido de
+reconocimiento
 automático de habla (ASR) y se cubrió una sola variante dialectal; con esos
 tamaños de categoría, las diferencias porcentuales entre modelos son
 indicativas, no estadísticamente significativas. Por último,
