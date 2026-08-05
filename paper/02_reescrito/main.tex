@@ -24,13 +24,17 @@
 \emergencystretch=3em
 
 % Presupuesto de páginas: el CFP de CACIC pide 10 páginas para trabajos
-% completos (referencias incluidas, supuesto conservador). Con 5 tablas, el
-% prompt íntegro y una figura, la separación por omisión de los flotantes
-% fragmentaba el cuerpo; estos valores la ajustan sin tocar el interlineado
-% del texto ni el cuerpo de letra de las tablas.
+% completos (referencias incluidas, supuesto conservador). Con las tablas del
+% cuerpo, el prompt íntegro y una figura, la separación por omisión de los
+% flotantes fragmentaba el cuerpo; estos valores la ajustan sin tocar el
+% interlineado del texto ni el cuerpo de letra de las tablas.
 \setlength{\textfloatsep}{8pt plus 2pt minus 2pt}
 \setlength{\intextsep}{8pt plus 2pt minus 2pt}
 \setlength{\floatsep}{8pt plus 2pt minus 2pt}
+% llncs.cls deja \belowcaptionskip en 10pt (heredado de article.cls); bajarlo
+% a 4pt ahorra ~3 líneas acumuladas sobre los captions de las tablas y la
+% figura del documento, sin tocar el cuerpo de letra ni el interlineado.
+\setlength{\belowcaptionskip}{4pt}
 % Menos páginas rotas a la mitad por un flotante que no entra.
 \renewcommand{\topfraction}{0.9}
 \renewcommand{\bottomfraction}{0.7}

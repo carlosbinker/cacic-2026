@@ -348,11 +348,22 @@ def tabla3_por_categoria(df: pd.DataFrame) -> str:
 _ANCHO_VERBATIM = 72
 
 
-def _envolver_para_verbatim(texto: str, ancho: int = _ANCHO_VERBATIM) -> str:
+def _envolver_para_verbatim(texto: str, ancho: int = _ANCHO_VERBATIM,
+                             colapsar_parrafos: bool = False) -> str:
     """Envuelve `texto` a `ancho` columnas preservando los saltos de línea que
     ya trae (párrafos separados por línea en blanco, o el salto duro antes del
     JSON de ejemplo): sólo parte las líneas que de otro modo desbordarían el
-    ancho de columna dentro de `verbatim`, nunca colapsa un salto existente."""
+    ancho de columna dentro de `verbatim`; nunca colapsa un salto DURO (los
+    que separan una línea de la siguiente dentro del mismo párrafo).
+
+    `colapsar_parrafos=True` (item de la revisión de PDF sobre presupuesto de
+    páginas) sí quita la línea en blanco ENTRE párrafos -- separador
+    puramente tipográfico dentro del bloque `verbatim`, no una palabra ni un
+    salto duro del prompt -- para ahorrar una línea renderizada por cada
+    frontera de párrafo. Ningún token ni salto de línea intra-párrafo del
+    prompt se toca; el texto de `SYSTEM_PROMPT_2026` (la fuente real,
+    `src/prompt_2026.py`) no se modifica, sólo cambia cómo se unen sus
+    párrafos al emitir el .tex."""
     parrafos = texto.split("\n\n")
     salida_parrafos = []
     for parrafo in parrafos:
@@ -362,7 +373,8 @@ def _envolver_para_verbatim(texto: str, ancho: int = _ANCHO_VERBATIM) -> str:
             for linea in lineas
         ]
         salida_parrafos.append("\n".join(envueltas))
-    return "\n\n".join(salida_parrafos)
+    separador = "\n" if colapsar_parrafos else "\n\n"
+    return separador.join(salida_parrafos)
 
 
 def prompt_sistema_tex() -> str:
@@ -373,7 +385,7 @@ def prompt_sistema_tex() -> str:
     -- para que el .tex no pueda desincronizarse en silencio de lo que
     efectivamente se ejecutó. Se muestran íntegros (no un resumen ni un diff
     contra ninguna versión anterior): es, sin más, el prompt de este trabajo."""
-    sistema = _envolver_para_verbatim(SYSTEM_PROMPT_2026)
+    sistema = _envolver_para_verbatim(SYSTEM_PROMPT_2026, colapsar_parrafos=True)
     usuario = construir_prompt_usuario("<comando del usuario>")
     lineas = [
         r"\paragraph{Prompt de sistema (texto completo).}",

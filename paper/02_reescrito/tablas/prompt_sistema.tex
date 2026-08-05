@@ -11,11 +11,9 @@ bano, garage, patio, entrada, todas), "valor" (número si el comando lo
 da, si no null), "unidad" ("%" o "°C" si corresponde, si no null).
 Reglas: respondé SOLO el JSON, sin texto adicional; si el comando ajusta
 sin dar un número, "valor" y "unidad" deben ser null.
-
 Ejemplo: Comando: "Poné el aire de la cocina en 20 grados."
 {"intent": "ajustar", "dispositivo": "aire_acondicionado", "ubicacion":
 "cocina", "valor": 20, "unidad": "°C"}
-
 IMPORTANTE: los campos "intent", "dispositivo", "ubicacion" y "unidad"
 son campos CATEGORICOS CERRADOS. Los valores listados entre parentesis
 mas arriba son, textualmente, los unicos outputs aceptados para esos
@@ -25,7 +23,6 @@ cualquier variante que no este literalmente en esa lista (por ejemplo
 "televisor" o "tele" en lugar de "tv") es una violacion del formato y la
 respuesta se considera incorrecta. Si ningun valor de la lista aplica,
 usa null.
-
 Ejemplo 2: Comando: "Bajale un poco a la luz del living."
 {"intent": "ajustar", "dispositivo": "luz", "ubicacion": "living",
 "valor": null, "unidad": null}
