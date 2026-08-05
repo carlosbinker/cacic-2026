@@ -7,6 +7,16 @@ que reemplaza toda anotación manual y escala sin que el costo de anotación
 crezca. \texttt{granite-4.0-1b} superó en 25,0 puntos porcentuales a la
 generación anterior de SLMs bajo el mismo protocolo (Sección 4.1).
 
+La latencia no crece de forma monótona con la exactitud: el modelo más lento
+del conjunto no es el más exacto, y entre los sub-1B, \texttt{Qwen3.5-0.8B}
+combina la mayor exactitud de su franja con una de las latencias más bajas
+(Sección 5). La sobrecarga de la atención híbrida ilustra ese mismo punto
+—más lenta en los dos tamaños evaluados, pero no sistemáticamente más exacta
+que su contraparte densa—, lo que sugiere que la elección de un SLM para
+domótica en el borde debe sopesar arquitectura y generación, no sólo el
+tiempo de cómputo. Ningún modelo del conjunto alcanza una latencia compatible
+con interacción de voz en tiempo real.
+
 Como trabajo futuro se plantea incorporar un juez externo de mayor escala o
 validación humana sobre una muestra; ampliar y balancear el dataset,
 incluyendo voz real transcrita por ASR; cubrir otras variantes dialectales; y
