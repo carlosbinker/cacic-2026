@@ -500,11 +500,17 @@ PY
 **Covers AC:** AC15 (*las cinco columnas de métricas globales de la Tabla 2 (Modelo, JSON, Estr., Laxa, Lat.) son las primeras del encabezado y ninguna cifra de la ronda 2025 aparece en la tabla; ninguna sección del paper atribuye datos, prosa o metodología a una "ronda inicial"/versión previa de este experimento; y la comparación generacional entre `granite-4.0-1b` (90,6\%) y `Qwen2.5-1.5B-Instruct` (65,6\%), ambos medidos ahora bajo el mismo prompt 2026, sigue presente*).
 **Nota de alcance (Delta 04).** Este check reemplaza al C15 original ("Continuidad con la Tabla 2 publicada"). No hay un "paper 2025" publicado: era un borrador de este mismo trabajo, nunca publicado ni a publicarse, y sus cifras se produjeron con el entorno sin fijar (`transformers`, `torch`, `attn_implementation`, `revision`), por lo que no son comparables de forma válida. Los datos de esa ronda salieron del paper por completo, no solo su atribución — presentarlos como columnas de continuidad invitaba a una comparación inválida. `data/resultados_experimento_resumen.json` sigue existiendo como F0 congelado (no se modifica), pero ya no alimenta ninguna tabla ni prosa del paper.
 **Nota de re-base (Delta 2026-08-05).** La Tabla 2 y la extinta Tabla 4/`tab:taxonomia` se fusionaron en un único `table` (mismo índice por modelo, mismas 12 filas; ver re-diseño de la Tarea 5). La Tabla 2 fusionada ya no tiene "exactamente cinco" columnas — tiene 5 de métricas globales más hasta 6 de la taxonomía de errores (`I`, `CI`, `CD`, `CU`, `VN`, `SE`, `US`, sujeto a que la etiqueta sume >0). La versión anterior de este check contaba `&` y exigía exactamente 4 (5 columnas); esa cuenta fija ya no tiene sentido con columnas de taxonomía de cardinalidad variable. La sustancia que este check protege —que ninguna columna/cifra de la ronda 2025 reaparezca— se preserva con una condición más precisa, no más débil: las primeras 5 columnas del encabezado deben ser exactamente `Modelo, JSON, Estr., Laxa, Lat.`, en ese orden. Cualquier columna de continuidad 2025 que se reintrodujera ahí lo haría fallar igual que antes; lo que cambió es que ya no asume un total fijo de columnas para el resto de la fila (taxonomía).
+**Nota de corrección (2026-08-05).** El re-base anterior quitó la cota superior por completo: al verificar sólo `columnas[:5]`, una columna espuria agregada después de `Lat.` (por error o por una regresión de la fusión) pasaba el check sin que nada la detectara — no era "más precisa", era estrictamente más débil que el `& == 4` original. Se restituye la cota exacta, pero derivada del mismo dato que usa el generador (`generate_tex_tables.py:tabla2_resultados_taxonomia`) en vez de un literal fijo: el total esperado de columnas es 5 (métricas) + 1 (`I`, incorrectas, siempre presente) + la cantidad de etiquetas de `ETIQUETAS_ERROR` (`src/taxonomia_2026.py`) cuya suma en `data/2026/taxonomia_2026.csv` sea > 0 — el mismo filtro `if int(df_taxonomia[e].sum()) > 0` que decide qué siglas entran a la tabla. El check ahora falla si sobra una columna tanto como si falta una.
 **Cost:** `cheap`
 **Run:**
 ```bash
 python - <<'PY'
+import sys
 from pathlib import Path
+
+sys.path.insert(0, "src")
+import pandas as pd
+from taxonomia_2026 import ETIQUETAS_ERROR
 
 fallas = []
 
@@ -521,6 +527,21 @@ if tabla2.exists():
     esperadas = ["Modelo", "JSON", "Estr.", "Laxa", "Lat."]
     if columnas[:5] != esperadas:
         fallas.append(f"tabla2: se esperan {esperadas} como primeras 5 columnas, hay {columnas[:5]}")
+    # Cota superior restituida (2026-08-05, ver nota de correccion arriba): se
+    # deriva el total exacto de columnas del mismo filtro que usa el generador
+    # (generate_tex_tables.py:tabla2_resultados_taxonomia) en vez de un literal
+    # fijo, para que el check falle tanto si falta como si sobra una columna.
+    taxonomia_csv = Path("data/2026/taxonomia_2026.csv")
+    if taxonomia_csv.exists():
+        df_taxonomia = pd.read_csv(taxonomia_csv)
+        etiquetas_con_datos = [e for e in ETIQUETAS_ERROR if int(df_taxonomia[e].sum()) > 0]
+        columnas_esperadas_total = 5 + 1 + len(etiquetas_con_datos)  # metricas + I + taxonomia
+        if len(columnas) != columnas_esperadas_total:
+            fallas.append(
+                f"tabla2: se esperan {columnas_esperadas_total} columnas en total "
+                f"(5 metricas + I + {len(etiquetas_con_datos)} de taxonomia con datos), "
+                f"hay {len(columnas)}: {columnas}"
+            )
 
 # 2. Ninguna seccion del paper atribuye datos/prosa a una "ronda inicial" o
 #    version previa de este experimento (fuera de citas bibliograficas de
@@ -548,11 +569,11 @@ if "generación anterior" not in res:
     fallas.append("04_resultados.tex: se perdio la referencia a la generacion anterior")
 
 assert not fallas, fallas
-print("sin-2025 OK: tabla2 con las 5 columnas de metricas esperadas, sin prosa de ronda inicial/continuidad, titular generacional intacto")
+print("sin-2025 OK: tabla2 con el total de columnas exacto y las 5 de metricas esperadas, sin prosa de ronda inicial/continuidad, titular generacional intacto")
 PY
 ```
-**Expected:** imprime `sin-2025 OK: tabla2 con las 5 columnas de metricas esperadas, sin prosa de ronda inicial/continuidad, titular generacional intacto`, exit 0.
-**On failure indicates:** o bien reapareció una columna/cifra de la ronda 2025 (regresión del Delta 04), o bien el titular generacional (90,6\% vs 65,6\%, medido bajo el prompt 2026 para ambos modelos) se perdió al remover la prosa de continuidad — ese resultado es válido y debe sobrevivir, es la versión legítima de la comparación contra la generación anterior.
+**Expected:** imprime `sin-2025 OK: tabla2 con el total de columnas exacto y las 5 de metricas esperadas, sin prosa de ronda inicial/continuidad, titular generacional intacto`, exit 0.
+**On failure indicates:** o bien reapareció una columna/cifra de la ronda 2025 (regresión del Delta 04), o bien el titular generacional (90,6\% vs 65,6\%, medido bajo el prompt 2026 para ambos modelos) se perdió al remover la prosa de continuidad — ese resultado es válido y debe sobrevivir, es la versión legítima de la comparación contra la generación anterior — o bien el total de columnas de `tabla2_resultados_globales.tex` no coincide con el derivado de `data/2026/taxonomia_2026.csv` (sobra o falta una columna de taxonomía, regresión de la cota restituida el 2026-08-05).
 
 ---
 
