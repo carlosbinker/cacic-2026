@@ -165,22 +165,13 @@ def test_armar_fila_con_salida_no_parseable():
     fila = armar_fila(
         modelo=modelo, idx=1, comando="Prendé la luz.", gt=gt,
         texto_generado="No entiendo el comando.", latencia_s=0.5,
-        modo="raw_completion", transformers_version="4.57.0",
+        modo="chat_template", transformers_version="4.57.0",
     )
     assert fila["json_valido"] is False
     assert fila["pred_json"] == ""
     assert fila["parse_note"] == "no_parseable_como_json"
     assert fila["match_exact"] is False
-    assert fila["modo_prompting"] == "raw_completion"
-
-
-def test_armar_fila_rechaza_un_modo_invalido():
-    modelo = por_nombre("LFM2.5-230M")
-    with pytest.raises(ValueError, match="modo_prompting"):
-        armar_fila(
-            modelo=modelo, idx=1, comando="x", gt={}, texto_generado="{}",
-            latencia_s=0.1, modo="inventado", transformers_version="4.57.0",
-        )
+    assert fila["modo_prompting"] == "chat_template"
 
 
 def test_el_modulo_se_importa_sin_torch_ni_transformers():

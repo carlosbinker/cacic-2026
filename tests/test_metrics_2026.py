@@ -167,12 +167,12 @@ def test_laxo_json_invalido_n_es_cero_cuando_toda_json_valida_es_rescatada():
 
 
 def test_el_resumen_trae_metadatos_del_registro():
-    det = _det(M1, [True], modo="raw_completion")
+    det = _det(M1, [True], modo="chat_template")
     fila = calcular_resumen_2026(det, _eti([]))[0]
     assert fila["hf_repo_id"] == roster_activo()[0].hf_repo_id
     assert fila["tier"] == roster_activo()[0].tier
     assert fila["transformers_pin"] == roster_activo()[0].transformers_pin
-    assert fila["modo_prompting"] == "raw_completion"
+    assert fila["modo_prompting"] == "chat_template"
 
 
 def test_el_resumen_respeta_el_orden_del_roster():

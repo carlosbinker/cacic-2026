@@ -47,8 +47,6 @@ COLUMNAS_DETALLE = [
     "modo_prompting", "transformers_version",
 ]
 
-MODOS_VALIDOS = ("chat_template", "raw_completion")
-
 # Tipos de transformers/torch, que no se importan a nivel de módulo para que
 # la lógica pura siga siendo testeable sin esas dependencias.
 Tokenizer = Any
@@ -59,7 +57,7 @@ RedCausal = Any
 # `src/run_control_prompt_original.py` pasa un builder alternativo que solo
 # cambia el prompt de sistema, para que la corrida de control reuse este
 # mismo bucle de inferencia sin copiarlo.
-ConstructorEntrada = Callable[[Tokenizer, str], tuple[dict[str, Any], str]]
+ConstructorEntrada = Callable[[Tokenizer, str], dict[str, Any]]
 
 
 # --------------------------------------------------------------------------
@@ -118,10 +116,6 @@ def armar_fila(*, modelo: ModeloEvaluado2026, idx: int, comando: str,
     Reutiliza `scoring.py` tal cual (F0): la etapa 1 es coincidencia textual
     exacta campo a campo (RF6), así que un sinónimo cuenta como error.
     """
-    if modo not in MODOS_VALIDOS:
-        raise ValueError(
-            f"modo_prompting inválido: {modo!r}. Válidos: {MODOS_VALIDOS}"
-        )
     pred, json_valido, nota = extraer_json(texto_generado)
     matches = comparar_campos(pred, gt)
     fila = {
@@ -223,7 +217,7 @@ def _evaluar_comando(ctx: ContextoInferencia, idx: int, fila_ds: pd.Series,
                      ) -> dict[str, Any]:
     """Corre un comando del dataset y devuelve su fila de detalle."""
     comando = fila_ds["comando"]
-    entrada, modo = construir_entrada(ctx.tokenizer, comando)
+    entrada = construir_entrada(ctx.tokenizer, comando)
     texto, latencia_s = _generar_respuesta(ctx, entrada)
     return armar_fila(
         modelo=ctx.modelo,
@@ -232,7 +226,9 @@ def _evaluar_comando(ctx: ContextoInferencia, idx: int, fila_ds: pd.Series,
         gt=fila_a_ground_truth(fila_ds),
         texto_generado=texto,
         latencia_s=latencia_s,
-        modo=modo,
+        # El roster 2026 es enteramente instruct/chat (F2, revertido 2026-08-05):
+        # no hay una segunda ruta de prompting que decidir en runtime.
+        modo="chat_template",
         transformers_version=ctx.transformers_version,
     )
 

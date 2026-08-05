@@ -7,16 +7,19 @@ son: (a) la cláusula taxativa sobre campos categóricos cerrados, que es un
 cambio deliberado de protocolo respecto del estudio original, y (b) el segundo
 ejemplo few-shot que el paper declara haber usado pero no transcribe.
 
-Como el roster 2026 incluye modelos base que no exponen chat_template, la
-construcción de entrada despacha por capacidad y no por identificador de
-modelo.
+Revertido (2026-08-05, instrucción del usuario): existió una ruta de
+prompting alternativa por *raw completion* para tokenizers sin
+`chat_template`, pensada para modelos base. Los 12 modelos del roster 2026
+son variantes instruct/chat y exponen `chat_template`; ningún modelo la
+ejerció nunca, y su única cobertura era un test sintético con un tokenizer
+falso. Se eliminó esa ruta: `construir_entrada` aplica la plantilla de chat
+directamente y falla explícitamente -- no con un `AttributeError`/`TypeError`
+opaco -- si el tokenizer no la expone. Si en el futuro hace falta evaluar un
+modelo base de verdad, hay que reincorporar una ruta de raw completion
+explícita, no reintroducir un fallback silencioso.
 """
 
-from typing import Literal
-
 from prompt import SYSTEM_PROMPT_PAPER, construir_prompt_usuario
-
-ModoPrompting = Literal["chat_template", "raw_completion"]
 
 CLAUSULA_TAXATIVA = (
     'IMPORTANTE: los campos "intent", "dispositivo", "ubicacion" y "unidad" '
@@ -40,51 +43,42 @@ SYSTEM_PROMPT_2026 = (
     SYSTEM_PROMPT_PAPER + "\n\n" + CLAUSULA_TAXATIVA + "\n\n" + _SEGUNDO_EJEMPLO
 )
 
-RAW_TEMPLATE = '{system}\n\nComando: "{comando}"\nJSON:'
-
-
-def detectar_modo(tokenizer) -> ModoPrompting:
-    """Decide el modo por capacidad, nunca por identificador de modelo.
-
-    Los modelos base del roster no traen chat_template; hardcodear sus IDs
-    haría que el harness se rompa en silencio si mañana el proveedor publica
-    una variante instruct con el mismo nombre."""
-    plantilla = getattr(tokenizer, "chat_template", None)
-    return "raw_completion" if not plantilla else "chat_template"
-
-
-def construir_entrada_con_prompt(tokenizer, comando: str,
-                                 system_prompt: str) -> tuple[dict, ModoPrompting]:
+def construir_entrada_con_prompt(tokenizer, comando: str, system_prompt: str) -> dict:
     """Igual que `construir_entrada`, pero con el prompt de sistema como
     parámetro en vez de hardcodeado a `SYSTEM_PROMPT_2026`.
 
     Factorización mínima (Delta 04 / corrida de control): existe para que
-    `src/run_control_prompt_original.py` pueda reusar exactamente la misma
-    lógica de despacho por capacidad (chat_template vs. raw_completion) y
-    sustituir únicamente el texto del prompt, sin copiar esta función. La
-    firma pública de `construir_entrada` (F2, congelada) no cambia.
+    `src/run_control_prompt_original.py` pueda reusar exactamente esta misma
+    lógica y sustituir únicamente el texto del prompt, sin copiar esta
+    función. La firma pública de `construir_entrada` (F2, congelada) no
+    cambia en lo que le importa a sus llamadores: recibe tokenizer y comando,
+    devuelve algo apto para `modelo.generate(**entrada)`.
     """
     if not comando or not comando.strip():
         raise ValueError(f"Se recibió un comando vacío: {comando!r}")
 
-    modo = detectar_modo(tokenizer)
-    if modo == "chat_template":
-        mensajes = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": construir_prompt_usuario(comando)},
-        ]
-        entrada = tokenizer.apply_chat_template(
-            mensajes,
-            add_generation_prompt=True,
-            return_tensors="pt",
-            return_dict=True,
+    if not getattr(tokenizer, "chat_template", None):
+        raise ValueError(
+            "El tokenizer no expone chat_template: el harness 2026 solo admite "
+            "modelos instruct/chat con plantilla de chat (la ruta de raw "
+            "completion para modelos base se eliminó el 2026-08-05 porque "
+            "ningún modelo del roster la ejercía). Si hace falta evaluar un "
+            "modelo base de verdad, hay que reincorporar una ruta de raw "
+            "completion explícita en vez de forzarlo por esta función."
         )
-    else:
-        texto = RAW_TEMPLATE.format(system=system_prompt, comando=comando)
-        entrada = tokenizer(texto, return_tensors="pt")
-    return entrada, modo
+
+    mensajes = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": construir_prompt_usuario(comando)},
+    ]
+    return tokenizer.apply_chat_template(
+        mensajes,
+        add_generation_prompt=True,
+        return_tensors="pt",
+        return_dict=True,
+    )
 
 
-def construir_entrada(tokenizer, comando: str) -> tuple[dict, ModoPrompting]:
-    """Devuelve (entrada, modo), con entrada apta para modelo.generate(**entrada)."""
+def construir_entrada(tokenizer, comando: str) -> dict:
+    """Entrada apta para `modelo.generate(**entrada)`, con el prompt 2026."""
     return construir_entrada_con_prompt(tokenizer, comando, SYSTEM_PROMPT_2026)
