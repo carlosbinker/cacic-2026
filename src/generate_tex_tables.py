@@ -367,7 +367,7 @@ def tabla5_versiones() -> str:
     return _tabla(
         caption="Pines de \\texttt{transformers} por modelo",
         label="tab:versiones",
-        spec="lllrp{4.2cm}",
+        spec=r"lllr>{\raggedright\arraybackslash}p{4.8cm}",
         encabezado=["Grupo", "Pin", "Versión resuelta", "Modelos", "Motivos"],
         filas=filas,
         nota=nota,
