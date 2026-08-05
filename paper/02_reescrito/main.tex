@@ -35,6 +35,15 @@
 \renewcommand{\bottomfraction}{0.7}
 \renewcommand{\textfraction}{0.08}
 \renewcommand{\floatpagefraction}{0.8}
+% Las referencias van sin aire extra entre entradas: es espacio en blanco, no
+% contenido, y cuenta contra el limite de paginas.
+\let\viejathebibliography\thebibliography
+\renewcommand{\thebibliography}[1]{%
+  \viejathebibliography{#1}%
+  \setlength{\itemsep}{0pt}%
+  \setlength{\parsep}{0pt}%
+  \setlength{\parskip}{0pt}%
+}
 
 \begin{document}
 

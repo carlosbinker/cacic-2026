@@ -1,35 +1,27 @@
 \section{Amenazas a la validez}
 
-\textbf{Constructo.} La exactitud estricta exige coincidencia textual bajo un
-protocolo que declara los sinónimos de valores categóricos cerrados como
-violación de formato. La exactitud laxa y la taxonomía resuelven la amenaza
-\textbf{parcialmente}, separando qué parte de la exactitud perdida es de
-vocabulario y qué parte es de contenido. La brecha sigue siendo una cota
+\textbf{Constructo.} La exactitud laxa y la taxonomía separan qué parte de la
+exactitud estricta perdida es de vocabulario y qué parte es de contenido,
+pero sólo resuelven la amenaza \textbf{parcialmente}: la brecha es una cota
 superior semántica, no una medición con un evaluador humano, y es poco
-confiable donde el formato es débil: 24 de las 27 respuestas que acreditó a
-\texttt{SmolLM2-360M-Instruct} tenían JSON inválido.
+confiable donde el formato es débil (Sección \ref{sec:analisis-errores}).
 
 \textbf{Interna.} \emph{Sesgo de auto-favorecimiento del juez.} El juez es
 \texttt{granite-4.0-1b}, uno de los doce modelos evaluados: \textbf{juzga
 también sus propias respuestas}. Un juez basado en LLM puede favorecer las
 respuestas propias o las de su familia \cite{zheng2023judging}, y este diseño
 no lo controla ni con un juez externo ni con un segundo evaluador. Como
-atenuante, es el modelo con \textbf{menos} respuestas incorrectas en juego (3
-de 32, Tabla \ref{tab:taxonomia}). Además es un modelo sub-2B adjudicando
-equivalencia semántica, tarea más exigente que clasificar campos
-estructurados: los 0 casos de \texttt{juez\_parse\_ok = False} hablan de
-salidas parseables, no de calidad de criterio. Mitigarlo exigiría un juez
-externo de mayor escala, ajeno al roster, o validación humana sobre una
-muestra. Como contrapeso, la adjudicación es \textbf{reproducible por
-diseño}: ambas etapas corren con decodificación greedy a temperatura 0.
+atenuante, es el modelo con menos respuestas incorrectas en juego (3 de 32,
+Tabla \ref{tab:taxonomia}); y es un modelo sub-2B adjudicando equivalencia
+semántica, tarea más exigente que clasificar campos estructurados, de modo
+que los 0 casos de \texttt{juez\_parse\_ok = False} hablan de salidas
+parseables, no de calidad de criterio.
 
-\emph{Versiones divergentes de la librería como confusor de latencia.} Los
-doce modelos corren bajo \textbf{dos grupos de versión} de
-\texttt{transformers} mutuamente excluyentes (Tabla \ref{tab:versiones}),
-\textbf{9} y \textbf{3} modelos: parte de cualquier diferencia de latencia
-entre grupos puede deberse a la librería y no al modelo. Cada grupo está
-forzado por evidencia empírica propia, y ninguna versión mayor única cubre el
-roster.
+\emph{Versiones divergentes de la librería como confusor de latencia.} Como
+los doce modelos corren repartidos \textbf{9}/\textbf{3} entre los dos grupos
+de versión de \texttt{transformers} (Tabla \ref{tab:versiones}), parte de
+cualquier diferencia de latencia entre grupos puede deberse a la librería y
+no al modelo.
 
 \emph{Topología de procesadores no controlada.} Si los 2 procesadores lógicos
 que expone Docker son hermanos de un mismo núcleo del i5-11400H por
@@ -39,20 +31,14 @@ adentro del contenedor. Afecta por igual a los doce modelos, así que no
 introduce un sesgo relativo, pero los valores absolutos de latencia pueden
 estar inflados por contención y no deben leerse como la mejor latencia
 alcanzable en este hardware. Los cocientes \texttt{$\times$4,10} y
-\texttt{$\times$2,88} de la Sección \ref{sec:discusion-latencia-hibrida} son
-robustos: comparan pares medidos bajo la misma topología, cualquiera haya
-sido.
+\texttt{$\times$2,88} comparan pares medidos bajo la misma topología, así que
+son robustos a esta amenaza.
 
-\textbf{Externa.} El dataset es chico y desbalanceado (32 comandos, entre 3 y
-8 por categoría), se usó un único prompt sin optimización por modelo, la
-entrada fue texto limpio sin ruido de reconocimiento automático de habla
-(ASR), y se cubrió una sola variante dialectal.
-
-\textbf{Conclusión.} Con entre 3 y 8 comandos por categoría, las diferencias
-porcentuales entre modelos de las Tablas \ref{tab:globales} y
-\ref{tab:categorias} son indicativas, no estadísticamente significativas. Por
-último, \texttt{attn\_implementation} y la \texttt{revision} exacta de cada
-modelo
-quedaron \textbf{sin pinnear}: cada corrida usó lo que \texttt{transformers}
-resolviera por defecto. Pinnearlos exigiría re-correr el barrido completo, así
-que se documenta como limitación conocida.
+\textbf{Externa y de conclusión.} El dataset es chico y desbalanceado (32
+comandos, entre 3 y 8 por categoría), se usó un único prompt sin optimización
+por modelo, la entrada fue texto limpio sin ruido de reconocimiento
+automático de habla (ASR), y se cubrió una sola variante dialectal; con esos
+tamaños de categoría, las diferencias porcentuales entre modelos son
+indicativas, no estadísticamente significativas. Por último,
+\texttt{attn\_implementation} y la \texttt{revision} exacta de cada modelo
+quedaron \textbf{sin pinnear}.

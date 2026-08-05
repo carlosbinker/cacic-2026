@@ -3,28 +3,24 @@
 \textbf{La brecha entre exactitud estricta y laxa} mide cuánto penaliza la
 coincidencia textual exacta a respuestas que un juez semántico considera
 equivalentes, y la taxonomía la descompone en dos causas: ausencia de error
-semántico, y sustitución de una palabra del vocabulario cerrado por un
-sinónimo válido. No es uniformemente confiable: donde el formato es débil,
-buena parte de lo que acredita corresponde a JSON inválido.
+semántico, y sustitución de un valor del vocabulario cerrado por un sinónimo.
 
-\textbf{Endurecer el prompt no elimina el problema.} El prompt declara que un
-sinónimo de un valor categórico cerrado es una violación de formato (Sección
-\ref{sec:prompting}) y, aun así, \texttt{uso\_de\_sinonimos} aparece en
-prácticamente todos los modelos. Copiar textualmente un token de una lista
+\textbf{Endurecer el prompt no elimina el problema.} Aunque el prompt declara
+que un sinónimo de un valor categórico cerrado es una violación de formato
+(Sección \ref{sec:prompting}), \texttt{uso\_de\_sinonimos} aparece en
+prácticamente todos los modelos: copiar textualmente un token de una lista
 cerrada exige un tipo de obediencia distinto del que exige acertar el
 contenido, y varios modelos con buena exactitud de campo prefieren la forma
-lingüísticamente natural (``tele'') sobre la literal exigida (``tv''). El
-caso extremo es \texttt{SmolLM2-360M-Instruct}, cuyas respuestas incorrectas
-se explican casi por completo por esta única causa (Tabla
-\ref{tab:taxonomia}): entiende el comando pero no internaliza restricciones
-de vocabulario cerrado.
+natural (``tele'') sobre la literal exigida (``tv''). El caso extremo es
+\texttt{SmolLM2-360M-Instruct}, cuyas respuestas incorrectas se explican casi
+por completo por esta única causa (Tabla \ref{tab:taxonomia}).
 
-\textbf{Tamaño, arquitectura y generación.} \texttt{Qwen3.5-0.8B} supera a
-cuatro de los seis modelos del tier superior con menos de mil millones de
-parámetros: el desempeño no depende sólo del conteo de parámetros sino de la
-arquitectura y el entrenamiento de cada familia. Los +25,0 puntos de
-\texttt{granite-4.0-1b} sobre el mejor modelo de la generación anterior, bajo
-el mismo prompt, cuantifican ese desplazamiento en el rango sub-2B.
+\textbf{Tamaño, arquitectura y generación.} Que \texttt{Qwen3.5-0.8B} supere
+a cuatro de los seis modelos del tier superior con menos de mil millones de
+parámetros muestra que el desempeño no depende sólo del conteo de parámetros,
+y los +25,0 puntos de \texttt{granite-4.0-1b} sobre el mejor modelo de la
+generación anterior cuantifican el desplazamiento de lo factible en el rango
+sub-2B.
 
 \textbf{Penalización de latencia de la atención híbrida.}
 \label{sec:discusion-latencia-hibrida}
@@ -33,21 +29,18 @@ a los \textbf{13,77} de la variante densa \texttt{granite-4.0-350m}
 (\textbf{$\times$4,10}), y \texttt{granite-4.0-h-1b} \textbf{123,15} frente a
 los \textbf{42,78} de \texttt{granite-4.0-1b} (\textbf{$\times$2,88}). Que se
 reproduzca en \textbf{ambos} pares de tamaño, con la misma familia y el mismo
-protocolo, indica un efecto arquitectónico y no un artefacto de una corrida
-puntual. Las variantes híbridas se promocionan por su complejidad
-sub-cuadrática en la longitud de secuencia, un beneficio que se materializa
-en secuencias largas; aquí los prompts son \textbf{cortos} y la ejecución es
-sobre \textbf{CPU}, así que ese beneficio asintótico no llega a manifestarse
-mientras que la sobrecarga \textbf{constante} de gestionar dos tipos de caché
-—atención estándar y estado lineal/recurrente— se paga en cada comando y
-domina el tiempo total. \textbf{A igual cantidad de parámetros, la variante
-densa es preferible en CPU para prompts cortos.}
+protocolo, indica un efecto arquitectónico y no un artefacto puntual. Las
+variantes híbridas se promocionan por su complejidad sub-cuadrática en la
+longitud de secuencia, beneficio que se materializa en secuencias largas;
+aquí los prompts son \textbf{cortos} y la ejecución es sobre \textbf{CPU}, de
+modo que ese beneficio asintótico no llega a manifestarse mientras que la
+sobrecarga \textbf{constante} de gestionar dos tipos de caché —atención
+estándar y estado lineal/recurrente— se paga en cada comando y domina el
+tiempo total. \textbf{A igual cantidad de parámetros, la variante densa es
+preferible en CPU para prompts cortos.}
 
-\textbf{Viabilidad práctica.} \texttt{granite-4.0-1b} procesa cada comando en
-\textbf{42,78} segundos bajo el tope de recursos de este estudio:
-incompatible con una interacción de voz en tiempo real, aceptable para
-automatización diferida. Entre los sub-1B, \texttt{Qwen3.5-0.8B} combina
-75,0\% de exactitud estricta con 18,17 segundos, el compromiso más
-equilibrado del roster. Ningún modelo alcanza latencias de segundo único bajo
-este tope: la tarea sigue siendo un problema de compromiso entre exactitud y
-tiempo de respuesta.
+\textbf{Viabilidad práctica.} Los 42,78 segundos por comando del modelo más
+exacto son incompatibles con una interacción de voz en tiempo real, aunque
+aceptables para automatización diferida; entre los sub-1B,
+\texttt{Qwen3.5-0.8B} combina 75,0\% de exactitud estricta con 18,17
+segundos, el compromiso más equilibrado del roster.

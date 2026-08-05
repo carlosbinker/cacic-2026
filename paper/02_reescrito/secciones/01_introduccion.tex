@@ -6,18 +6,17 @@ gran escala alojados en la nube, lo que impone latencia de red, costo
 recurrente por uso de API y dependencia de conectividad. Los Small Language
 Models (SLMs) pueden ejecutarse en el propio hub domótico y alcanzan, en
 tareas acotadas, un desempeño competitivo frente a modelos mucho más grandes
-\cite{gupta2025slms}, pero la literatura los evalúa mayormente en inglés.
-Clasificar a mano sus respuestas incorrectas, además, no escala a un roster
-de doce modelos ni es reproducible por un tercero.
+\cite{gupta2025slms}, pero la literatura los evalúa mayormente en inglés. Y
+clasificar a mano sus respuestas incorrectas no escala a doce modelos ni es
+reproducible por un tercero.
 
 Este trabajo aporta: (1) la evaluación de doce SLMs abiertos sub-2B, sin
 restricción de licencia ni de token, en dos tiers de seis modelos bajo un
-protocolo común, con familias publicadas recientemente (LFM2.5, Granite 4.0,
-Qwen3.5 y OLMo-2); (2) un pipeline de verificación automática en dos etapas
-—coincidencia textual determinista más un juez de lenguaje con taxonomía
-cerrada— que elimina todo etiquetado manual; (3) el reporte conjunto de
-exactitud estricta y laxa, cuya brecha cuantifica el costo de exigir
-coincidencia textual exacta; (4) un protocolo reproducible, con aislamiento
-por contenedor y versiones documentadas por grupo; y (5) la inclusión
-deliberada de \texttt{Qwen2.5-1.5B-Instruct} como representante de la
-generación anterior de SLMs, medido bajo el mismo protocolo.
+protocolo común y reproducible, con aislamiento por contenedor y versiones
+documentadas por grupo; (2) un pipeline de verificación automática en dos
+etapas —coincidencia textual determinista más un juez de lenguaje con
+taxonomía cerrada— que elimina todo etiquetado manual; (3) el reporte
+conjunto de exactitud estricta y laxa, cuya brecha cuantifica el costo de
+exigir coincidencia textual exacta; y (4) la inclusión deliberada de
+\texttt{Qwen2.5-1.5B-Instruct} como representante de la generación anterior
+de SLMs, medido bajo el mismo protocolo.
