@@ -34,6 +34,14 @@ ETIQUETAS_ERROR_DISPLAY: dict[str, str] = {
     "sin_error_semantico": "Sin error semántico",
     "uso_de_sinonimos": "Uso de sinónimos",
 }
+ETIQUETAS_ERROR_SIGLA: dict[str, str] = {
+    "confusion_intencion": "CI",
+    "confusion_dispositivo": "CD",
+    "confusion_ubicacion": "CU",
+    "valor_numerico_incorrecto": "VN",
+    "sin_error_semantico": "SE",
+    "uso_de_sinonimos": "US",
+}
 CATEGORIAS_DISPLAY: dict[str, str] = {
     "encendido_apagado_simple": "Encendido / apagado simple",
     "ajuste_con_valor_numerico": "Ajuste con valor numérico",

@@ -34,6 +34,7 @@ from taxonomia_2026 import (
     CATEGORIAS_DISPLAY,
     ETIQUETAS_ERROR,
     ETIQUETAS_ERROR_DISPLAY,
+    ETIQUETAS_ERROR_SIGLA,
 )
 
 # Versiones efectivamente resueltas por pip para cada grupo (F3): no se re-sondean
@@ -96,6 +97,12 @@ def _escapar(texto: object) -> str:
     for viejo, nuevo in _REEMPLAZOS:
         salida = salida.replace(viejo, nuevo)
     return salida
+
+
+def _minuscula_inicial(texto: str) -> str:
+    """Pasa a minúscula sólo la primera letra, para insertar un nombre de
+    categoría (normalmente capitalizado) a mitad de una oración del caption."""
+    return texto[:1].lower() + texto[1:]
 
 
 def _tabla(caption: str, label: str, spec: str, encabezado: list[str],
@@ -259,11 +266,12 @@ def tabla4_taxonomia(df: pd.DataFrame) -> str:
     incorrectas -- transpuesta (item 1 de la revisión de PDF) respecto de la
     versión anterior, que ponía un modelo por columna: con doce modelos esa
     orientación desbordaba el ancho de columna LNCS. Los encabezados de
-    etiqueta van rotados 90° para que las 12 filas no exijan comprimir tanto
-    el ancho de cada columna. Sin `resizebox` (corrección del item 1 de la
-    revisión de PDF: `resizebox` no tiene piso de tamaño de letra): las
-    columnas de enteros chicos con encabezados rotados entran a ancho de
-    columna LNCS con una letra un escalón más chica.
+    etiqueta se abrevian con una sigla horizontal (CI, CD, CU, VN, SE, US) en
+    vez de rotarse 90°: la sigla ocupa lo mismo que el rótulo rotado pero no
+    exige girar la página para leerla; la equivalencia sigla = tipo de error
+    va en el caption. Sin `resizebox` (corrección del item 1 de la revisión
+    de PDF: `resizebox` no tiene piso de tamaño de letra): las columnas de
+    enteros chicos entran a ancho de columna LNCS sin comprimir letra.
 
     Las etiquetas que quedaron en cero para los doce modelos NO llevan
     columna: el paper sólo muestra lo que efectivamente aparece en los
@@ -274,8 +282,7 @@ def tabla4_taxonomia(df: pd.DataFrame) -> str:
     modelos = sorted(df["modelo"], key=lambda m: orden.get(m, len(orden)))
     etiquetas = [e for e in ETIQUETAS_ERROR if int(df[e].sum()) > 0]
     encabezado = ["Modelo", "Incorrectas"] + [
-        r"\rotatebox{90}{" + _escapar(ETIQUETAS_ERROR_DISPLAY[e]) + "}"
-        for e in etiquetas
+        _escapar(ETIQUETAS_ERROR_SIGLA[e]) for e in etiquetas
     ]
     filas = []
     for m in modelos:
@@ -284,8 +291,17 @@ def tabla4_taxonomia(df: pd.DataFrame) -> str:
         fila += [str(int(fila_df[e])) for e in etiquetas]
         filas.append(fila)
     spec = "l" + "r" * (1 + len(etiquetas))
+    equivalencias = "; ".join(
+        f"{ETIQUETAS_ERROR_SIGLA[e]}: "
+        f"{_minuscula_inicial(_escapar(ETIQUETAS_ERROR_DISPLAY[e]))}"
+        for e in etiquetas
+    )
+    caption = (
+        "Distribución de errores por categoría de la taxonomía. "
+        + equivalencias
+    )
     return _tabla(
-        caption="Distribución de errores por categoría de la taxonomía",
+        caption=caption,
         label="tab:taxonomia",
         spec=spec,
         encabezado=encabezado,
