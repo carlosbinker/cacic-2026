@@ -92,15 +92,19 @@ Y **host ocioso** (RNF1, RNF6): nada más consumiendo CPU mientras corre E2, ni 
 **Cost:** `cheap`
 **Steps:**
 1. Abrir `paper/02_reescrito/main.pdf`.
-2. Localizar las cinco tablas (`tab:modelos`, `tab:globales`, `tab:categorias`, `tab:taxonomia`, `tab:versiones`) y la figura.
+2. Localizar las **tres** tablas (`tab:modelos`, `tab:resultados`, `tab:categorias`) y la figura.
 3. Buscar en el texto la cadena `??`.
 4. Contar las páginas del PDF.
-**Expected observation:** las **cinco** tablas y **la única figura** (`fig1`) aparecen, ninguna se sale del margen de la caja de texto LNCS, la tabla 1 lista 12 filas de modelos (el roster activo, sin los excluidos), y no hay ninguna ocurrencia de `??` (referencia cruzada rota) en todo el PDF. El PDF tiene **11 páginas**. **Prestar atención especial a la Tabla 2**, que tiene **cinco** columnas (Modelo, JSON válido, Estricta, Laxa, Latencia): desde el Delta 04 ya no lleva columnas de continuidad 2025 (ver nota siguiente), así que ya no es la más ancha del paper.
+**Expected observation:** las **tres** tablas y **la única figura** (`fig1`) aparecen, ninguna se sale del margen de la caja de texto LNCS, la tabla 1 lista 12 filas de modelos (el roster activo, sin los excluidos), y no hay ninguna ocurrencia de `??` (referencia cruzada rota) en todo el PDF. **Prestar atención especial a la Tabla 2** (`tab:resultados`), que tiene **12 columnas** de datos (Modelo, JSON, Estr., Laxa, Lat., I, y hasta 6 siglas de taxonomía): es la fila más ancha del paper, en `\footnotesize` con `\tabcolsep` acotado a 2pt sólo para ese bloque, sin `\resizebox`.
 
-**Actualizado (recorte a 10 páginas).** El paper pasó de 22 a **11** páginas. Cambios que este check debe dar por buenos, no por defectos: (i) **una** sola figura, no dos — `fig2` salió del `.tex`; (ii) la Tabla 1 tiene **tres** columnas (Modelo, Parámetros, Familia) y separa los tiers con un `\midrule` en vez de una columna `Tier`, y ya no lleva la columna constante `Prompting`; (iii) la Tabla 5 tiene **cuatro** columnas — se fue `¿Necesario?`, redundante con `Motivo`; (iv) la Tabla 4 lleva **seis** etiquetas de error y no siete: `Alucinación de valor/unidad` quedó en cero en las 12 filas y el generador omite toda etiqueta all-zero (el hecho se reporta en prosa en §4.3); (v) las cinco tablas van en `\footnotesize`. **11 páginas es el mínimo alcanzable conservando las 5 tablas en el cuerpo y el prompt íntegro de §3.3**; bajar a 10 exige soltar alguna de esas dos cosas (ver la nota de tensión al pie de este check).
-
-**Nota de tensión (10 vs. 11 páginas).** El contenido fijo —5 tablas (≈2,0 pág.), prompt íntegro de §3.3 (0,67 pág.), `fig1` (0,40 pág.), resumen, referencias y declaración de IA— ocupa ≈5,8 páginas medidas. Con toda la prosa comprimida a ~3.050 palabras (desde 7.490) el total compilado es 11. Para llegar a 10 haría falta liberar ~44 líneas: soltar el prompt íntegro (medido: ~0,67 pág.) más `fig1`, o mover una tabla a material suplementario. Ninguna de las tres se hizo porque el usuario las declaró no negociables.
-**On failure indicates:** un fragmento `.tex` generado por `generate_tex_tables.py` es demasiado ancho para el formato LNCS, o un `\label`/`\ref` quedó desparejado entre secciones. **Actualizado (Delta 04).** Este check exigía antes preservar las dos columnas de continuidad 2025 de la Tabla 2 como "mecanismo de RF19 y de C15" — ese requisito quedó retractado: no hay un "paper 2025" publicado (fue un borrador de este mismo trabajo, nunca publicado), y esas cifras se produjeron con el entorno sin fijar, por lo que no son comparables de forma válida. Si la Tabla 2 desborda, el arreglo es acortar los encabezados o el `spec` de columnas en `generate_tex_tables.py`. Siguen siendo cinco tablas: no se agregó ni se quitó ninguna.
+**Actualizado (Delta 2026-08-05, fusión de tablas).** Cambios que este check debe dar por buenos, no por defectos:
+(i) **una** sola figura, no dos — `fig2` salió del `.tex`;
+(ii) la Tabla 1 (`tab:modelos`) tiene **cuatro** columnas (Modelo, Parámetros, Familia, `transformers`) — la versión resuelta de `transformers` por modelo (antes Tabla 5/`tab:versiones`, un `table` flotante aparte) es ahora su cuarta columna, y los 4 motivos reales de pin son una cláusula de su caption; separa los tiers con un `\midrule` en vez de una columna `Tier`, y no lleva la columna constante `Prompting`;
+(iii) la Tabla 5/`tab:versiones` **ya no existe** como `table`: no hay una cuarta tabla en el cuerpo, hay tres;
+(iv) la Tabla 2 (`tab:resultados`) es la fusión de las antiguas Tabla 2 (`tab:globales`) y Tabla 4 (`tab:taxonomia`): ambas indexaban por modelo con las mismas 12 filas, así que comparten un único `table` sin perder ningún dato — sólo desapareció el segundo entorno flotante. Su leyenda del caption distingue explícitamente `SE` (sin error semántico, equivalente por otro motivo) de `US` (uso de sinónimos, difiere solo por un sinónimo) en vez de dejarlas leer como sinónimas entre sí;
+(v) la que era Tabla 4 (taxonomía) lleva **seis** etiquetas de error y no siete: `Alucinación de valor/unidad` quedó en cero en las 12 filas y el generador omite toda etiqueta all-zero (el hecho se reporta en prosa en §4.3);
+(vi) las tres tablas van en `\footnotesize`.
+**On failure indicates:** un fragmento `.tex` generado por `generate_tex_tables.py` es demasiado ancho para el formato LNCS, o un `\label`/`\ref` quedó desparejado entre secciones. **Actualizado (Delta 04).** Este check exigía antes preservar las dos columnas de continuidad 2025 de la Tabla 2 como "mecanismo de RF19 y de C15" — ese requisito quedó retractado: no hay un "paper 2025" publicado (fue un borrador de este mismo trabajo, nunca publicado), y esas cifras se produjeron con el entorno sin fijar, por lo que no son comparables de forma válida. Si la Tabla 2 desborda, el arreglo es acortar los encabezados, el `spec` de columnas o `\tabcolsep` en `generate_tex_tables.py` — nunca `\resizebox`. Ahora son **tres** tablas, no cinco: dos se fusionaron/reubicaron sin perder datos (ver (ii) y (iv) arriba).
 
 ---
 
@@ -491,8 +495,9 @@ PY
 **On failure indicates:** o bien un modelo excluido se coló en una tabla de resultados (contaminando una comparación que no corrió), o bien `docker/README.md` dejó de documentar alguna de las tres causas de exclusión, o bien el paper **sobreafirma** sobre `Qwen3.5-2B` si alguien reintrodujo su mención en `03_metodologia.tex`/`06_amenazas.tex`. Esto último es el error más fácil de cometer y el más caro: su sonda bajo 5.14.1 **nunca corrió** por un bloqueo de infraestructura de Docker, así que no hay evidencia de que falle bajo esa versión — solo ausencia de evidencia de que funcione. Escribir "incompatible con las dos versiones mayores" sería una afirmación empírica sin respaldo en un paper.
 
 ### Check C15 — Sin datos de la ronda 2025 en el paper; sobrevive la comparación generacional (RF19 retractado, Delta 04)
-**Covers AC:** AC15 (*la Tabla 2 tiene exactamente **cinco** columnas, sin ninguna cifra de la ronda 2025; ninguna sección del paper atribuye datos, prosa o metodología a una "ronda inicial"/versión previa de este experimento; y la comparación generacional entre `granite-4.0-1b` (90,6\%) y `Qwen2.5-1.5B-Instruct` (65,6\%), ambos medidos ahora bajo el mismo prompt 2026, sigue presente*).
+**Covers AC:** AC15 (*las cinco columnas de métricas globales de la Tabla 2 (Modelo, JSON, Estr., Laxa, Lat.) son las primeras del encabezado y ninguna cifra de la ronda 2025 aparece en la tabla; ninguna sección del paper atribuye datos, prosa o metodología a una "ronda inicial"/versión previa de este experimento; y la comparación generacional entre `granite-4.0-1b` (90,6\%) y `Qwen2.5-1.5B-Instruct` (65,6\%), ambos medidos ahora bajo el mismo prompt 2026, sigue presente*).
 **Nota de alcance (Delta 04).** Este check reemplaza al C15 original ("Continuidad con la Tabla 2 publicada"). No hay un "paper 2025" publicado: era un borrador de este mismo trabajo, nunca publicado ni a publicarse, y sus cifras se produjeron con el entorno sin fijar (`transformers`, `torch`, `attn_implementation`, `revision`), por lo que no son comparables de forma válida. Los datos de esa ronda salieron del paper por completo, no solo su atribución — presentarlos como columnas de continuidad invitaba a una comparación inválida. `data/resultados_experimento_resumen.json` sigue existiendo como F0 congelado (no se modifica), pero ya no alimenta ninguna tabla ni prosa del paper.
+**Nota de re-base (Delta 2026-08-05).** La Tabla 2 y la extinta Tabla 4/`tab:taxonomia` se fusionaron en un único `table` (mismo índice por modelo, mismas 12 filas; ver re-diseño de la Tarea 5). La Tabla 2 fusionada ya no tiene "exactamente cinco" columnas — tiene 5 de métricas globales más hasta 6 de la taxonomía de errores (`I`, `CI`, `CD`, `CU`, `VN`, `SE`, `US`, sujeto a que la etiqueta sume >0). La versión anterior de este check contaba `&` y exigía exactamente 4 (5 columnas); esa cuenta fija ya no tiene sentido con columnas de taxonomía de cardinalidad variable. La sustancia que este check protege —que ninguna columna/cifra de la ronda 2025 reaparezca— se preserva con una condición más precisa, no más débil: las primeras 5 columnas del encabezado deben ser exactamente `Modelo, JSON, Estr., Laxa, Lat.`, en ese orden. Cualquier columna de continuidad 2025 que se reintrodujera ahí lo haría fallar igual que antes; lo que cambió es que ya no asume un total fijo de columnas para el resto de la fila (taxonomía).
 **Cost:** `cheap`
 **Run:**
 ```bash
@@ -501,15 +506,19 @@ from pathlib import Path
 
 fallas = []
 
-# 1. La Tabla 2 tiene exactamente 5 columnas y ninguna mencion a 2025.
+# 1. Las primeras 5 columnas de la Tabla 2 fusionada son las metricas globales,
+#    en ese orden, y ninguna mencion a 2025 en toda la tabla.
 tabla2 = Path("paper/02_reescrito/tablas/tabla2_resultados_globales.tex")
 if tabla2.exists():
     tex = tabla2.read_text(encoding="utf-8")
     if "2025" in tex:
         fallas.append("tabla2: todavia menciona 2025")
     encabezado = next(l for l in tex.splitlines() if "Modelo" in l)
-    if encabezado.count("&") != 4:
-        fallas.append(f"tabla2: se esperan 5 columnas (4 '&'), hay {encabezado.count('&') + 1}")
+    columnas = [c.strip() for c in encabezado.split("&")]
+    columnas = [c.rstrip("\\").strip() for c in columnas]
+    esperadas = ["Modelo", "JSON", "Estr.", "Laxa", "Lat."]
+    if columnas[:5] != esperadas:
+        fallas.append(f"tabla2: se esperan {esperadas} como primeras 5 columnas, hay {columnas[:5]}")
 
 # 2. Ninguna seccion del paper atribuye datos/prosa a una "ronda inicial" o
 #    version previa de este experimento (fuera de citas bibliograficas de
@@ -537,10 +546,10 @@ if "generación anterior" not in res:
     fallas.append("04_resultados.tex: se perdio la referencia a la generacion anterior")
 
 assert not fallas, fallas
-print("sin-2025 OK: tabla2 con 5 columnas, sin prosa de ronda inicial/continuidad, titular generacional intacto")
+print("sin-2025 OK: tabla2 con las 5 columnas de metricas esperadas, sin prosa de ronda inicial/continuidad, titular generacional intacto")
 PY
 ```
-**Expected:** imprime `sin-2025 OK: tabla2 con 5 columnas, sin prosa de ronda inicial/continuidad, titular generacional intacto`, exit 0.
+**Expected:** imprime `sin-2025 OK: tabla2 con las 5 columnas de metricas esperadas, sin prosa de ronda inicial/continuidad, titular generacional intacto`, exit 0.
 **On failure indicates:** o bien reapareció una columna/cifra de la ronda 2025 (regresión del Delta 04), o bien el titular generacional (90,6\% vs 65,6\%, medido bajo el prompt 2026 para ambos modelos) se perdió al remover la prosa de continuidad — ese resultado es válido y debe sobrevivir, es la versión legítima de la comparación contra la generación anterior.
 
 ---

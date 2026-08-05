@@ -80,7 +80,6 @@ ARCHIVOS_TABLAS = [
     "tabla1_modelos.tex",
     "tabla2_resultados_globales.tex",
     "tabla3_por_categoria.tex",
-    "tabla4_taxonomia.tex",
 ]
 
 _REEMPLAZOS = [
@@ -107,7 +106,8 @@ def _minuscula_inicial(texto: str) -> str:
 
 def _tabla(caption: str, label: str, spec: str, encabezado: list[str],
            filas: list[list[str]], nota: str = "", ancho_completo: bool = False,
-           fuente_pequena: bool = False, cortes: frozenset[int] = frozenset()) -> str:
+           fuente_pequena: bool = False, cortes: frozenset[int] = frozenset(),
+           tabcolsep: str = "") -> str:
     """Arma un bloque table+tabular con booktabs, en el estilo LNCS.
 
     `ancho_completo=True` envuelve el `tabular` en `\\resizebox{\\textwidth}{!}{...}`;
@@ -120,7 +120,12 @@ def _tabla(caption: str, label: str, spec: str, encabezado: list[str],
 
     `cortes` son índices de fila (0-based) DESPUÉS de los cuales va un
     `\\midrule`: agrupan filas sin gastar una columna entera en decir a qué
-    grupo pertenece cada una."""
+    grupo pertenece cada una.
+
+    `tabcolsep`, si no es vacío (p. ej. `"2pt"`), acota `\\tabcolsep` sólo
+    para este bloque -- último recurso de ancho para tablas con muchas
+    columnas de datos angostos, alternativa a `resizebox` que no toca el
+    tamaño de letra. No afecta a ninguna otra tabla del documento."""
     cuerpo = [
         r"\toprule",
         " & ".join(encabezado) + r" \\",
@@ -139,6 +144,8 @@ def _tabla(caption: str, label: str, spec: str, encabezado: list[str],
         # cuerpo, un escalón de cuerpo de letra en las tablas es ~0,25 páginas
         # frente al límite de 10 del CFP, y ninguna tabla pierde una fila.
         tabular = [r"{\footnotesize", *tabular, "}"]
+    if tabcolsep:
+        tabular = [f"{{\\setlength{{\\tabcolsep}}{{{tabcolsep}}}", *tabular, "}"]
     lineas = [
         r"\begin{table}[htbp]",
         r"\centering",
@@ -217,37 +224,81 @@ def tabla1_modelos() -> str:
     )
 
 
-def tabla2_resultados(resumen: list[dict]) -> str:
-    """Tabla 2: resultados globales 2026 (JSON válido, estricta, laxa, latencia),
-    en el orden canónico del paper (item 3 de la revisión de PDF). Sin
-    `resizebox` (criterio del item 1 de la revisión de PDF, extendido a las 5
-    tablas): los encabezados se parten en \\shortstack de 2 líneas cortas para
-    no desbordar la caja LNCS."""
-    filas = []
+# Aclaración adicional entre paréntesis para las siglas que, sin ella, se
+# leen como si fueran sinónimas entre sí (Tarea 2 de la revisión de PDF):
+# `sin_error_semantico` y `uso_de_sinonimos` son ambas parte de la exactitud
+# laxa pero por motivos distintos (ver `judge_2026.py` -- prompt del juez):
+# la primera es equivalencia semántica por cualquier otro motivo, la segunda
+# es específicamente una diferencia de sinónimo.
+_ACLARACION_SIGLA: dict[str, str] = {
+    "sin_error_semantico": "equivalente por otro motivo",
+    "uso_de_sinonimos": "difiere solo por un sinónimo",
+}
+
+
+def tabla2_resultados_taxonomia(resumen: list[dict], df_taxonomia: pd.DataFrame) -> str:
+    """Tabla 2 (fusión de las antiguas Tablas 2 y 4, Delta 2026-08-05): las
+    métricas globales (JSON válido, estricta, laxa, latencia) y la
+    distribución de errores de la taxonomía comparten índice -- ambas están
+    indexadas por modelo, en las mismas 12 filas y el mismo orden canónico --
+    así que fusionarlas en un único `table` no pierde ningún dato y ahorra un
+    entorno flotante completo.
+
+    Con 12 columnas de datos (4 métricas + Incorrectas + hasta 6 siglas de
+    etiqueta) la fila más ancha del paper: encabezados muy abreviados
+    (`JSON`, `Estr.`, `Laxa`, `Lat.`, `I`, siglas horizontales para la
+    taxonomía) y `\\tabcolsep` acotado a 2pt sólo para este bloque (ver
+    `_tabla(tabcolsep=...)`) -- alternativa a `resizebox` (prohibido: no
+    tiene piso de tamaño de letra) que no toca `\\footnotesize`. El caption
+    lleva la leyenda completa de siglas, con `I` primero porque es la primera
+    columna abreviada, en el mismo orden de las columnas. Las etiquetas en
+    cero para los doce modelos siguen sin columna (mismo criterio que antes
+    de la fusión)."""
     resumen_ordenado = sorted(
         resumen, key=lambda f: clave_orden_canonico(f["tier"], f["params_b"], f["modelo"])
     )
+    taxonomia_por_modelo = {fila["modelo"]: fila for _, fila in df_taxonomia.iterrows()}
+    etiquetas = [e for e in ETIQUETAS_ERROR if int(df_taxonomia[e].sum()) > 0]
+
+    encabezado = ["Modelo", "JSON", "Estr.", "Laxa", "Lat.", "I"] + [
+        _escapar(ETIQUETAS_ERROR_SIGLA[e]) for e in etiquetas
+    ]
+    filas = []
     for fila in resumen_ordenado:
+        tax = taxonomia_por_modelo[fila["modelo"]]
         filas.append([
             _escapar(fila["modelo"]),
             f"{fila['json_valido_pct']:.1f}",
             f"{fila['exact_match_pct']:.1f}",
             f"{fila['exact_match_laxo_pct']:.1f}",
             f"{fila['avg_latencia_s']:.2f}",
-        ])
+            str(int(tax["total_incorrectas"])),
+        ] + [str(int(tax[e])) for e in etiquetas])
+    spec = "l" + "r" * (5 + len(etiquetas))
+
+    partes_leyenda = ["I: incorrectas"]
+    for e in etiquetas:
+        parte = (f"{ETIQUETAS_ERROR_SIGLA[e]}: "
+                  f"{_minuscula_inicial(_escapar(ETIQUETAS_ERROR_DISPLAY[e]))}")
+        aclaracion = _ACLARACION_SIGLA.get(e)
+        if aclaracion:
+            parte += f" ({aclaracion})"
+        partes_leyenda.append(parte)
+    leyenda = "; ".join(partes_leyenda)
+
+    caption = (
+        "Resultados globales por modelo (JSON válido, exactitud estricta y "
+        "laxa, latencia) y distribución de errores de la taxonomía, en las "
+        "mismas doce filas. " + leyenda + "."
+    )
     return _tabla(
-        caption="Resultados globales por modelo",
-        label="tab:globales",
-        spec="lrrrr",
-        encabezado=[
-            "Modelo",
-            r"\shortstack{JSON\\válido\\(\%)}",
-            r"\shortstack{Estricta\\(\%)}",
-            r"\shortstack{Laxa\\(\%)}",
-            r"\shortstack{Latencia\\(s)}",
-        ],
+        caption=caption,
+        label="tab:resultados",
+        spec=spec,
+        encabezado=encabezado,
         filas=filas,
         fuente_pequena=True,
+        tabcolsep="2pt",
     )
 
 
@@ -282,56 +333,6 @@ def tabla3_por_categoria(df: pd.DataFrame) -> str:
     return _tabla(
         caption="Exactitud estricta por categoría lingüística",
         label="tab:categorias",
-        spec=spec,
-        encabezado=encabezado,
-        filas=filas,
-        fuente_pequena=True,
-    )
-
-
-def tabla4_taxonomia(df: pd.DataFrame) -> str:
-    """Tabla 4: taxonomía de 7 etiquetas de error, una FILA por modelo (orden
-    canónico, item 3) y una columna por etiqueta más el total de
-    incorrectas -- transpuesta (item 1 de la revisión de PDF) respecto de la
-    versión anterior, que ponía un modelo por columna: con doce modelos esa
-    orientación desbordaba el ancho de columna LNCS. Los encabezados de
-    etiqueta se abrevian con una sigla horizontal (CI, CD, CU, VN, SE, US) en
-    vez de rotarse 90°: la sigla ocupa lo mismo que el rótulo rotado pero no
-    exige girar la página para leerla; la equivalencia sigla = tipo de error
-    va en el caption. Sin `resizebox` (corrección del item 1 de la revisión
-    de PDF: `resizebox` no tiene piso de tamaño de letra): las columnas de
-    enteros chicos entran a ancho de columna LNCS sin comprimir letra.
-
-    Las etiquetas que quedaron en cero para los doce modelos NO llevan
-    columna: el paper sólo muestra lo que efectivamente aparece en los
-    resultados, y una etiqueta que el juez pudo usar y nunca usó se reporta en
-    una frase de prosa, no en una columna entera de ceros. Una etiqueta con
-    una sola ocurrencia sí lleva columna --- es una medición, no un vacío."""
-    orden = {m.nombre: i for i, m in enumerate(orden_canonico(roster_activo()))}
-    modelos = sorted(df["modelo"], key=lambda m: orden.get(m, len(orden)))
-    etiquetas = [e for e in ETIQUETAS_ERROR if int(df[e].sum()) > 0]
-    encabezado = ["Modelo", "Incorrectas"] + [
-        _escapar(ETIQUETAS_ERROR_SIGLA[e]) for e in etiquetas
-    ]
-    filas = []
-    for m in modelos:
-        fila_df = df.loc[df["modelo"] == m].iloc[0]
-        fila = [_escapar(m), str(int(fila_df["total_incorrectas"]))]
-        fila += [str(int(fila_df[e])) for e in etiquetas]
-        filas.append(fila)
-    spec = "l" + "r" * (1 + len(etiquetas))
-    equivalencias = "; ".join(
-        f"{ETIQUETAS_ERROR_SIGLA[e]}: "
-        f"{_minuscula_inicial(_escapar(ETIQUETAS_ERROR_DISPLAY[e]))}"
-        for e in etiquetas
-    )
-    caption = (
-        "Distribución de errores por categoría de la taxonomía. "
-        + equivalencias
-    )
-    return _tabla(
-        caption=caption,
-        label="tab:taxonomia",
         spec=spec,
         encabezado=encabezado,
         filas=filas,
@@ -413,9 +414,10 @@ def main() -> None:
 
     fragmentos = {
         "tabla1_modelos.tex": tabla1_modelos(),
-        "tabla2_resultados_globales.tex": tabla2_resultados(_cargar_resumen_2026()),
+        "tabla2_resultados_globales.tex": tabla2_resultados_taxonomia(
+            _cargar_resumen_2026(), _cargar_taxonomia()
+        ),
         "tabla3_por_categoria.tex": tabla3_por_categoria(_cargar_por_categoria()),
-        "tabla4_taxonomia.tex": tabla4_taxonomia(_cargar_taxonomia()),
     }
     for nombre in ARCHIVOS_TABLAS:
         ruta = args.salida_dir / nombre
