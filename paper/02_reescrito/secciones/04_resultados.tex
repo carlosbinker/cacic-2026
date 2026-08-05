@@ -26,12 +26,12 @@ supera a cuatro de los seis modelos del tier superior.
 
 La brecha entre exactitud estricta y laxa es grande y desigual (Figura
 \ref{fig:globales}): en varios modelos la laxa más que duplica a la estricta.
-Es un resultado en sí mismo, y parte de ella resulta poco confiable
-exactamente donde la validez de formato es débil (Sección
-\ref{sec:analisis-errores}). Por campo del esquema, \texttt{intent} y
-\texttt{unidad} concentran la mayor tasa de error y \texttt{valor} y
-\texttt{ubicacion} la menor: buena parte del error estricto está en detalles
-de menor jerarquía semántica, no en confundir la intención del comando.
+Es un resultado en sí mismo, y parte de ella resulta poco confiable donde la
+validez de formato es débil (Sección \ref{sec:analisis-errores}). Por campo
+del esquema, \texttt{intent} y \texttt{unidad} concentran la mayor tasa de
+error y \texttt{valor} y \texttt{ubicacion} la menor: buena parte del error
+estricto está en detalles de menor jerarquía semántica, no en confundir la
+intención del comando.
 
 \subsection{Exactitud por categoría lingüística}
 
@@ -53,33 +53,32 @@ valor de la tabla como desagregación lingüística fina (Sección 6).
 El juez que resulta de la regla de la Sección \ref{sec:dos-etapas} es
 \texttt{granite-4.0-1b}, con \textbf{90,6\%} de exactitud estricta en la
 etapa 1. Clasificó las 225 respuestas con \texttt{match\_exact = False} en
-las \textbf{siete} etiquetas de la Tabla \ref{tab:taxonomia}; ninguna de
-ellas, ni ninguna de las 32 asignaciones de categoría, quedó con
-\texttt{juez\_parse\_ok = False}: no hubo reintentos ni etiquetas de
-respaldo. Dos etiquetas describen el espacio de errores observado y no un
-defecto de la taxonomía: \emph{alucinación de valor/unidad} no se instanció
-en ninguna de las 225 respuestas y \emph{valor numérico incorrecto} una única
-vez, en \texttt{OLMo-2-0425-1B-Instruct}. La columna se conserva porque la
-categoría sí se consideró al clasificar, y su ausencia casi total es un dato:
-los errores de este roster se concentran en confusión de dispositivo y uso de
+las siete etiquetas cerradas, y ninguna de ellas —ni ninguna de las 32
+asignaciones de categoría— quedó con \texttt{juez\_parse\_ok = False}: no
+hubo reintentos ni etiquetas de respaldo. De esas siete, \emph{alucinación de
+valor/unidad} no se instanció en ninguna de las 225 respuestas, así que no
+lleva columna en la Tabla \ref{tab:taxonomia}: los modelos de este roster no
+inventan valores ni unidades fuera del comando. \emph{Valor numérico
+incorrecto} se instanció una única vez, en \texttt{OLMo-2-0425-1B-Instruct}.
+Los errores se concentran, entonces, en confusión de dispositivo y uso de
 sinónimos. La métrica laxa rescató \textbf{123} de las 225 respuestas
 incorrectas.
 
 Una exactitud estricta cercana a cero admite dos lecturas opuestas, y
-distinguirlas exige mirar \texttt{json\_valido}. Alto junto a una exactitud
-casi nula es un fallo semántico genuino: el modelo emite bien el formato y se
-equivoca en el contenido. Bajo, es un artefacto de parseo.
-\texttt{LFM2.5-350M} tiene 0,0\% de exactitud estricta con \textbf{100\%} de
-JSON válido y \texttt{OLMo-2-0425-1B-Instruct} 3,1\% con también
-\textbf{100\%}: ambos son fallos semánticos. \texttt{SmolLM2-360M-Instruct},
-en cambio, tiene 9,4\% con apenas \textbf{25\%} de JSON válido. La validez de
-formato no puede darse por sentada: sólo nueve de los doce modelos llegan a
-100\%, y \texttt{LFM2.5-230M} a 87,5\%.
+distinguirlas exige mirar \texttt{json\_valido}: alto, es un fallo semántico
+genuino —el modelo emite bien el formato y se equivoca en el contenido—;
+bajo, es un artefacto de parseo. \texttt{LFM2.5-350M} tiene 0,0\% de
+exactitud estricta con \textbf{100\%} de JSON válido, y
+\texttt{OLMo-2-0425-1B-Instruct} 3,1\% con también \textbf{100\%}: ambos son
+fallos semánticos. \texttt{SmolLM2-360M-Instruct}, en cambio, tiene 9,4\% con
+apenas \textbf{25\%} de JSON válido. La validez de formato no puede darse por
+sentada: sólo nueve de los doce modelos llegan a 100\%, y
+\texttt{LFM2.5-230M} a 87,5\%.
 
 De ahí que la métrica laxa sea poco confiable exactamente donde el formato es
 débil. El campo \texttt{laxo\_json\_invalido\_n} —respuestas acreditadas a la
 exactitud laxa pese a tener JSON inválido— vale \textbf{24} para
 \texttt{SmolLM2-360M-Instruct} sobre apenas \textbf{27} rescatadas: su
-exactitud laxa de 93,8\% es un artefacto de la fragilidad de formato del
-modelo, no evidencia de competencia semántica. Vale \textbf{4} para
+exactitud laxa de 93,8\% es un artefacto de fragilidad de formato, no
+evidencia de competencia semántica. Vale \textbf{4} para
 \texttt{LFM2.5-230M} y \textbf{0} para los diez modelos restantes.

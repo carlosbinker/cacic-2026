@@ -4,34 +4,32 @@ Convertir un comando en una estructura de intención y argumentos (slots) es
 una tarea clásica de Natural Language Understanding (NLU). Weld et al.
 \cite{weld2023survey} relevan los modelos conjuntos de detección de intención
 y slot filling previos a los grandes modelos de lenguaje (LLMs), entrenados
-específicamente para el dominio; son el punto de comparación natural del
-enfoque actual, que resuelve la misma tarea generando directamente un JSON
-con un modelo general. Bouraoui et al. \cite{bouraoui2018french} mostraron,
-sobre un corpus de comandos de voz para hogar inteligente en francés, que los
-recursos de NLU en inglés no transfieren bien a otras lenguas y que cada
-idioma requiere corpus propios; este trabajo sigue esa lógica para el español
-rioplatense, con un dataset de evaluación y no de entrenamiento.
+específicamente para el dominio; son el punto de comparación del enfoque
+actual, que genera directamente un JSON con un modelo general. Bouraoui et
+al. \cite{bouraoui2018french} mostraron, sobre un corpus de comandos de voz
+domóticos en francés, que los recursos de NLU en inglés no transfieren bien a
+otras lenguas: cada idioma requiere corpus propios.
 
 El antecedente más cercano evalúa LLMs on-device para home assistants
 \cite{ondevice2025homeassistant}: variantes cuantizadas de 16, 8 y 4 bits en
-el doble rol de detección de intención y generación de respuesta, con
-80\%--86\% de exactitud y latencias de 5 a 6 segundos. Este trabajo se
-diferencia en el extremo inferior de tamaño (sub-2B, sin cuantización
-agresiva), el idioma, y la interpretación estructurada en lugar de la
-generación conversacional. El survey de Lu et al. \cite{gupta2025slms}
-documenta que modelos de pocos miles de millones de parámetros alcanzan
-paridad de tarea específica frente a modelos mucho mayores cuando se entrenan
-con datos de alta calidad; los reportes técnicos de Qwen2.5
-\cite{qwen2024report}, SmolLM2 \cite{allal2024smollm2} y OLMo 2
-\cite{olmo2report} describen tres de las familias evaluadas aquí.
+detección de intención y generación de respuesta, con 80\%--86\% de exactitud
+y latencias de 5 a 6 segundos. Este trabajo se diferencia en el extremo
+inferior de tamaño (sub-2B, sin cuantización agresiva), el idioma, y la
+interpretación estructurada en lugar de la generación conversacional. El
+survey de Lu et al. \cite{gupta2025slms} documenta que modelos de pocos miles
+de millones de parámetros alcanzan paridad de tarea específica frente a
+modelos mucho mayores cuando se entrenan con datos de alta calidad; los
+reportes técnicos de Qwen2.5 \cite{qwen2024report}, SmolLM2
+\cite{allal2024smollm2} y OLMo 2 \cite{olmo2report} describen tres de las
+familias evaluadas.
 
 La decodificación restringida por gramática garantiza validez sintáctica con
 independencia de la capacidad del modelo
-\cite{beurerkellner2024guiding,dong2024xgrammar}. Este estudio optó
-deliberadamente por no usarla, para medir el seguimiento de instrucciones en
-un despliegue simple: resuelve la validez de formato, pero no evita que el
-modelo alucine un valor semánticamente incorrecto dentro de un JSON válido,
-patrón que la taxonomía de la Sección \ref{sec:dos-etapas} distingue.
+\cite{beurerkellner2024guiding,dong2024xgrammar}; este estudio optó por no
+usarla, para medir el seguimiento de instrucciones en un despliegue simple.
+Resuelve la validez de formato, pero no evita que el modelo alucine un valor
+incorrecto dentro de un JSON válido, patrón que la taxonomía de la Sección
+\ref{sec:dos-etapas} distingue.
 
 La técnica central que este trabajo incorpora es la evaluación con un modelo
 de lenguaje como juez. Zheng et al. \cite{zheng2023judging} muestran que un
@@ -40,4 +38,4 @@ proponen la técnica donde la coincidencia exacta subestima el desempeño real
 — el caso de este trabajo, donde un sinónimo válido de un dispositivo no
 coincide con el ground truth. Su limitación conocida es el sesgo de
 auto-favorecimiento; como aquí el juez es uno de los modelos evaluados,
-aplica directamente y se retoma en la Sección 6.
+aplica directamente (Sección 6).

@@ -1,16 +1,14 @@
 \section{Introducción}
 
 Los asistentes de voz y los sistemas domóticos interpretan comandos en
-lenguaje natural (``prendé la luz del living'', ``bajá el aire a 20 grados'')
-casi siempre con modelos de gran escala alojados en la nube, lo que impone
-latencia de red, costo recurrente por uso de API y dependencia de
-conectividad: apagar una luz no debería fallar por una caída de internet. Los
-Small Language Models (SLMs) pueden ejecutarse en el propio hub domótico y
-alcanzan, en tareas acotadas, un desempeño competitivo frente a modelos mucho
-más grandes \cite{gupta2025slms}, pero la literatura los evalúa mayormente en
-inglés. Clasificar a mano sus respuestas incorrectas, además, no escala a un
-roster de doce modelos ni es reproducible por un tercero, porque depende del
-criterio del anotador.
+lenguaje natural (``prendé la luz del living'') casi siempre con modelos de
+gran escala alojados en la nube, lo que impone latencia de red, costo
+recurrente por uso de API y dependencia de conectividad. Los Small Language
+Models (SLMs) pueden ejecutarse en el propio hub domótico y alcanzan, en
+tareas acotadas, un desempeño competitivo frente a modelos mucho más grandes
+\cite{gupta2025slms}, pero la literatura los evalúa mayormente en inglés.
+Clasificar a mano sus respuestas incorrectas, además, no escala a un roster
+de doce modelos ni es reproducible por un tercero.
 
 Este trabajo aporta: (1) la evaluación de doce SLMs abiertos sub-2B, sin
 restricción de licencia ni de token, en dos tiers de seis modelos bajo un

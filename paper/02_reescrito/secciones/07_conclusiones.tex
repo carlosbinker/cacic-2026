@@ -8,19 +8,18 @@ español rioplatense. Bajo el mismo prompt, \texttt{granite-4.0-1b} alcanza
 representante de la generación anterior y medido idénticamente. Las
 arquitecturas recientes de tamaño sub-2B amplían, entonces, lo factible para
 esta tarea. El tamaño no es el único factor —\texttt{Qwen3.5-0.8B} supera a
-la mayoría del tier superior— y la brecha entre exactitud estricta y laxa es
-sustancial pero no uniformemente confiable: donde la validez de formato es
-débil, buena parte es un artefacto de JSON inválido acreditado por el juez.
-La variante híbrida de \texttt{granite-4.0} paga, en ambos tamaños
-evaluados, una penalización de latencia de varias veces la de su contraparte
-densa sin ganancia de exactitud proporcional. El aporte metodológico central
-es reemplazar la anotación manual por un pipeline automático de dos etapas
-con decodificación determinista: reproducible por construcción y escalable a
-rosters mucho mayores sin que el costo de anotación crezca.
+la mayoría del tier superior— y la brecha estricta--laxa es sustancial pero
+no uniformemente confiable: donde la validez de formato es débil, buena parte
+es un artefacto de JSON inválido acreditado por el juez. La variante híbrida
+de \texttt{granite-4.0} paga, en ambos tamaños evaluados, una penalización de
+latencia de varias veces la de su contraparte densa sin ganancia proporcional
+de exactitud. El aporte metodológico central es reemplazar la anotación
+manual por un pipeline automático de dos etapas con decodificación
+determinista: reproducible por construcción y escalable a rosters mucho
+mayores sin que el costo de anotación crezca.
 
-Como trabajo futuro se plantea incorporar un juez externo de mayor escala,
-ajeno al roster, o validación humana sobre una muestra; ampliar y balancear el
-dataset, incluyendo voz real transcripta por ASR; cubrir variantes dialectales
-más allá del rioplatense; y repetir el barrido sobre un host con más de 2
-procesadores lógicos, para separar el efecto de la arquitectura del efecto del
-tope de recursos sobre los valores absolutos de latencia.
+Como trabajo futuro se plantea incorporar un juez externo de mayor escala, o
+validación humana sobre una muestra; ampliar y balancear el dataset,
+incluyendo voz real transcripta por ASR; cubrir variantes dialectales más allá
+del rioplatense; y repetir el barrido sobre un host con más de 2 procesadores
+lógicos.

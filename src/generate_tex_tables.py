@@ -128,7 +128,10 @@ def _tabla(caption: str, label: str, spec: str, encabezado: list[str],
     if ancho_completo:
         tabular = [r"\resizebox{\textwidth}{!}{%", *tabular, "}"]
     elif fuente_pequena:
-        tabular = [r"{\small", *tabular, "}"]
+        # \footnotesize y no \small: con las 5 tablas y el prompt íntegro en el
+        # cuerpo, un escalón de cuerpo de letra en las tablas es ~0,25 páginas
+        # frente al límite de 10 del CFP, y ninguna tabla pierde una fila.
+        tabular = [r"{\footnotesize", *tabular, "}"]
     lineas = [
         r"\begin{table}[htbp]",
         r"\centering",
@@ -258,22 +261,29 @@ def tabla4_taxonomia(df: pd.DataFrame) -> str:
     orientación desbordaba el ancho de columna LNCS. Los encabezados de
     etiqueta van rotados 90° para que las 12 filas no exijan comprimir tanto
     el ancho de cada columna. Sin `resizebox` (corrección del item 1 de la
-    revisión de PDF: `resizebox` no tiene piso de tamaño de letra): 9
+    revisión de PDF: `resizebox` no tiene piso de tamaño de letra): las
     columnas de enteros chicos con encabezados rotados entran a ancho de
-    columna LNCS con `\\small`."""
+    columna LNCS con una letra un escalón más chica.
+
+    Las etiquetas que quedaron en cero para los doce modelos NO llevan
+    columna: el paper sólo muestra lo que efectivamente aparece en los
+    resultados, y una etiqueta que el juez pudo usar y nunca usó se reporta en
+    una frase de prosa, no en una columna entera de ceros. Una etiqueta con
+    una sola ocurrencia sí lleva columna --- es una medición, no un vacío."""
     orden = {m.nombre: i for i, m in enumerate(orden_canonico(roster_activo()))}
     modelos = sorted(df["modelo"], key=lambda m: orden.get(m, len(orden)))
+    etiquetas = [e for e in ETIQUETAS_ERROR if int(df[e].sum()) > 0]
     encabezado = ["Modelo", "Incorrectas"] + [
         r"\rotatebox{90}{" + _escapar(ETIQUETAS_ERROR_DISPLAY[e]) + "}"
-        for e in ETIQUETAS_ERROR
+        for e in etiquetas
     ]
     filas = []
     for m in modelos:
         fila_df = df.loc[df["modelo"] == m].iloc[0]
         fila = [_escapar(m), str(int(fila_df["total_incorrectas"]))]
-        fila += [str(int(fila_df[e])) for e in ETIQUETAS_ERROR]
+        fila += [str(int(fila_df[e])) for e in etiquetas]
         filas.append(fila)
-    spec = "l" + "r" * (1 + len(ETIQUETAS_ERROR))
+    spec = "l" + "r" * (1 + len(etiquetas))
     return _tabla(
         caption="Distribución de errores por categoría de la taxonomía",
         label="tab:taxonomia",
