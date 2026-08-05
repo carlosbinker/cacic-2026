@@ -215,6 +215,8 @@ def construir_juez_real(hf_repo_id: str, trust_remote_code: bool):
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
+    from prompt_2026 import detectar_modo
+
     tokenizer = AutoTokenizer.from_pretrained(
         hf_repo_id, trust_remote_code=trust_remote_code
     )
@@ -223,18 +225,16 @@ def construir_juez_real(hf_repo_id: str, trust_remote_code: bool):
         trust_remote_code=trust_remote_code,
     )
     red.eval()
-    if not getattr(tokenizer, "chat_template", None):
-        raise ValueError(
-            f"{hf_repo_id} no expone chat_template: el juez 2026 solo admite "
-            "modelos instruct/chat con plantilla de chat (ver prompt_2026."
-            "construir_entrada_con_prompt, misma decisión 2026-08-05)."
-        )
+    modo = detectar_modo(tokenizer)
 
     def juez(prompt: str, max_new_tokens: int) -> str:
-        entrada = tokenizer.apply_chat_template(
-            [{"role": "user", "content": prompt}],
-            add_generation_prompt=True, return_tensors="pt", return_dict=True,
-        )
+        if modo == "chat_template":
+            entrada = tokenizer.apply_chat_template(
+                [{"role": "user", "content": prompt}],
+                add_generation_prompt=True, return_tensors="pt", return_dict=True,
+            )
+        else:
+            entrada = tokenizer(prompt, return_tensors="pt")
         with torch.no_grad():
             salida = red.generate(
                 **entrada, max_new_tokens=max_new_tokens,

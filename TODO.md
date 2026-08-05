@@ -201,16 +201,11 @@ Consecuencias:
 
 - Corregir la tabla de §2.1 y cualquier texto del plan que afirme que esos dos modelos van por
   raw-completion.
-- La ruta de raw-completion se conservó en su momento como fallback por capacidad
-  (`tokenizer.chat_template is None`), implementada y testeada aunque ningún modelo del roster la
-  ejerciera. **Revertido el 2026-08-05 por instrucción del usuario:** se eliminó del código
-  (`src/prompt_2026.py`, `src/run_sweep_2026.py`, `src/judge_2026.py`) porque los 12 modelos del
-  roster activo usan `chat_template` y su única cobertura era un test sintético con un tokenizer
-  falso — un artefacto construido que no llega a los resultados. `construir_entrada` ahora aplica la
-  plantilla de chat directamente y falla explícitamente (`ValueError` claro, no un
-  `AttributeError`/`TypeError` opaco) si un tokenizer no expone `chat_template`. Ver RF2 (eliminado) y
-  la especificación de F2 más abajo. Lo que no puede pasar es que el paper afirme que algún modelo se
-  prompteó por raw completion — nunca fue así.
+- La **ruta de raw-completion en si no se elimina**: sigue siendo el fallback correcto por capacidad
+  (`tokenizer.chat_template is None`) y esta implementada y testeada. Simplemente **ningun modelo del
+  roster actual la ejercita**. Decidir y documentar si queda como codigo de fallback no ejercitado o
+  si se cubre solo con un test sintetico — lo que no puede pasar es que el paper afirme que dos
+  modelos se prompted por raw completion cuando no fue asi.
 - Sacar del paper la salvedad de comparabilidad que se iba a declarar por esos dos modelos: ya no
   aplica, porque los 12 del roster usan chat template. Es una simplificacion, no una omision.
 
@@ -366,12 +361,12 @@ Con el modelo **fijo**, cualquier diferencia entre el número nuevo y el publica
 
 **Precisión obligatoria (no sobreafirmar).** §3.3 ya declara que la exactitud estricta **no es directamente comparable** con la del paper original porque el prompt se endureció; y la latencia arrastra además el confusor de los dos grupos de versión. La comparación es por lo tanto una **validación cruzada con el modelo controlado**, no una réplica: se reporta, se interpreta y, si hay divergencia, **se discute** — nunca se entierra ni se presenta como replicación exacta.
 
-El `modo_prompting` de la tabla es la **expectativa**. Hasta el 2026-08-04, el código lo decidía en runtime por capacidad (`tokenizer.chat_template is None`), nunca por ID hardcodeado; la detección de Phase 3 confirmó `chat_template` en los 11 modelos del roster activo que ya estaban sondeados entonces, incluidos los dos LFM2.5 base, que el diagnóstico inicial suponía sin chat template, y la sonda del 2026-08-04 confirmó `chat_template` también en `Qwen2.5-1.5B-Instruct` (modo reportado en la línea `PROBE_OK` de arriba). Los **12** del roster activo resuelven a `chat_template`. **Revertido el 2026-08-05** (instrucción del usuario, ver D2.3 más arriba y RF2 eliminado): como los 12 son y siempre fueron `chat_template`, la detección en runtime se eliminó; `construir_entrada` aplica la plantilla de chat directamente y falla explícitamente si algún tokenizer no la expone. La tabla sigue reflejando la realidad del roster.
+El `modo_prompting` de la tabla es la **expectativa**; el código lo decide en runtime por capacidad (`tokenizer.chat_template is None`), nunca por ID hardcodeado. Si la detección discrepa de la tabla, gana la detección y se corrige la tabla del paper. La detección de Phase 3 confirmó `chat_template` en los 11 modelos del roster activo que ya estaban sondeados entonces, incluidos los dos LFM2.5 base, que el diagnóstico inicial suponía sin chat template; la sonda del 2026-08-04 confirmó `chat_template` también en `Qwen2.5-1.5B-Instruct` (modo reportado en la línea `PROBE_OK` de arriba). Los **12** del roster activo resuelven a `chat_template`. La tabla ya refleja la detección.
 
 ### 2.2 Requisitos funcionales
 
 - **RF1** — Prompt de sistema 2026: el prompt del paper más una cláusula **taxativa** que declare que los valores entre paréntesis son los únicos outputs aceptados textualmente y que usar sinónimos es una violación de formato (texto exacto congelado en §4, F2).
-- **RF2 (ELIMINADO, 2026-08-05, instrucción del usuario)** — Existía una ruta de prompting por *raw completion* para tokenizers sin `chat_template`, detectada por capacidad. Ningún modelo del roster activo la ejercitaba (los 12 resuelven a `chat_template`) y su única cobertura era un test sintético con un tokenizer sin `chat_template` (`tests/test_prompt_2026.py`), no un modelo real: un artefacto construido que no llega a los resultados. Se eliminó la rama de código, la constante `ModoPrompting`/`RAW_TEMPLATE` y el test sintético; `construir_entrada` ahora falla explícitamente si un tokenizer no expone `chat_template`. Ni el plan ni el paper afirman ni afirmaron que algún modelo se prompteó por raw completion.
+- **RF2** — Ruta de prompting por *raw completion* para tokenizers sin `chat_template`, detectada por capacidad. Ningún modelo del roster activo la ejercita (los 12 resuelven a `chat_template`). La ruta se conserva como fallback por capacidad y su cobertura es un test sintético con un tokenizer sin `chat_template` (`tests/test_prompt_2026.py`), no un modelo del roster. Ni el plan ni el paper pueden afirmar que algún modelo se prompteó por raw completion.
 - **RF3** — Barrido **reanudable por modelo**: un CSV por modelo; reejecutar salta los modelos ya completos salvo `--force`.
 - **RF4** — **Una imagen Docker por modelo** — **12 imágenes activas**, una por modelo del roster activo, cada una con el pin de su grupo de versión. Las **tres** imágenes de los modelos excluidos siguen **definidas** (misma receta, incluida la plomería `--env-file` para los dos gated) pero **no se construyen ni se corren**. Compartiendo un único volumen de caché HF. Ejecución **estrictamente secuencial, un modelo a la vez**, con `--memory=8g --cpus=2 --cpuset-cpus=0-1`, CPU-only (ver RNF6 para el razonamiento del pinning). Como el roster activo no tiene modelos gated, **el barrido corre sin credenciales y no debe exigir `$HF_TOKEN`**.
 - **RF5** — Toda divergencia de versión respecto del baseline debe quedar documentada (qué modelo la forzó, qué error evita) en `docker/README.md`, en el sitio del pin, y en el texto de metodología y de amenazas del paper. Lo mismo para cualquier uso de `trust_remote_code`. Cada divergencia debe declararse como **necesaria** (hay evidencia empírica de que el modelo no corre con la otra versión mayor) o **heredada** (el modelo corre con el pin de su grupo y no se probó la alternativa). Solo las necesarias son confusores reales; ambas se documentan.
@@ -430,7 +425,7 @@ El `modo_prompting` de la tabla es la **expectativa**. Hasta el 2026-08-04, el c
 | id | title | depends_on | file | estado |
 |----|-------|------------|------|--------|
 | 01 | Registro de modelos 2026 y vocabularios cerrados | [] | `TODO_01_registro-modelos-2026.md` | implementado (`37a1703`) |
-| 02 | Prompt taxativo 2026 y ruta de raw completion | [01] | `TODO_02_prompt-y-raw-completion.md` | implementado (`8c9287a`); la parte de raw completion se **eliminó después** (2026-08-05, instrucción del usuario — ver D2.3 y RF2 eliminado) |
+| 02 | Prompt taxativo 2026 y ruta de raw completion | [01] | `TODO_02_prompt-y-raw-completion.md` | implementado (`8c9287a`) |
 | 03 | Harness de barrido reanudable por modelo | [01, 02] | `TODO_03_harness-barrido-reanudable.md` | implementado (`996873a`) |
 | 04 | Imágenes Docker por modelo y matriz de versiones | [01, 03] | `TODO_04_docker-por-modelo.md` | implementado (`99c13aa`, `dfb8315`, `d6c7581`) |
 | 05 | Ejecución del barrido completo (12 modelos del roster activo) | [04, 16, 17] | `TODO_05_ejecucion-barrido.md` | implementado (`dba3512`…`9ae5a9e`, 12 commits `data(2026): barrido de <modelo>` uno por modelo; `a1c2252`/`c4d9593` logs; `eba28f7` fallos_barrido.json) |
@@ -503,18 +498,17 @@ Corolario: **todo el código nuevo va en módulos nuevos**, no en ediciones de l
 
 ### F2 — Prompting: `src/prompt_2026.py`
 
-**Contrato revertido el 2026-08-05** (instrucción del usuario, ver D2.3 y RF2 eliminado más arriba): el
-contrato original de este bloque tenía `ModoPrompting`, `RAW_TEMPLATE` y `detectar_modo` para
-despachar entre `chat_template` y `raw_completion`. Se eliminó esa rama entera porque los 12 modelos
-del roster activo resuelven a `chat_template` y nadie ejercitó nunca la ruta raw; su única cobertura
-era un test sintético con un tokenizer falso. Contrato vigente:
-
 ```python
+from typing import Literal
+
+ModoPrompting = Literal["chat_template", "raw_completion"]
+
 CLAUSULA_TAXATIVA: str
 SYSTEM_PROMPT_2026: str
+RAW_TEMPLATE: str
 
-def construir_entrada_con_prompt(tokenizer, comando: str, system_prompt: str) -> dict: ...
-def construir_entrada(tokenizer, comando: str) -> dict: ...
+def detectar_modo(tokenizer) -> ModoPrompting: ...
+def construir_entrada(tokenizer, comando: str) -> tuple[dict, ModoPrompting]: ...
 ```
 
 `SYSTEM_PROMPT_2026` es, literalmente, `SYSTEM_PROMPT_PAPER + "\n\n" + CLAUSULA_TAXATIVA + "\n\n" + _SEGUNDO_EJEMPLO`, donde `SYSTEM_PROMPT_PAPER` se **importa** de `src/prompt.py` (no se copia). El texto congelado de `CLAUSULA_TAXATIVA` es exactamente:
@@ -530,11 +524,18 @@ Ejemplo 2: Comando: "Bajale un poco a la luz del living."
 {"intent": "ajustar", "dispositivo": "luz", "ubicacion": "living", "valor": null, "unidad": null}
 ```
 
-`construir_entrada_con_prompt` aplica la plantilla de chat directamente y devuelve siempre un dict con al menos la clave `input_ids` (tensor `pt`), apto para `modelo.generate(**entrada)`:
-`tokenizer.apply_chat_template([{"role":"system","content":system_prompt},{"role":"user","content":construir_prompt_usuario(comando)}], add_generation_prompt=True, return_tensors="pt", return_dict=True)`.
-Si `getattr(tokenizer, "chat_template", None)` es `None` o cadena vacía, levanta `ValueError` explícito
-en vez de caer a un fallback silencioso. `construir_entrada` es lo mismo con `system_prompt =
-SYSTEM_PROMPT_2026` fijo.
+`RAW_TEMPLATE` congelado (para modelos base, sin `chat_template`):
+
+```
+{system}
+
+Comando: "{comando}"
+JSON:
+```
+
+`detectar_modo` devuelve `"raw_completion"` si y solo si `getattr(tokenizer, "chat_template", None)` es `None` o cadena vacía. `construir_entrada` devuelve `(entrada, modo)` donde `entrada` es siempre un dict con al menos la clave `input_ids` (tensor `pt`), apto para `modelo.generate(**entrada)`:
+- modo `chat_template` → `tokenizer.apply_chat_template([{"role":"system","content":SYSTEM_PROMPT_2026},{"role":"user","content":construir_prompt_usuario(comando)}], add_generation_prompt=True, return_tensors="pt", return_dict=True)`
+- modo `raw_completion` → `tokenizer(RAW_TEMPLATE.format(system=SYSTEM_PROMPT_2026, comando=comando), return_tensors="pt")`
 
 ### F3 — Registro de modelos: `src/models_2026.py`
 

@@ -90,20 +90,19 @@ def test_construir_entrada_2026_sigue_usando_el_prompt_2026_por_defecto():
 
 def test_construir_entrada_con_prompt_permite_sustituir_el_sistema():
     tok = TokenizerConChat()
-    entrada = construir_entrada_con_prompt(tok, "Prendé la luz.", SYSTEM_PROMPT_PAPER)
+    entrada, modo = construir_entrada_con_prompt(tok, "Prendé la luz.", SYSTEM_PROMPT_PAPER)
+    assert modo == "chat_template"
     assert tok.mensajes_recibidos[0]["role"] == "system"
     assert tok.mensajes_recibidos[0]["content"] == SYSTEM_PROMPT_PAPER
     assert tok.mensajes_recibidos[0]["content"] != SYSTEM_PROMPT_2026
     assert tok.mensajes_recibidos[1]["content"] == 'Comando: "Prendé la luz."'
 
 
-def test_construir_entrada_con_prompt_falla_explicitamente_sin_chat_template():
-    """Revierte el fallback a raw completion (2026-08-05): mismo comportamiento
-    reforzado que en `tests/test_prompt_2026.py`, ahora también a través del
-    factorizado que usa la corrida de control."""
+def test_construir_entrada_con_prompt_modo_raw_usa_el_prompt_dado():
     tok = TokenizerBase()
-    with pytest.raises(ValueError, match="chat_template"):
-        construir_entrada_con_prompt(tok, "Apagá la tele.", SYSTEM_PROMPT_PAPER)
+    entrada, modo = construir_entrada_con_prompt(tok, "Apagá la tele.", SYSTEM_PROMPT_PAPER)
+    assert modo == "raw_completion"
+    assert tok.texto_recibido.startswith(SYSTEM_PROMPT_PAPER)
 
 
 def test_construir_entrada_con_prompt_rechaza_comando_vacio():
@@ -133,7 +132,7 @@ def test_evaluar_modelo_acepta_un_constructor_de_entrada_alternativo(monkeypatch
 
     def constructor_de_prueba(_tokenizer, comando):
         llamadas.append(comando)
-        return {"input_ids": [[1]]}
+        return {"input_ids": [[1]]}, "chat_template"
 
     monkeypatch.setattr(run_sweep_2026, "_abrir_contexto", fake_abrir_contexto)
     monkeypatch.setattr(run_sweep_2026, "_generar_respuesta", fake_generar_respuesta)
@@ -184,7 +183,8 @@ def test_verificar_es_baseline_original_acepta_los_cuatro_modelos():
 
 def test_construir_entrada_original_usa_el_prompt_del_paper_no_el_2026():
     tok = TokenizerConChat()
-    entrada = rcpo.construir_entrada_original(tok, "Prendé la luz.")
+    entrada, modo = rcpo.construir_entrada_original(tok, "Prendé la luz.")
+    assert modo == "chat_template"
     assert tok.mensajes_recibidos[0]["content"] == SYSTEM_PROMPT_PAPER
     assert tok.mensajes_recibidos[0]["content"] != SYSTEM_PROMPT_2026
 

@@ -53,7 +53,7 @@ from pathlib import Path
 
 from models_2026 import ModeloEvaluado2026, por_nombre, roster_baseline_original, slug
 from prompt import SYSTEM_PROMPT_PAPER
-from prompt_2026 import construir_entrada_con_prompt
+from prompt_2026 import ModoPrompting, construir_entrada_con_prompt
 from run_sweep_2026 import cargar_dataset, debe_saltear, escribir_detalle, evaluar_modelo
 
 RAIZ = Path(__file__).resolve().parent.parent
@@ -92,10 +92,11 @@ def verificar_es_baseline_original(modelo: ModeloEvaluado2026) -> None:
         )
 
 
-def construir_entrada_original(tokenizer, comando: str) -> dict:
+def construir_entrada_original(tokenizer, comando: str) -> tuple[dict, ModoPrompting]:
     """La ÚNICA diferencia respecto del barrido 2026: `SYSTEM_PROMPT_PAPER` en
     vez de `SYSTEM_PROMPT_2026`. Reusa `construir_entrada_con_prompt` (misma
-    lógica que el barrido principal, chat_template únicamente)."""
+    lógica de despacho por capacidad que el barrido principal), así que el
+    modo (`chat_template` / `raw_completion`) se decide exactamente igual."""
     return construir_entrada_con_prompt(tokenizer, comando, SYSTEM_PROMPT_PAPER)
 
 
