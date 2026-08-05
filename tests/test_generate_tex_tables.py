@@ -129,9 +129,10 @@ def test_tabla3_una_fila_por_categoria():
 
 
 def test_tabla4_tiene_las_siete_etiquetas_con_nombre_legible():
+    """Con las siete etiquetas instanciadas, las siete llevan columna."""
     df = pd.DataFrame([
         {"modelo": roster_activo()[0].nombre, "total_incorrectas": 10,
-         **{e: i for i, e in enumerate(ETIQUETAS_ERROR)}},
+         **{e: i + 1 for i, e in enumerate(ETIQUETAS_ERROR)}},
     ])
     tex = tabla4_taxonomia(df)
     assert _es_bloque_table(tex)
@@ -140,6 +141,28 @@ def test_tabla4_tiene_las_siete_etiquetas_con_nombre_legible():
         assert ETIQUETAS_ERROR_DISPLAY[e] in tex
     assert "Alucinación de valor/unidad" in tex
     assert "Valor numérico incorrecto" in tex
+
+
+def test_tabla4_omite_la_etiqueta_que_quedo_en_cero_pero_no_la_de_una_ocurrencia():
+    """El paper sólo muestra lo que llega a los resultados: una etiqueta que el
+    juez pudo usar y nunca usó no gasta una columna entera de ceros en una
+    tabla apretada (el hecho se reporta en prosa, §4.3). Una etiqueta con una
+    sola ocurrencia sí lleva columna: es una medición, no un vacío."""
+    nunca, una_vez = ETIQUETAS_ERROR[0], ETIQUETAS_ERROR[1]
+    conteos = {e: 2 for e in ETIQUETAS_ERROR}
+    conteos[nunca] = 0
+    conteos[una_vez] = 1
+    df = pd.DataFrame([
+        {"modelo": m.nombre, "total_incorrectas": 10, **conteos}
+        for m in roster_activo()[:2]
+    ])
+    df.loc[:, nunca] = 0
+    tex = tabla4_taxonomia(df)
+    assert ETIQUETAS_ERROR_DISPLAY[nunca] not in tex
+    assert ETIQUETAS_ERROR_DISPLAY[una_vez] in tex
+    encabezado = next(l for l in tex.splitlines() if "Modelo" in l)
+    # Modelo + Incorrectas + 6 etiquetas con al menos una ocurrencia
+    assert encabezado.count("&") == 1 + len(ETIQUETAS_ERROR) - 1
 
 
 def test_tabla5_marca_cuales_pines_son_necesarios():
