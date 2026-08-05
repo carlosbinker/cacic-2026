@@ -217,7 +217,7 @@ PY
 **On failure indicates (adicional):** si pedir un excluido no falla, el barrido podría intentar descargar un modelo sin acceso —o correr `Qwen3.5-2B`, cuya compatibilidad no está verificada— y romper a mitad de camino. Si la receta con `--env-file` desapareció, se perdió la plomería de credenciales que el Delta 01 introdujo — necesaria si algún modelo se reactiva en el futuro. Ojo con el caso mixto: `Qwen3.5-2B` está excluido y **no** es gated, así que tiene que fallar por `motivo_exclusion` **sin** que aparezca `--env-file` en ninguna parte.
 
 ### Check C7 — Trazabilidad de versiones (dos grupos, roster activo)
-**Covers AC:** AC6 tras el Delta 02 (*los 12 modelos del roster activo aparecen en la matriz de `docker/README.md` **y** en `tabla5_versiones.tex` con su pin y su versión resuelta, **y** los dos grupos de versión quedan declarados en `03_metodologia.tex` y trazables desde `06_amenazas.tex`*), RF5.
+**Covers AC:** AC6 tras el Delta 02 (*los 12 modelos del roster activo aparecen en la matriz de `docker/README.md` **y** en `tabla1_modelos.tex` con su versión de `transformers` resuelta, **y** los dos grupos de versión quedan declarados en `03_metodologia.tex` y trazables desde `06_amenazas.tex`*), RF5.
 **Cost:** `cheap`
 **Run:**
 ```bash
@@ -229,7 +229,7 @@ from models_2026 import roster_activo
 
 destinos = {
     "docker/README.md": Path("docker/README.md"),
-    "tabla5_versiones.tex": Path("paper/02_reescrito/tablas/tabla5_versiones.tex"),
+    "tabla1_modelos.tex": Path("paper/02_reescrito/tablas/tabla1_modelos.tex"),
     "03_metodologia.tex": Path("paper/02_reescrito/secciones/03_metodologia.tex"),
     "06_amenazas.tex": Path("paper/02_reescrito/secciones/06_amenazas.tex"),
 }
@@ -238,7 +238,7 @@ textos = {k: v.read_text(encoding="utf-8") for k, v in destinos.items()}
 fallas = [
     f"{m.nombre} no aparece en {k}"
     for m in roster_activo()
-    for k in ("docker/README.md", "tabla5_versiones.tex")
+    for k in ("docker/README.md", "tabla1_modelos.tex")
     if m.nombre not in textos[k]
 ]
 fallas += [
@@ -252,7 +252,7 @@ def declara_versiones(texto: str) -> bool:
 for k in ("03_metodologia.tex", "06_amenazas.tex"):
     bajo = textos[k].lower()
     # 06_amenazas puede remitir a la tabla en vez de repetir los numeros (nota Delta 04)
-    remite = k == "06_amenazas.tex" and "tab:versiones" in bajo and "transformers" in bajo
+    remite = k == "06_amenazas.tex" and "tab:modelos" in bajo and "transformers" in bajo
     if not (declara_versiones(bajo) or remite):
         fallas.append(f"{k}: no declara los dos grupos de version")
 assert not fallas, fallas
@@ -261,12 +261,14 @@ PY
 ```
 **Expected:** imprime `trazabilidad OK para los 12 modelos del roster activo, 2 grupos`. Exit 0.
 **On failure indicates:** un modelo del roster activo o su motivo quedó sin documentar en la matriz, o el paper no declara los dos grupos de versión. Es un confusor directo de la tabla de latencia y una de las tres amenazas de RF16 — si no está escrita, el paper afirma una comparación que no puede sostener.
-**Nota (Delta 2026-08-04).** El bloque de arriba es agnóstico del reparto por grupo porque itera `roster_activo()` y usa el `motivo_pin` de cada fila: sirve igual con el reparto **9 / 3** vigente. Dos consecuencias que sí cambiaron y hay que tener presentes al leer un fallo: (i) `Qwen2.5-1.5B-Instruct` es un modelo **nuevo** del roster activo, así que si falta en `docker/README.md` o en `tabla5_versiones.tex` este check lo va a marcar y el arreglo es documentarlo, no relajar el check; (ii) `Qwen3.5-2B` **ya no** está en `roster_activo()`, así que este check dejó de exigirlo — su presencia en el árbol la cubren C14 (tabla de exclusiones) y el subtask 17.
+**Nota (Delta 2026-08-04).** El bloque de arriba es agnóstico del reparto por grupo porque itera `roster_activo()` y usa el `motivo_pin` de cada fila: sirve igual con el reparto **9 / 3** vigente. Dos consecuencias que sí cambiaron y hay que tener presentes al leer un fallo: (i) `Qwen2.5-1.5B-Instruct` es un modelo **nuevo** del roster activo, así que si falta en `docker/README.md` o en `tabla1_modelos.tex` este check lo va a marcar y el arreglo es documentarlo, no relajar el check; (ii) `Qwen3.5-2B` **ya no** está en `roster_activo()`, así que este check dejó de exigirlo — su presencia en el árbol la cubren C14 (tabla de exclusiones) y el subtask 17.
 
 **Nota (Delta 04, 2026-08-05).** Dos relajaciones deliberadas del contrato, ambas consecuencia de revisiones de contenido del paper y no de un vacío de trazabilidad:
 
-1. **La columna `¿Necesario?` de `tabla5_versiones.tex` ya no existe.** Se eliminó porque su valor `Heredado` no respondía a la pregunta del encabezado y era redundante con `Motivo` (motivo no vacío = ese modelo forzó el pin; `—` = sin requisito propio, quedó en el grupo por defecto). El bloque ejecutable nunca la verificaba, así que sólo se corrigió la redacción del *Covers AC*.
-2. **`06_amenazas.tex` puede remitir a `Tabla \ref{tab:versiones}` en lugar de repetir `4.57` / `5.14`.** La fuente de verdad literal sigue exigida en `03_metodologia.tex` (línea 89: *«4.57.6 para nueve modelos y 5.14.1 para los otros tres»*) y en la tabla; la sección de amenazas sólo necesita declarar que el reparto 9/3 existe y es un confusor, cosa que hace citando la tabla correcta. Repetir los números allí era duplicación que el pase de registro quitó a propósito, y el paper está en su techo de páginas. Un cross-reference a la tabla correcta **es** trazabilidad; lo que el check debe seguir impidiendo es que la sección hable de «dos grupos» sin ningún anclaje verificable, y eso lo cubre la condición `tab:versiones` + `transformers`.
+1. **La columna `¿Necesario?` de la extinta `tabla5_versiones.tex` ya no existe.** Se eliminó porque su valor `Heredado` no respondía a la pregunta del encabezado y era redundante con `Motivo` (motivo no vacío = ese modelo forzó el pin; `—` = sin requisito propio, quedó en el grupo por defecto). El bloque ejecutable nunca la verificaba, así que sólo se corrigió la redacción del *Covers AC*.
+2. **`06_amenazas.tex` puede remitir a `Tabla \ref{tab:modelos}` en lugar de repetir `4.57` / `5.14`.** La fuente de verdad literal sigue exigida en `03_metodologia.tex` (línea 89: *«4.57.6 para nueve modelos y 5.14.1 para los otros tres»*) y en la tabla; la sección de amenazas sólo necesita declarar que el reparto 9/3 existe y es un confusor, cosa que hace citando la tabla correcta. Repetir los números allí era duplicación que el pase de registro quitó a propósito, y el paper está en su techo de páginas. Un cross-reference a la tabla correcta **es** trazabilidad; lo que el check debe seguir impidiendo es que la sección hable de «dos grupos» sin ningún anclaje verificable, y eso lo cubre la condición `tab:modelos` + `transformers`.
+
+**Nota (Delta 2026-08-05, re-base de diseño).** La Tabla 5/`tab:versiones` (matriz de pines de `transformers`) se eliminó como `table` flotante propia: la versión resuelta de cada modelo pasó a ser la cuarta columna de la Tabla 1 (`tabla1_modelos.tex`, generada por `tabla1_modelos()` en `src/generate_tex_tables.py`) y los 4 motivos reales de pin pasaron al caption de esa misma tabla. Este check se re-basó a `tabla1_modelos.tex` conservando la misma exigencia sustantiva: los 12 nombres del roster, los dos grupos de versión (4.57/5.14) y `motivo_pin[:30]` en `docker/README.md` (sin cambios, ese archivo no se tocó). No hay debilitamiento: lo único que cambió es el archivo destino de la verificación, porque el dato migró de contenedor (de una tabla dedicada a una columna de una tabla existente), no de contenido.
 
 ### Check C8 — Regeneración idempotente de los fragmentos `.tex`
 **Covers AC:** AC9 (*cada valor de las Tablas 2/3/4 proviene de los fragmentos generados por `src/generate_tex_tables.py`; regenerar los fragmentos no produce diff*).

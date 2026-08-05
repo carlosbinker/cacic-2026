@@ -11,11 +11,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 from generate_tex_tables import (  # noqa: E402
     ARCHIVOS_TABLAS,
     _escapar,
+    _MOTIVO_EXPLICACION_PAPER,
+    _VERSION_RESUELTA,
     tabla1_modelos,
     tabla2_resultados,
     tabla3_por_categoria,
     tabla4_taxonomia,
-    tabla5_versiones,
 )
 from models_2026 import (  # noqa: E402
     BASELINE_TRANSFORMERS,
@@ -46,11 +47,13 @@ def test_escapar_no_rompe_texto_limpio():
     assert _escapar("granite-4.0-h-1b") == "granite-4.0-h-1b"
 
 
-def test_los_cinco_archivos_estan_declarados():
+def test_los_cuatro_archivos_estan_declarados():
+    # Bajó de 5 a 4 (Delta 2026-08-05): la Tabla 5/`tab:versiones` se fusionó
+    # como columna de la Tabla 1 (versión de `transformers` + motivos de pin
+    # en el caption) -- ningún dato se perdió, sólo el contenedor `table`.
     assert sorted(ARCHIVOS_TABLAS) == [
         "tabla1_modelos.tex", "tabla2_resultados_globales.tex",
         "tabla3_por_categoria.tex", "tabla4_taxonomia.tex",
-        "tabla5_versiones.tex",
     ]
 
 
@@ -86,6 +89,22 @@ def test_tabla1_no_lista_los_modelos_excluidos():
     assert len(excluidos) == len(MODELOS_2026) - len(roster_activo())
     for m in excluidos:
         assert _escapar(m.nombre) not in tex
+
+
+def test_tabla1_incluye_version_de_transformers_y_motivos_de_pin():
+    """Re-base (Delta 2026-08-05) de lo que antes exigía
+    `test_tabla5_marca_cuales_pines_son_necesarios` sobre la extinta Tabla 5
+    (`tab:versiones`): la versión resuelta de `transformers` ahora es una
+    columna de la Tabla 1 y los motivos de pin son una cláusula del caption.
+    Mismo rigor sustantivo que el contrato anterior: los 12 nombres del
+    roster (ya cubierto arriba), los dos valores de versión resuelta y los 4
+    motivos reales de pin, cada uno junto a su modelo."""
+    tex = tabla1_modelos()
+    assert _escapar(_VERSION_RESUELTA[BASELINE_TRANSFORMERS]) in tex
+    assert _escapar(_VERSION_RESUELTA[TRANSFORMERS_5X]) in tex
+    for nombre, motivo in _MOTIVO_EXPLICACION_PAPER.items():
+        assert _escapar(nombre) in tex
+        assert _escapar(motivo) in tex
 
 
 def test_tabla2_trae_estricta_y_laxa():
@@ -171,33 +190,13 @@ def test_tabla4_omite_la_etiqueta_que_quedo_en_cero_pero_no_la_de_una_ocurrencia
     assert encabezado.count("&") == 1 + len(ETIQUETAS_ERROR) - 1
 
 
-def test_tabla5_marca_cuales_pines_son_necesarios():
-    tex = tabla5_versiones()
-    assert _es_bloque_table(tex)
-    assert r"\label{tab:versiones}" in tex
-    for m in roster_activo():
-        assert _escapar(m.nombre) in tex
-    assert _escapar(BASELINE_TRANSFORMERS) in tex
-    assert _escapar(TRANSFORMERS_5X) in tex
-    assert "necesario" in tex.lower()
-
-
-def test_tabla5_no_lista_los_modelos_excluidos():
-    tex = tabla5_versiones()
-    excluidos = [m for m in MODELOS_2026 if not m.activo]
-    assert len(excluidos) == len(MODELOS_2026) - len(roster_activo())
-    for m in excluidos:
-        assert _escapar(m.nombre) not in tex
-
-
 def test_ninguna_tabla_deja_guiones_bajos_sin_escapar():
     df_tax = pd.DataFrame([{"modelo": roster_activo()[0].nombre, "total_incorrectas": 1,
                             **{e: 0 for e in ETIQUETAS_ERROR}}])
     df_cat = pd.DataFrame([{"categoria": "encendido_apagado_simple", "n": 8,
                             roster_activo()[0].nombre: 50.0}])
     for tex in (tabla1_modelos(), tabla2_resultados(_resumen()),
-                tabla3_por_categoria(df_cat), tabla4_taxonomia(df_tax),
-                tabla5_versiones()):
+                tabla3_por_categoria(df_cat), tabla4_taxonomia(df_tax)):
         for i, ch in enumerate(tex):
             if ch == "_":
                 assert tex[i - 1] == "\\", f"guion bajo sin escapar cerca de: {tex[i-30:i+10]!r}"

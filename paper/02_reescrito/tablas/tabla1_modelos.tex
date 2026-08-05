@@ -1,25 +1,25 @@
 \begin{table}[htbp]
 \centering
-\caption{Conjunto de modelos evaluados. La línea horizontal separa la franja sub-1B (arriba) de la franja 1--2B (abajo)}
+\caption{Conjunto de modelos evaluados, con la versión de \texttt{transformers} resuelta para cada uno. La línea horizontal separa la franja sub-1B (arriba) de la franja 1--2B (abajo). Forzaron el pin: tokenizer no soportado en 4.57.6 (\texttt{LFM2.5-230M}); íd. (mismo tokenizer) (\texttt{LFM2.5-350M}); regresión de caché en la versión 5.14.1 (\texttt{granite-4.0-350m}); arquitectura no reconocida en 4.57.6 (\texttt{Qwen3.5-0.8B}).}
 \label{tab:modelos}
 {\footnotesize
-\begin{tabular}{lrl}
+\begin{tabular}{lrlr}
 \toprule
-Modelo & Parámetros & Familia \\
+Modelo & Parámetros & Familia & \texttt{transformers} \\
 \midrule
-LFM2.5-230M & 0.23B & LiquidAI \\
-granite-4.0-h-350m & 0.34B & IBM Granite \\
-LFM2.5-350M & 0.35B & LiquidAI \\
-granite-4.0-350m & 0.35B & IBM Granite \\
-SmolLM2-360M-Instruct & 0.36B & HuggingFaceTB \\
-Qwen3.5-0.8B & 0.80B & Qwen \\
+LFM2.5-230M & 0.23B & LiquidAI & 5.14.1 \\
+granite-4.0-h-350m & 0.34B & IBM Granite & 4.57.6 \\
+LFM2.5-350M & 0.35B & LiquidAI & 5.14.1 \\
+granite-4.0-350m & 0.35B & IBM Granite & 4.57.6 \\
+SmolLM2-360M-Instruct & 0.36B & HuggingFaceTB & 4.57.6 \\
+Qwen3.5-0.8B & 0.80B & Qwen & 5.14.1 \\
 \midrule
-OLMo-2-0425-1B-Instruct & 1.00B & AllenAI \\
-LFM2.5-1.2B-Instruct & 1.20B & LiquidAI \\
-granite-4.0-h-1b & 1.50B & IBM Granite \\
-Qwen2.5-1.5B-Instruct & 1.54B & Qwen \\
-granite-4.0-1b & 1.60B & IBM Granite \\
-SmolLM2-1.7B-Instruct & 1.71B & HuggingFaceTB \\
+OLMo-2-0425-1B-Instruct & 1.00B & AllenAI & 4.57.6 \\
+LFM2.5-1.2B-Instruct & 1.20B & LiquidAI & 4.57.6 \\
+granite-4.0-h-1b & 1.50B & IBM Granite & 4.57.6 \\
+Qwen2.5-1.5B-Instruct & 1.54B & Qwen & 4.57.6 \\
+granite-4.0-1b & 1.60B & IBM Granite & 4.57.6 \\
+SmolLM2-1.7B-Instruct & 1.71B & HuggingFaceTB & 4.57.6 \\
 \bottomrule
 \end{tabular}
 }

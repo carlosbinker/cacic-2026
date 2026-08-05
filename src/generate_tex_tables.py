@@ -54,8 +54,9 @@ _PREFIJO_A_FAMILIA = {
 }
 
 # Explicación breve, en el lenguaje del paper, del motivo de cada pin
-# NECESARIO -- item 5 de la revisión de PDF: la Tabla de versiones citaba
-# antes el texto crudo de la excepción (incluidas rutas de
+# NECESARIO -- item 5 de la revisión de PDF: la Tabla 1 (columna
+# `transformers` + nota del caption) citaba antes el texto crudo de la
+# excepción (incluidas rutas de
 # `.claude-scratch/logs/...`), que es ruido y, en un envío ciego, una
 # filtración de estructura de directorios local. El texto completo con la
 # excepción y la ruta del log sigue documentado en `docker/README.md` (no es
@@ -80,7 +81,6 @@ ARCHIVOS_TABLAS = [
     "tabla2_resultados_globales.tex",
     "tabla3_por_categoria.tex",
     "tabla4_taxonomia.tex",
-    "tabla5_versiones.tex",
 ]
 
 _REEMPLAZOS = [
@@ -111,8 +111,8 @@ def _tabla(caption: str, label: str, spec: str, encabezado: list[str],
     """Arma un bloque table+tabular con booktabs, en el estilo LNCS.
 
     `ancho_completo=True` envuelve el `tabular` en `\\resizebox{\\textwidth}{!}{...}`;
-    reservado como último recurso (ninguna de las 5 tablas del paper lo usa
-    hoy -- `resizebox` no tiene piso de tamaño de letra y fue la causa real de
+    reservado como último recurso (ninguna tabla del paper lo usa hoy --
+    `resizebox` no tiene piso de tamaño de letra y fue la causa real de
     que las tablas transpuestas se vieran comprimidas/ilegibles). Preferí
     `fuente_pequena=True` (envuelve en `{\\small ... }`, sin escalar) cuando
     la tabla entra a ancho de columna pero apretada con el cuerpo de texto
@@ -135,7 +135,7 @@ def _tabla(caption: str, label: str, spec: str, encabezado: list[str],
     if ancho_completo:
         tabular = [r"\resizebox{\textwidth}{!}{%", *tabular, "}"]
     elif fuente_pequena:
-        # \footnotesize y no \small: con las 5 tablas y el prompt íntegro en el
+        # \footnotesize y no \small: con las tablas del cuerpo y el prompt íntegro en el
         # cuerpo, un escalón de cuerpo de letra en las tablas es ~0,25 páginas
         # frente al límite de 10 del CFP, y ninguna tabla pierde una fila.
         tabular = [r"{\footnotesize", *tabular, "}"]
@@ -158,30 +158,59 @@ def _familia(hf_repo_id: str) -> str:
     return _PREFIJO_A_FAMILIA.get(prefijo, prefijo)
 
 
+def _motivos_pin_para_caption(modelos: list) -> str:
+    """Frase compacta con los motivos reales de pin, generada desde
+    `_MOTIVO_EXPLICACION_PAPER` (la misma fuente que antes alimentaba la
+    columna `Motivos` de la extinta tabla de versiones) en orden canónico de
+    roster -- no escrita a mano. Los 8 modelos sin motivo propio (heredan el
+    pin de grupo por defecto) no aportan cláusula."""
+    return "; ".join(
+        f"{_escapar(_MOTIVO_EXPLICACION_PAPER[m.nombre])} "
+        f"(\\texttt{{{_escapar(m.nombre)}}})"
+        for m in modelos if m.motivo_pin
+    )
+
+
 def tabla1_modelos() -> str:
-    """Tabla 1: roster activo de 12 modelos, con parámetros y familia, en el
-    orden canónico del paper (el mismo de la Fig. 1, agrupado por tier y
-    tamaño creciente).
+    """Tabla 1: roster activo de 12 modelos, con parámetros, familia y la
+    versión de \\texttt{transformers} resuelta para cada uno, en el orden
+    canónico del paper (el mismo de la Fig. 1, agrupado por tier y tamaño
+    creciente).
 
     Sin columna `Prompting`: era constante en las 12 filas y no distinguía a
     ningún modelo. Sin columna `Tier`: los dos tiers son bloques contiguos del
     orden canónico, así que un `\\midrule` entre el último sub-1B y el primero
-    de 1--2B dice lo mismo sin gastar una columna."""
+    de 1--2B dice lo mismo sin gastar una columna.
+
+    La columna `transformers` (encabezado corto: el nombre del paquete sin
+    calificar, ya que la tabla no tiene otra columna de versión con la que
+    confundirla) reemplaza a la extinta Tabla 5/`tab:versiones` -- ese float
+    desaparecía sin ahorrar espacio porque seguía siendo una `table` propia;
+    la versión resuelta es un dato por modelo, así que vive mejor como una
+    columna más de esta tabla que como una tabla aparte. Los 4 motivos reales
+    de pin (los otros 8 modelos heredan el pin de grupo sin motivo propio) van
+    en una cláusula del caption, generada por `_motivos_pin_para_caption`."""
     modelos = orden_canonico(roster_activo())
     filas = [
-        [_escapar(m.nombre), f"{m.params_b:.2f}B", _escapar(_familia(m.hf_repo_id))]
+        [_escapar(m.nombre), f"{m.params_b:.2f}B", _escapar(_familia(m.hf_repo_id)),
+         _VERSION_RESUELTA[m.transformers_pin]]
         for m in modelos
     ]
     tiers = [m.tier for m in modelos]
     cortes = frozenset(
         i for i in range(len(tiers) - 1) if tiers[i] != tiers[i + 1]
     )
+    caption = (
+        "Conjunto de modelos evaluados, con la versión de "
+        "\\texttt{transformers} resuelta para cada uno. La línea horizontal "
+        "separa la franja sub-1B (arriba) de la franja 1--2B (abajo). "
+        "Forzaron el pin: " + _motivos_pin_para_caption(modelos) + "."
+    )
     return _tabla(
-        caption="Conjunto de modelos evaluados. La línea horizontal separa la "
-                "franja sub-1B (arriba) de la franja 1--2B (abajo)",
+        caption=caption,
         label="tab:modelos",
-        spec="lrl",
-        encabezado=["Modelo", "Parámetros", "Familia"],
+        spec="lrlr",
+        encabezado=["Modelo", "Parámetros", "Familia", r"\texttt{transformers}"],
         filas=filas,
         fuente_pequena=True,
         cortes=cortes,
@@ -310,71 +339,6 @@ def tabla4_taxonomia(df: pd.DataFrame) -> str:
     )
 
 
-def tabla5_versiones() -> str:
-    """Tabla 5: matriz de versiones de transformers (RF5), colapsada a **2
-    FILAS por grupo** (item de la revisión de PDF sobre recorte a 10
-    páginas): las 12 filas originales (un modelo por fila) sólo llevaban 2
-    valores distintos de versión resuelta y 4 motivos reales -- las otras 8
-    filas repetían "—". Una fila por grupo (pin, versión resuelta, cantidad
-    de modelos, motivos concatenados de los modelos que sí forzaron el pin)
-    dice lo mismo sin la repetición. El pin se abrevia sin el prefijo
-    `transformers` (ya está en el caption) para que la columna entre a ancho
-    LNCS; la cadena completa (`BASELINE_TRANSFORMERS`/`TRANSFORMERS_5X`, con
-    el prefijo) sigue citada en la nota para C7. Los 12 nombres del roster no
-    desaparecen: se listan agrupados por grupo en la nota, que hace de
-    leyenda -- así C7 (`m.nombre in texto`) sigue satisfecho y el lector
-    conserva la trazabilidad completa. Sin `resizebox`: entra a ancho de
-    columna LNCS sin comprimir letra."""
-    modelos = orden_canonico(roster_activo())
-    grupo_de = {BASELINE_TRANSFORMERS: "A", TRANSFORMERS_5X: "B"}
-    por_grupo: dict[str, list] = {"A": [], "B": []}
-    for m in modelos:
-        por_grupo[grupo_de[m.transformers_pin]].append(m)
-
-    def motivos_de(grupo: str) -> str:
-        motivos = [
-            f"{_escapar(_MOTIVO_EXPLICACION_PAPER[m.nombre])} "
-            f"(\\texttt{{{_escapar(m.nombre)}}})"
-            for m in por_grupo[grupo] if m.motivo_pin
-        ]
-        return "; ".join(motivos) if motivos else "—"
-
-    def pin_corto(pin: str) -> str:
-        return _escapar(pin.removeprefix("transformers"))
-
-    filas = [
-        ["A", f"\\texttt{{{pin_corto(BASELINE_TRANSFORMERS)}}}",
-         _VERSION_RESUELTA[BASELINE_TRANSFORMERS], str(len(por_grupo["A"])),
-         motivos_de("A")],
-        ["B", f"\\texttt{{{pin_corto(TRANSFORMERS_5X)}}}",
-         _VERSION_RESUELTA[TRANSFORMERS_5X], str(len(por_grupo["B"])),
-         motivos_de("B")],
-    ]
-    roster_por_grupo = {
-        grupo: ", ".join(f"\\texttt{{{_escapar(m.nombre)}}}" for m in miembros)
-        for grupo, miembros in por_grupo.items()
-    }
-    nota = (
-        f"Grupo A (\\texttt{{{_escapar(BASELINE_TRANSFORMERS)}}}, resuelve "
-        f"{_VERSION_RESUELTA[BASELINE_TRANSFORMERS]}) y grupo B "
-        f"(\\texttt{{{_escapar(TRANSFORMERS_5X)}}}, resuelve "
-        f"{_VERSION_RESUELTA[TRANSFORMERS_5X]}) son necesarios y mutuamente "
-        "excluyentes sobre el conjunto evaluado: no existe una única versión mayor que "
-        "sirva para las 12 filas activas. "
-        f"Grupo A ({len(por_grupo['A'])} modelos): {roster_por_grupo['A']}. "
-        f"Grupo B ({len(por_grupo['B'])} modelos): {roster_por_grupo['B']}."
-    )
-    return _tabla(
-        caption="Pines de \\texttt{transformers} por modelo",
-        label="tab:versiones",
-        spec=r"lllr>{\raggedright\arraybackslash}p{4.8cm}",
-        encabezado=["Grupo", "Pin", "Versión resuelta", "Modelos", "Motivos"],
-        filas=filas,
-        nota=nota,
-        fuente_pequena=True,
-    )
-
-
 # Columnas de \ttfamily\footnotesize que entran a ancho LNCS sin overfull. El
 # bloque pasó de \small a \footnotesize por presupuesto de páginas (límite de
 # 10 del CFP): el prompt se sigue emitiendo íntegro desde la constante real,
@@ -452,14 +416,13 @@ def main() -> None:
         "tabla2_resultados_globales.tex": tabla2_resultados(_cargar_resumen_2026()),
         "tabla3_por_categoria.tex": tabla3_por_categoria(_cargar_por_categoria()),
         "tabla4_taxonomia.tex": tabla4_taxonomia(_cargar_taxonomia()),
-        "tabla5_versiones.tex": tabla5_versiones(),
     }
     for nombre in ARCHIVOS_TABLAS:
         ruta = args.salida_dir / nombre
         ruta.write_text(fragmentos[nombre], encoding="utf-8")
         print(ruta)
 
-    # Fuera de ARCHIVOS_TABLAS (item 6): no es una de las 5 tablas numeradas,
+    # Fuera de ARCHIVOS_TABLAS (item 6): no es una de las tablas numeradas,
     # es el fragmento del prompt de §3.3, mismo directorio y convención de
     # \input.
     ruta_prompt = args.salida_dir / ARCHIVO_PROMPT_SISTEMA
