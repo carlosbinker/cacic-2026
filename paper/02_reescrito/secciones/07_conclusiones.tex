@@ -3,12 +3,9 @@
 Este trabajo evaluó automáticamente doce SLMs abiertos de menos de 2 mil
 millones de parámetros interpretando comandos de domótica en español
 rioplatense, con un procedimiento de dos etapas y decodificación determinista
-que reemplaza toda anotación manual: es reproducible por construcción y
-escala a conjuntos mucho mayores sin que el costo de anotación crezca. Bajo
-el mismo prompt, \texttt{granite-4.0-1b} alcanza 90,6\% de exactitud
-estricta, 25,0 puntos porcentuales por encima de
-\texttt{Qwen2.5-1.5B-Instruct} (65,6\%), incorporado deliberadamente como
-representante de la generación anterior y medido bajo el mismo protocolo.
+que reemplaza toda anotación manual y escala sin que el costo de anotación
+crezca. \texttt{granite-4.0-1b} superó en 25,0 puntos porcentuales a la
+generación anterior de SLMs bajo el mismo protocolo (Sección 4.1).
 
 Como trabajo futuro se plantea incorporar un juez externo de mayor escala o
 validación humana sobre una muestra; ampliar y balancear el dataset,
