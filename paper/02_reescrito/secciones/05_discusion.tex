@@ -1,92 +1,56 @@
 \section{Discusión}
 
-\textbf{Qué significa la brecha entre exactitud estricta y laxa.} La Sección
-4 mostró que, para varios modelos, la exactitud laxa duplica o más que
-duplica a la exactitud estricta. Esa brecha es la medida directa de cuánto
-penaliza la coincidencia textual exacta a respuestas que un juez semántico
-considera correctas o equivalentes. Aquí la brecha se cuantifica por modelo
-y se descompone en dos causas distintas
-gracias a la taxonomía de siete etiquetas: respuestas sin ningún error
-semántico y respuestas que sólo cambian una palabra del vocabulario cerrado
-por un sinónimo válido. La Sección 4.4 mostró además que esa brecha no es
-uniformemente confiable: donde la validez de formato es débil
-(\texttt{SmolLM2-360M-Instruct}), buena parte de lo que la métrica laxa
-acredita como equivalencia semántica en realidad corresponde a JSON inválido,
-y ese caso se retoma como amenaza a la validez en la Sección 6.
+\textbf{La brecha entre exactitud estricta y laxa} mide cuánto penaliza la
+coincidencia textual exacta a respuestas que un juez semántico considera
+equivalentes; la taxonomía la descompone en ausencia de error semántico y
+sustitución de una palabra del vocabulario cerrado por un sinónimo válido. No
+es uniformemente confiable: donde el formato es débil, buena parte de lo que
+acredita corresponde a JSON inválido.
 
-\textbf{Endurecer el prompt no elimina el problema.} El protocolo de este
-estudio declara explícitamente, en el prompt de sistema, que un sinónimo de un
-valor categórico cerrado es una violación de formato y la respuesta se
-considera incorrecta (Sección \ref{sec:prompting}). Aun así, la etiqueta
-\texttt{uso\_de\_sinonimos} aparece en prácticamente todos los modelos del
-roster: la instrucción taxativa reduce el problema, pero no lo elimina. Eso
-dice algo relevante sobre la capacidad de estos modelos de respetar
-vocabularios cerrados bajo instrucción explícita: seguir al pie de la letra
-una restricción de formato —copiar textualmente un token de una lista cerrada
-en vez de parafrasearlo— exige un tipo de obediencia a la instrucción distinto
-del que exige acertar el contenido, y varios modelos de este roster, incluidos
-algunos con buena exactitud de campo, siguen prefiriendo la forma
-lingüísticamente más natural (``tele'') sobre la forma literal exigida
-(``tv''). El caso más extremo es \texttt{SmolLM2-360M-Instruct}: la enorme
-mayoría de sus respuestas incorrectas queda explicada por esta única causa
-(Tabla \ref{tab:taxonomia}), lo que sugiere un modelo que entiende el comando
-pero no internaliza restricciones de vocabulario cerrado declaradas en el
-prompt, más que un modelo que falla en la interpretación semántica en sí.
+\textbf{Endurecer el prompt no elimina el problema.} El prompt declara
+explícitamente que un sinónimo de un valor categórico cerrado es una
+violación de formato (Sección \ref{sec:prompting}) y, aun así,
+\texttt{uso\_de\_sinonimos} aparece en prácticamente todos los modelos.
+Copiar textualmente un token de una lista cerrada exige un tipo de obediencia
+distinto del que exige acertar el contenido, y varios modelos con buena
+exactitud de campo prefieren la forma lingüísticamente natural (``tele'')
+sobre la literal exigida (``tv''). El caso extremo es
+\texttt{SmolLM2-360M-Instruct}, cuyas respuestas incorrectas se explican casi
+por completo por esta única causa (Tabla \ref{tab:taxonomia}): entiende el
+comando pero no internaliza restricciones de vocabulario cerrado.
 
-\textbf{Tamaño, desempeño y latencia.}
-La Sección 4.1 mostró que la ventaja del tier 1--2B sobre el tier sub-1B se
-sostiene en promedio pero no punto por punto: \texttt{Qwen3.5-0.8B}, con menos
-de mil millones de parámetros, iguala o supera a cuatro de los seis modelos
-del tier superior en exactitud estricta. El desempeño no depende sólo del
-conteo de parámetros sino también, evidentemente, de la arquitectura y del
-entrenamiento de cada familia — el resultado generacional de este trabajo es
-justamente que arquitecturas de 2026 en el rango de menor tamaño (sub-2B)
-cambian lo que antes se consideraba factible para esta tarea, un desplazamiento
-que el titular de la Sección 4.1 (\texttt{granite-4.0-1b} 25,0 puntos por
-encima del mejor modelo de la generación anterior, bajo el mismo prompt)
-cuantifica directamente.
+\textbf{Tamaño, arquitectura y generación.} \texttt{Qwen3.5-0.8B} supera a
+cuatro de los seis modelos del tier superior con menos de mil millones de
+parámetros: el desempeño no depende sólo del conteo de parámetros sino de la
+arquitectura y el entrenamiento de cada familia. Los +25,0 puntos de
+\texttt{granite-4.0-1b} sobre el mejor modelo de la generación anterior, bajo
+el mismo prompt, cuantifican ese desplazamiento de lo factible en el rango
+sub-2B.
 
 \textbf{Penalización de latencia de la atención híbrida.}
 \label{sec:discusion-latencia-hibrida}
-Un hallazgo que merece discusión propia, no una simple lectura de tabla, es el
-costo de latencia de las variantes híbridas de \texttt{granite-4.0}. En el
-tier sub-1B, \texttt{granite-4.0-h-350m} tarda en promedio \textbf{56,45}
-segundos por comando frente a los \textbf{13,77} de la variante densa
-\texttt{granite-4.0-350m} de tamaño equivalente — un factor de
-\textbf{$\times$4,10}. En el tier 1--2B, \texttt{granite-4.0-h-1b} tarda
-\textbf{123,15} segundos frente a los \textbf{42,78} de
-\texttt{granite-4.0-1b} — un factor de \textbf{$\times$2,88}. Que la
+\texttt{granite-4.0-h-350m} tarda \textbf{56,45} segundos por comando frente
+a los \textbf{13,77} de la variante densa \texttt{granite-4.0-350m}
+(\textbf{$\times$4,10}), y \texttt{granite-4.0-h-1b} \textbf{123,15} frente a
+los \textbf{42,78} de \texttt{granite-4.0-1b} (\textbf{$\times$2,88}). Que la
 penalización se reproduzca en \textbf{ambos} pares de tamaño, con la misma
-familia y el mismo protocolo, indica que es un efecto arquitectónico y no un
-artefacto de una corrida puntual. La explicación más probable es la
-siguiente: las variantes híbridas o de atención lineal se promocionan por su
-eficiencia asintótica —complejidad sub-cuadrática en la longitud de
-secuencia—, un beneficio que se materializa en secuencias largas. Los 32
-comandos de este dataset son prompts \textbf{cortos}, y la ejecución es sobre
-\textbf{CPU}: en ese régimen el beneficio asintótico de la atención híbrida no
-llega a manifestarse, mientras que la sobrecarga \textbf{constante} de
-gestionar dos tipos de caché a la vez (de atención estándar y de estado
-lineal/recurrente) sí se paga en cada comando, y domina el tiempo total. La
-conclusión práctica para la viabilidad de SLMs en hardware modesto es directa:
-\textbf{a igual cantidad de parámetros, la variante densa es preferible en CPU
-para prompts cortos.}
+familia y el mismo protocolo, indica un efecto arquitectónico y no un
+artefacto de una corrida puntual. Las variantes híbridas o de atención lineal
+se promocionan por su complejidad sub-cuadrática en la longitud de secuencia,
+un beneficio que se materializa en secuencias largas; aquí los prompts son
+\textbf{cortos} y la ejecución es sobre \textbf{CPU}, así que ese beneficio
+asintótico no llega a manifestarse mientras que la sobrecarga
+\textbf{constante} de gestionar dos tipos de caché a la vez —atención
+estándar y estado lineal/recurrente— se paga en cada comando y domina el
+tiempo total. \textbf{A igual cantidad de parámetros, la variante densa es
+preferible en CPU para prompts cortos.}
 
-\textbf{Viabilidad práctica para domótica local en CPU con dos procesadores
-lógicos.} El modelo con mejor exactitud estricta, \texttt{granite-4.0-1b},
-procesa cada comando en \textbf{42,78} segundos en promedio sobre los 2
-procesadores lógicos y 8\,GB de memoria de este estudio (Sección
-\ref{sec:entorno-repro}); como se detalló allí, ese valor absoluto no debe
-leerse como la mejor latencia alcanzable en CPU para este modelo, sino como
-su desempeño bajo este tope de recursos específico. Aun así, ese tiempo es
-incompatible con una interacción de voz conversacional en tiempo real, pero
-puede ser aceptable para un escenario de automatización diferida (programar
-una acción, no conversar con el asistente). Entre los modelos sub-1B,
-\texttt{Qwen3.5-0.8B} combina una exactitud estricta alta (75,0\%) con una
-latencia baja (18,17 segundos) para su tier, lo que lo vuelve, de los doce
-evaluados, el candidato más equilibrado si el objetivo es minimizar tanto el
-hardware como el tiempo de respuesta sin resignar demasiada exactitud.
-Ningún modelo de este estudio alcanza latencias de segundo único bajo este
-tope de recursos, lo que confirma que, sobre CPU con dos procesadores
-lógicos, la interpretación de comandos de domótica con SLMs sigue siendo un
-problema de compromiso entre exactitud y tiempo de respuesta, no un problema
-resuelto.
+\textbf{Viabilidad práctica.} \texttt{granite-4.0-1b} procesa cada comando en
+\textbf{42,78} segundos bajo el tope de recursos de este estudio:
+incompatible con una interacción de voz conversacional en tiempo real,
+aceptable para automatización diferida. Entre los sub-1B,
+\texttt{Qwen3.5-0.8B} combina 75,0\% de exactitud estricta con 18,17
+segundos, el compromiso más equilibrado del roster. Ningún modelo alcanza
+latencias de segundo único bajo este tope, así que la interpretación de
+comandos de domótica con SLMs en CPU sigue siendo un problema de compromiso
+entre exactitud y tiempo de respuesta, no un problema resuelto.

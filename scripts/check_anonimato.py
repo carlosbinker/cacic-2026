@@ -26,6 +26,20 @@ _PLACEHOLDERS_ACEPTADOS = re.compile(
     re.IGNORECASE,
 )
 
+# Motivos cuyo hallazgo deja de ser fuga si el fragmento viene envuelto entre
+# corchetes. Los corchetes son la convención de anonimización de este envío
+# --- `\institute{[Afiliación / Institución]\\ \email{[correo@institucion.edu.ar]}}`
+# no filtra a nadie: es el molde que el autor completa recién en la versión de
+# cámara. Sin esta excepción el verificador da un falso positivo sobre su
+# propia convención. La excepción es deliberadamente estrecha: sólo aplica al
+# fragmento literalmente delimitado por `[` y `]`, así que un correo, un ORCID
+# o una URL reales --- que nadie escribe entre corchetes --- siguen fallando.
+_ACEPTAN_CORCHETES = {
+    "correo electrónico",
+    "ORCID identifica al autor",
+    "URL de repositorio o dataset identificable",
+}
+
 PATRONES_PROHIBIDOS: list[tuple[str, str]] = [
     (r"\\author\s*\{(?P<v>[^}]*)\}", "author no anonimizado"),
     (r"\\institute\s*\{(?P<v>[^}]*)\}", "afiliación / institute no anonimizado"),
@@ -59,6 +73,12 @@ class Hallazgo:
     fragmento: str
 
 
+def _entre_corchetes(linea: str, inicio: int, fin: int) -> bool:
+    """¿El fragmento `linea[inicio:fin]` está literalmente entre `[` y `]`?"""
+    return (inicio > 0 and linea[inicio - 1] == "["
+            and fin < len(linea) and linea[fin] == "]")
+
+
 def _buscar_en_texto(texto: str, origen: str, linea_base: int = 0) -> list[Hallazgo]:
     hallazgos = []
     for numero, linea in enumerate(texto.splitlines(), start=1):
@@ -70,6 +90,9 @@ def _buscar_en_texto(texto: str, origen: str, linea_base: int = 0) -> list[Halla
                     valor = (m.groupdict().get("v") or "")
                     if _PLACEHOLDERS_ACEPTADOS.match(valor):
                         continue
+                if (motivo in _ACEPTAN_CORCHETES
+                        and _entre_corchetes(linea, m.start(), m.end())):
+                    continue
                 hallazgos.append(Hallazgo(
                     archivo=origen,
                     linea=linea_base or numero,

@@ -70,10 +70,6 @@ _MOTIVO_EXPLICACION_PAPER: dict[str, str] = {
 
 ARCHIVO_PROMPT_SISTEMA = "prompt_sistema.tex"
 
-# Modo de prompting por modelo (tabla §2.1 del índice): todo el roster activo
-# usa chat_template nativo del tokenizer.
-_MODO_PROMPTING = "Chat template"
-
 RAIZ = Path(__file__).resolve().parent.parent
 DIR_2026 = RAIZ / "data" / "2026"
 DIR_SALIDA = RAIZ / "paper" / "02_reescrito" / "tablas"
@@ -104,7 +100,7 @@ def _escapar(texto: object) -> str:
 
 def _tabla(caption: str, label: str, spec: str, encabezado: list[str],
            filas: list[list[str]], nota: str = "", ancho_completo: bool = False,
-           fuente_pequena: bool = False) -> str:
+           fuente_pequena: bool = False, cortes: frozenset[int] = frozenset()) -> str:
     """Arma un bloque table+tabular con booktabs, en el estilo LNCS.
 
     `ancho_completo=True` envuelve el `tabular` en `\\resizebox{\\textwidth}{!}{...}`;
@@ -113,13 +109,20 @@ def _tabla(caption: str, label: str, spec: str, encabezado: list[str],
     que las tablas transpuestas se vieran comprimidas/ilegibles). Preferí
     `fuente_pequena=True` (envuelve en `{\\small ... }`, sin escalar) cuando
     la tabla entra a ancho de columna pero apretada con el cuerpo de texto
-    normal."""
+    normal.
+
+    `cortes` son índices de fila (0-based) DESPUÉS de los cuales va un
+    `\\midrule`: agrupan filas sin gastar una columna entera en decir a qué
+    grupo pertenece cada una."""
     cuerpo = [
         r"\toprule",
         " & ".join(encabezado) + r" \\",
         r"\midrule",
     ]
-    cuerpo += [" & ".join(f) + r" \\" for f in filas]
+    for i, f in enumerate(filas):
+        cuerpo.append(" & ".join(f) + r" \\")
+        if i in cortes:
+            cuerpo.append(r"\midrule")
     cuerpo += [r"\bottomrule"]
     tabular = [f"\\begin{{tabular}}{{{spec}}}", *cuerpo, r"\end{tabular}"]
     if ancho_completo:
@@ -146,25 +149,32 @@ def _familia(hf_repo_id: str) -> str:
 
 
 def tabla1_modelos() -> str:
-    """Tabla 1: roster activo de 12 modelos, con parámetros, tier, familia y
-    prompting, en el orden canónico del paper (item 3 de la revisión de PDF:
-    el mismo orden de la Fig. 1, agrupado por tier y tamaño creciente)."""
+    """Tabla 1: roster activo de 12 modelos, con parámetros y familia, en el
+    orden canónico del paper (el mismo de la Fig. 1, agrupado por tier y
+    tamaño creciente).
+
+    Sin columna `Prompting`: era constante en las 12 filas y no distinguía a
+    ningún modelo. Sin columna `Tier`: los dos tiers son bloques contiguos del
+    orden canónico, así que un `\\midrule` entre el último sub-1B y el primero
+    de 1--2B dice lo mismo sin gastar una columna."""
+    modelos = orden_canonico(roster_activo())
     filas = [
-        [
-            _escapar(m.nombre),
-            f"{m.params_b:.2f}B",
-            m.tier,
-            _escapar(_familia(m.hf_repo_id)),
-            _MODO_PROMPTING,
-        ]
-        for m in orden_canonico(roster_activo())
+        [_escapar(m.nombre), f"{m.params_b:.2f}B", _escapar(_familia(m.hf_repo_id))]
+        for m in modelos
     ]
+    tiers = [m.tier for m in modelos]
+    cortes = frozenset(
+        i for i in range(len(tiers) - 1) if tiers[i] != tiers[i + 1]
+    )
     return _tabla(
-        caption="Roster de modelos evaluados",
+        caption="Roster de modelos evaluados. La línea horizontal separa el "
+                "tier sub-1B (arriba) del tier 1--2B (abajo)",
         label="tab:modelos",
-        spec="lrlll",
-        encabezado=["Modelo", "Parámetros", "Tier", "Familia", "Prompting"],
+        spec="lrl",
+        encabezado=["Modelo", "Parámetros", "Familia"],
         filas=filas,
+        fuente_pequena=True,
+        cortes=cortes,
     )
 
 
@@ -236,6 +246,7 @@ def tabla3_por_categoria(df: pd.DataFrame) -> str:
         spec=spec,
         encabezado=encabezado,
         filas=filas,
+        fuente_pequena=True,
     )
 
 
@@ -280,24 +291,22 @@ def tabla5_versiones() -> str:
     doce modelos en columnas (encabezados rotados 90°) dejaba la fila de
     `Motivo` en celdas de 1/13 del ancho, ilegible. El motivo de cada pin
     necesario se resume en el lenguaje del paper, sin texto crudo de
-    excepción ni rutas de archivo (item 5 de la revisión de PDF: esas rutas
-    son ruido y, en un envío ciego, una filtración de estructura de
-    directorios local); el motivo completo, con su evidencia y la ruta del
-    log, sigue documentado en `docker/README.md`, que no forma parte del
-    envío. Sin `resizebox`: entra a ancho de columna LNCS sin comprimir
-    letra."""
+    excepción ni rutas de archivo: esas rutas son ruido y, en un envío ciego,
+    una filtración de estructura de directorios local. Sin columna
+    `¿Necesario?`: su valor `Heredado` no respondía la pregunta del
+    encabezado y era redundante con `Motivo`, donde un motivo no vacío ya
+    significa que ese modelo forzó el pin. Sin `resizebox`: entra a ancho de
+    columna LNCS sin comprimir letra."""
     modelos = orden_canonico(roster_activo())
     grupo_de = {BASELINE_TRANSFORMERS: "A", TRANSFORMERS_5X: "B"}
     filas = []
     for m in modelos:
         version_resuelta = _VERSION_RESUELTA[m.transformers_pin]
-        necesario = "Sí" if m.motivo_pin else "Heredado"
         motivo = _escapar(_MOTIVO_EXPLICACION_PAPER[m.nombre]) if m.motivo_pin else "—"
         filas.append([
             _escapar(m.nombre),
             grupo_de[m.transformers_pin],
             version_resuelta,
-            necesario,
             motivo,
         ])
     nota = (
@@ -306,21 +315,27 @@ def tabla5_versiones() -> str:
         f"(\\texttt{{{_escapar(TRANSFORMERS_5X)}}}, resuelve "
         f"{_VERSION_RESUELTA[TRANSFORMERS_5X]}) son necesarios y mutuamente "
         "excluyentes sobre el roster: no existe una única versión mayor que "
-        "sirva para las 12 filas activas. El motivo completo de cada pin "
-        "necesario, con su evidencia y referencia de log, está documentado "
-        "en \\texttt{docker/README.md}."
+        "sirva para las 12 filas activas. Un motivo en blanco (—) indica que "
+        "el modelo no impuso ningún requisito propio y quedó en el grupo por "
+        "omisión."
     )
     return _tabla(
         caption="Pines de \\texttt{transformers} por modelo",
         label="tab:versiones",
-        spec="llllp{3.1cm}",
-        encabezado=["Modelo", "Grupo", "Versión resuelta", "¿Necesario?", "Motivo"],
+        spec="lllp{3.6cm}",
+        encabezado=["Modelo", "Grupo", "Versión resuelta", "Motivo"],
         filas=filas,
         nota=nota,
+        fuente_pequena=True,
     )
 
 
-_ANCHO_VERBATIM = 64  # columnas de \ttfamily\small que entran a ancho LNCS sin overfull
+# Columnas de \ttfamily\footnotesize que entran a ancho LNCS sin overfull. El
+# bloque pasó de \small a \footnotesize por presupuesto de páginas (límite de
+# 10 del CFP): el prompt se sigue emitiendo íntegro desde la constante real,
+# sólo baja un escalón de cuerpo, y el ancho de envoltura sube en proporción
+# inversa (64 * 9/8 = 72) para no desperdiciar ancho de caja.
+_ANCHO_VERBATIM = 72
 
 
 def _envolver_para_verbatim(texto: str, ancho: int = _ANCHO_VERBATIM) -> str:
@@ -352,14 +367,14 @@ def prompt_sistema_tex() -> str:
     usuario = construir_prompt_usuario("<comando del usuario>")
     lineas = [
         r"\paragraph{Prompt de sistema (texto completo).}",
-        r"{\small\ttfamily",
+        r"{\footnotesize\ttfamily",
         r"\begin{verbatim}",
         sistema,
         r"\end{verbatim}",
         r"}",
         "",
         r"\paragraph{Prompt de usuario (uno por comando, tras el de sistema).}",
-        r"{\small\ttfamily",
+        r"{\footnotesize\ttfamily",
         r"\begin{verbatim}",
         usuario,
         r"\end{verbatim}",

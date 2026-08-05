@@ -22,14 +22,28 @@
 % desbordar el margen en esos casos, sin alterar el resto del documento.
 \emergencystretch=3em
 
+% Presupuesto de páginas: el CFP de CACIC pide 10 páginas para trabajos
+% completos (referencias incluidas, supuesto conservador). Con 5 tablas, el
+% prompt íntegro y una figura, la separación por omisión de los flotantes
+% fragmentaba el cuerpo; estos valores la ajustan sin tocar el interlineado
+% del texto ni el cuerpo de letra de las tablas.
+\setlength{\textfloatsep}{8pt plus 2pt minus 2pt}
+\setlength{\intextsep}{8pt plus 2pt minus 2pt}
+\setlength{\floatsep}{8pt plus 2pt minus 2pt}
+% Menos páginas rotas a la mitad por un flotante que no entra.
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.7}
+\renewcommand{\textfraction}{0.08}
+\renewcommand{\floatpagefraction}{0.8}
+
 \begin{document}
 
 \title{Modelos de Lenguaje Pequeños para la Interpretación de Comandos de
 Domótica en Español: Evaluación Automática de Doce Modelos Sub-2B}
 \titlerunning{SLMs para Comandos de Domótica en Español}
-\author{Anonimizado por revisión ciega}
-\authorrunning{Anonimizado por revisión ciega}
-\institute{Anonimizado por revisión ciega}
+\author{[Nombre y Apellido del autor/a]}
+\authorrunning{[Nombre y Apellido del autor/a]}
+\institute{[Afiliación / Institución]\\ \email{[correo@institucion.edu.ar]}}
 \maketitle
 
 \input{secciones/00_abstract}

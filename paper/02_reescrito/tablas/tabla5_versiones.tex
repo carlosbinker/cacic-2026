@@ -2,23 +2,25 @@
 \centering
 \caption{Pines de \texttt{transformers} por modelo}
 \label{tab:versiones}
-\begin{tabular}{llllp{3.1cm}}
+{\small
+\begin{tabular}{lllp{3.6cm}}
 \toprule
-Modelo & Grupo & Versión resuelta & ¿Necesario? & Motivo \\
+Modelo & Grupo & Versión resuelta & Motivo \\
 \midrule
-LFM2.5-230M & B & 5.14.1 & Sí & tokenizer no soportado en 4.57.6 \\
-granite-4.0-h-350m & A & 4.57.6 & Heredado & — \\
-LFM2.5-350M & B & 5.14.1 & Sí & íd. (mismo tokenizer) \\
-granite-4.0-350m & A & 4.57.6 & Sí & regresión de caché en 5.14.1 \\
-SmolLM2-360M-Instruct & A & 4.57.6 & Heredado & — \\
-Qwen3.5-0.8B & B & 5.14.1 & Sí & arquitectura no reconocida en 4.57.6 \\
-OLMo-2-0425-1B-Instruct & A & 4.57.6 & Heredado & — \\
-LFM2.5-1.2B-Instruct & A & 4.57.6 & Heredado & — \\
-granite-4.0-h-1b & A & 4.57.6 & Heredado & — \\
-Qwen2.5-1.5B-Instruct & A & 4.57.6 & Heredado & — \\
-granite-4.0-1b & A & 4.57.6 & Heredado & — \\
-SmolLM2-1.7B-Instruct & A & 4.57.6 & Heredado & — \\
+LFM2.5-230M & B & 5.14.1 & tokenizer no soportado en 4.57.6 \\
+granite-4.0-h-350m & A & 4.57.6 & — \\
+LFM2.5-350M & B & 5.14.1 & íd. (mismo tokenizer) \\
+granite-4.0-350m & A & 4.57.6 & regresión de caché en 5.14.1 \\
+SmolLM2-360M-Instruct & A & 4.57.6 & — \\
+Qwen3.5-0.8B & B & 5.14.1 & arquitectura no reconocida en 4.57.6 \\
+OLMo-2-0425-1B-Instruct & A & 4.57.6 & — \\
+LFM2.5-1.2B-Instruct & A & 4.57.6 & — \\
+granite-4.0-h-1b & A & 4.57.6 & — \\
+Qwen2.5-1.5B-Instruct & A & 4.57.6 & — \\
+granite-4.0-1b & A & 4.57.6 & — \\
+SmolLM2-1.7B-Instruct & A & 4.57.6 & — \\
 \bottomrule
 \end{tabular}
-\\[2pt]\footnotesize{Grupo A (\texttt{transformers>=4.57.0,<5.0.0}, resuelve 4.57.6) y grupo B (\texttt{transformers>=5.0.0}, resuelve 5.14.1) son necesarios y mutuamente excluyentes sobre el roster: no existe una única versión mayor que sirva para las 12 filas activas. El motivo completo de cada pin necesario, con su evidencia y referencia de log, está documentado en \texttt{docker/README.md}.}
+}
+\\[2pt]\footnotesize{Grupo A (\texttt{transformers>=4.57.0,<5.0.0}, resuelve 4.57.6) y grupo B (\texttt{transformers>=5.0.0}, resuelve 5.14.1) son necesarios y mutuamente excluyentes sobre el roster: no existe una única versión mayor que sirva para las 12 filas activas. Un motivo en blanco (—) indica que el modelo no impuso ningún requisito propio y quedó en el grupo por omisión.}
 \end{table}

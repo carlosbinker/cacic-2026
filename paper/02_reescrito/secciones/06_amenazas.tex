@@ -1,117 +1,63 @@
 \section{Amenazas a la validez}
 
-\textbf{Validez de constructo.} La métrica principal (exactitud estricta)
-exige coincidencia textual con el ground truth bajo un protocolo que declara
-explícitamente los sinónimos de valores categóricos cerrados como violación de
-formato (Sección \ref{sec:prompting}). Esta amenaza queda \textbf{resuelta
-parcialmente} por la exactitud laxa y por la taxonomía de
-errores de la Sección \ref{sec:analisis-errores}, que separan explícitamente
-cuánta exactitud estricta perdida corresponde a \texttt{uso\_de\_sinonimos} o
-a \texttt{sin\_error\_semantico} en lugar de a un error de contenido real. La
-brecha sigue siendo una cota superior semántica, no una medición
-independiente con un evaluador humano, y la Sección 4.4 mostró que esta
-métrica laxa es a su vez poco confiable donde la validez de formato es débil:
-24 de las 27 respuestas que la métrica laxa acreditó a
-\texttt{SmolLM2-360M-Instruct} tenían JSON inválido (ver más abajo, amenaza de
-validez interna sobre el sesgo del juez y la fragilidad de
-\texttt{SmolLM2-360M-Instruct}).
+\textbf{Validez de constructo.} La exactitud estricta exige coincidencia
+textual bajo un protocolo que declara los sinónimos de valores categóricos
+cerrados como violación de formato. La exactitud laxa y la taxonomía
+resuelven la amenaza \textbf{parcialmente}, separando qué parte de la
+exactitud perdida es de vocabulario y qué parte es de contenido. La brecha
+sigue siendo una cota superior semántica, no una medición independiente con
+un evaluador humano, y es poco confiable donde el formato es débil: 24 de las
+27 respuestas que acreditó a \texttt{SmolLM2-360M-Instruct} tenían JSON
+inválido.
 
-\textbf{Validez interna.}
+\textbf{Validez interna.} \emph{Sesgo de auto-favorecimiento del juez.} El
+juez es \texttt{granite-4.0-1b}, uno de los doce modelos evaluados:
+\textbf{juzga también sus propias respuestas de la etapa 1}. Un juez basado
+en LLM puede favorecer las respuestas propias o las de su familia
+\cite{zheng2023judging}, y este diseño no lo controla ni con un juez externo
+ni con un segundo evaluador. Como atenuante, es el modelo con \textbf{menos}
+respuestas incorrectas en juego (3 de 32, Tabla \ref{tab:taxonomia}). Además
+es un modelo sub-2B adjudicando equivalencia semántica, tarea más exigente
+que clasificar campos estructurados: los 0 casos de \texttt{juez\_parse\_ok =
+False} hablan de salidas parseables, no de calidad de criterio. Mitigarlo
+exigiría un juez externo de mayor escala, ajeno al roster, o validación
+humana sobre una muestra. Como contrapeso, la adjudicación es
+\textbf{reproducible por diseño}: ambas etapas corren con decodificación
+greedy a temperatura 0.
 
-\emph{Sesgo de auto-favorecimiento del juez.} El juez de la etapa 2,
-seleccionado por la regla congelada de mayor exactitud estricta en la etapa 1
-(Sección \ref{sec:dos-etapas}), es \texttt{granite-4.0-1b}, y ese mismo
-modelo es uno de los doce evaluados: \textbf{juzga también sus propias
-respuestas de la etapa 1}. Un juez basado en LLM puede favorecer respuestas
-generadas por sí mismo o por modelos de su misma familia
-\cite{zheng2023judging}, y en este diseño esa posibilidad no está controlada
-ni por un juez externo ni por un segundo evaluador independiente. El riesgo es
-mayor todavía porque, al ser el modelo con mayor exactitud estricta de la
-etapa 1, \texttt{granite-4.0-1b} es también el modelo con \textbf{menos}
-respuestas incorrectas en juego (apenas 3 de 32, Tabla \ref{tab:taxonomia}):
-tiene la menor cantidad relativa de casos propios para favorecer, lo que
-acota — sin eliminar — el margen concreto de ese sesgo sobre el resultado
-agregado. Además, es un modelo de menos de 2 mil millones de parámetros
-adjudicando equivalencia semántica en lenguaje natural, una tarea de juicio
-más exigente que la clasificación de campos estructurados, con la capacidad
-limitada que ese tamaño implica; los 0 casos de \texttt{juez\_parse\_ok = False}
-reportados en la Sección \ref{sec:analisis-errores} indican que el juez sí
-logró producir salidas parseables de forma consistente, pero no dicen nada
-sobre la calidad de su criterio semántico. Mitigar esta amenaza en trabajo
-futuro requeriría un juez externo de mayor escala, no perteneciente al roster
-evaluado, o una validación humana sobre una muestra de sus adjudicaciones.
-Como contrapeso, la adjudicación es \textbf{reproducible por diseño}: ambas
-etapas corren con decodificación greedy (\texttt{do\_sample=False},
-temperatura 0), de modo que, dado el mismo modelo de entrada, cualquiera puede
-re-ejecutar el juicio y obtener exactamente el mismo resultado.
+\emph{Versiones divergentes de la librería como confusor de latencia.} Los
+doce modelos corren bajo \textbf{dos grupos de versión} de
+\texttt{transformers} mutuamente excluyentes (Tabla \ref{tab:versiones}),
+\textbf{9} y \textbf{3} modelos: parte de cualquier diferencia de latencia
+entre un modelo del grupo A y uno del B puede deberse a la versión de la
+librería y no al modelo. Cada grupo está forzado por evidencia empírica
+propia, no por preferencia de diseño, y ninguna versión mayor única cubre el
+roster completo.
 
-\emph{Versiones divergentes de la librería de inferencia como confusor de
-latencia.} Los doce modelos del roster activo corren bajo \textbf{dos grupos
-de versión} de \texttt{transformers}, mutuamente excluyentes (Tabla
-\ref{tab:versiones}): el grupo A resuelve a la versión 4.57.6, con
-\textbf{9} modelos, y el grupo B resuelve a la versión 5.14.1, con los
-\textbf{3} restantes. Esto es un confusor conocido para cualquier comparación
-de \textbf{latencia} entre un modelo del grupo A y uno del grupo B: parte de
-la diferencia observada puede deberse a la versión de la librería y no al
-modelo en sí. Cada grupo está forzado por evidencia empírica propia, no por
-preferencia de diseño: \texttt{granite-4.0-350m} necesita el grupo A porque
-falla bajo 5.14.1; \texttt{LFM2.5-230M}, \texttt{LFM2.5-350M} y
-\texttt{Qwen3.5-0.8B} necesitan el grupo B porque fallan bajo 4.57.6. La
-evidencia más nítida de que el confusor no es un artefacto teórico es que el
-grupo B resuelve exactamente a la versión (5.14.1) que rompe al modelo que
-fuerza el grupo A: ninguna versión mayor única cubre el roster completo. No
-se repite aquí la premisa, ya descartada en este mismo trabajo, de que una
-única versión mayor de \texttt{transformers} elimina este confusor: la
-evidencia de ambos grupos activos la refuta en las dos direcciones.
+\emph{Topología de procesadores no controlada.} Si los 2 procesadores lógicos
+que expone Docker son hermanos de un mismo núcleo del i5-11400H por
+\emph{hyperthreading} —con la contención que eso agrega— o dos núcleos
+físicos distintos, lo decide el hipervisor y no puede observarse desde
+adentro del contenedor: la topología efectiva no quedó bajo control del
+experimento. Afecta por igual a los doce modelos, así que no introduce un
+sesgo relativo, pero los valores absolutos de latencia pueden estar inflados
+por contención y no deben leerse como la mejor latencia alcanzable en este
+hardware. Los cocientes \texttt{$\times$4,10} y \texttt{$\times$2,88} de la
+Sección \ref{sec:discusion-latencia-hibrida} son robustos: comparan pares
+medidos bajo la misma topología, cualquiera haya sido.
 
-\emph{Topología de procesadores no observable.} La Sección
-\ref{sec:entorno-repro} estableció que la configuración de Docker de esta
-máquina expone únicamente 2 procesadores lógicos a los contenedores, y que
-\texttt{-{}-cpuset-cpus=0-1} fija ese mismo par en las doce corridas y en la
-del juez. Qué relación guardan esos 2 procesadores lógicos con los núcleos
-físicos del host —hermanos de un mismo núcleo por \emph{hyperthreading}
-(SMT), lo que introduciría contención adicional entre ellos, o dos núcleos
-físicos distintos, sin esa contención— la decide el hipervisor de esa
-configuración de Docker, y esta amenaza a la validez no puede resolverse
-observando desde adentro del contenedor: la topología efectiva no quedó bajo
-control de este experimento. Esto afecta por igual a los doce modelos —todos
-corrieron bajo el mismo tope, de a uno por vez—, así que no introduce un
-sesgo relativo entre ellos, pero sí implica que los valores absolutos de
-latencia reportados pueden estar inflados por contención respecto de lo que
-esta misma máquina lograría con dos núcleos físicos completos, y no deben
-leerse como la mejor latencia alcanzable en este hardware. Los cocientes de
-latencia entre variantes híbridas y densas de la Sección
-\ref{sec:discusion-latencia-hibrida} (\texttt{$\times$4,10} y
-\texttt{$\times$2,88}) son robustos a esta amenaza precisamente porque
-comparan pares de modelos medidos bajo la misma topología, cualquiera haya
-sido.
-
-\textbf{Validez externa.}
-
-Persisten además las siguientes amenazas de validez externa: el dataset de evaluación es chico y desbalanceado (32
-comandos, entre 3 y 8 por categoría lingüística), se usó un único prompt sin
-optimización específica por modelo, la entrada fue siempre texto limpio sin
-ruido de reconocimiento de voz (ASR), y sólo se cubrió una variante
-dialectal (español rioplatense).
+\textbf{Validez externa.} El dataset es chico y desbalanceado (32 comandos,
+entre 3 y 8 por categoría), se usó un único prompt sin optimización por
+modelo, la entrada fue siempre texto limpio sin ruido de reconocimiento
+automático de habla (ASR), y se cubrió una sola variante dialectal.
 
 \textbf{Validez de conclusión.} Con entre 3 y 8 comandos por categoría, las
-diferencias porcentuales entre modelos de la Tabla \ref{tab:categorias} y de
-la Tabla \ref{tab:globales} son indicativas, no estadísticamente
-significativas en sentido formal — una limitación que este trabajo no
-resuelve. Todas las corridas del
-barrido principal (Sección \ref{sec:entorno-repro}) se ejecutaron en una
-\textbf{única máquina}, de forma estrictamente secuencial y con
-procesadores fijos, para que la latencia fuera comparable entre modelos;
-las corridas de control, en cambio, compartieron la máquina con trabajo
-concurrente del orquestador y por eso se excluyen explícitamente de
-cualquier afirmación de latencia de este trabajo, quedando limitadas a la
-justificación metodológica de la Sección \ref{sec:entorno-repro}. Por último,
-\texttt{attn\_implementation} y la \texttt{revision} exacta de cada modelo de
-HuggingFace quedaron, también en este trabajo, \textbf{sin pinnear}: cada
-corrida usó lo que \texttt{transformers} resolviera por defecto en el momento
-de ejecutarse, y ningún registro deja constancia de qué implementación de
-atención ni qué revisión de pesos se usó exactamente. Pinnear ambos valores
-ahora exigiría re-correr el barrido completo para que la comparación siguiera
-siendo de igual a igual, lo que explícitamente no se consideró que valiera la
-pena frente al beneficio; se documenta aquí como limitación conocida y no como
-un defecto corregido.
+diferencias porcentuales entre modelos de las Tablas \ref{tab:globales} y
+\ref{tab:categorias} son indicativas, no estadísticamente significativas. Las
+corridas de control compartieron la máquina con trabajo concurrente y se
+excluyen de cualquier afirmación de latencia. Por último,
+\texttt{attn\_implementation} y la \texttt{revision} exacta de cada modelo
+quedaron \textbf{sin pinnear}: cada corrida usó lo que \texttt{transformers}
+resolviera por defecto y no hay registro de cuál fue. Pinnearlos exigiría
+re-correr el barrido completo para que la comparación siguiera siendo de
+igual a igual; se documenta como limitación conocida.
