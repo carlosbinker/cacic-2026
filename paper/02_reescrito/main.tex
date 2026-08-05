@@ -28,9 +28,14 @@
 % cuerpo, el prompt íntegro y una figura, la separación por omisión de los
 % flotantes fragmentaba el cuerpo; estos valores la ajustan sin tocar el
 % interlineado del texto ni el cuerpo de letra de las tablas.
-\setlength{\textfloatsep}{8pt plus 2pt minus 2pt}
-\setlength{\intextsep}{8pt plus 2pt minus 2pt}
-\setlength{\floatsep}{8pt plus 2pt minus 2pt}
+% El componente \plus (cuánto puede estirarse esta separación) sube de 2pt a
+% 8pt tras la fusión de tablas (Tarea 5): la página que comparte la Tabla 2
+% fusionada con fig1 dejaba un Underfull \vbox porque la separación fija no
+% tenía margen para absorber la diferencia de alto; el valor base (8pt) no
+% cambia, sólo cuánto puede estirarse cuando la página lo necesita.
+\setlength{\textfloatsep}{8pt plus 8pt minus 2pt}
+\setlength{\intextsep}{8pt plus 8pt minus 2pt}
+\setlength{\floatsep}{8pt plus 8pt minus 2pt}
 % llncs.cls deja \belowcaptionskip en 10pt (heredado de article.cls); bajarlo
 % a 4pt ahorra ~3 líneas acumuladas sobre los captions de las tablas y la
 % figura del documento, sin tocar el cuerpo de letra ni el interlineado.
