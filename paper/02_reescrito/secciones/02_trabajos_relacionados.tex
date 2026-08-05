@@ -1,34 +1,34 @@
 \section{Trabajos relacionados}
 
-Convertir un comando en una estructura de intención y argumentos (slots) es
-una tarea clásica de Natural Language Understanding (NLU): Weld et al.
-\cite{weld2023survey} relevan los modelos conjuntos de detección de intención
-y slot filling previos a los grandes modelos de lenguaje (LLMs), entrenados
-para el dominio, frente a los cuales el enfoque actual genera directamente un
-JSON con un modelo general. Bouraoui et al. \cite{bouraoui2018french}
-mostraron, sobre un corpus de comandos domóticos en francés, que los recursos
-de NLU en inglés no transfieren bien a otras lenguas. El antecedente más
-cercano evalúa LLMs on-device para home assistants
-\cite{ondevice2025homeassistant}: variantes cuantizadas de 16, 8 y 4 bits,
-con 80\%--86\% de exactitud y latencias de 5 a 6 segundos. Este trabajo se
-diferencia en el extremo inferior de tamaño (sub-2B, sin cuantización), el
-idioma, y la interpretación estructurada en lugar de la generación
-conversacional.
+Convertir un comando en una estructura de intención y argumentos
+(\emph{slots}) es una tarea clásica de Natural Language Understanding (NLU):
+Weld et al. \cite{weld2023survey} revisan los modelos conjuntos de detección
+de intención y \emph{slot filling} anteriores a los grandes modelos de
+lenguaje (LLMs), entrenados específicamente para el dominio; el enfoque
+actual, en cambio, genera directamente un JSON con un modelo general.
+Bouraoui et al. \cite{bouraoui2018french} mostraron, sobre un corpus de
+comandos domóticos en francés, que los recursos de NLU en inglés no se
+transfieren bien a otras lenguas. El antecedente más cercano evalúa LLMs en
+el dispositivo para asistentes domóticos \cite{ondevice2025homeassistant}:
+variantes cuantizadas de 16, 8 y 4 bits, con 80\%--86\% de exactitud y
+latencias de 5 a 6 segundos. Este trabajo se diferencia por el extremo
+inferior de tamaño (sub-2B, sin cuantización), el idioma y la interpretación
+estructurada en lugar de la generación conversacional.
 
-El survey de Lu et al. \cite{gupta2025slms} documenta que modelos de pocos
-miles de millones de parámetros alcanzan paridad de tarea específica frente a
-modelos mucho mayores; los reportes técnicos de Qwen2.5
-\cite{qwen2024report}, SmolLM2 \cite{allal2024smollm2} y OLMo 2
-\cite{olmo2report} describen tres de las familias evaluadas. La
-decodificación restringida por gramática garantiza validez sintáctica
-\cite{beurerkellner2024guiding,dong2024xgrammar}; este estudio optó por no
-usarla, para medir el seguimiento de instrucciones en un despliegue simple, y
-porque resuelve la validez de formato sin evitar que el modelo alucine un
-valor incorrecto dentro de un JSON válido.
+Lu et al. \cite{gupta2025slms} documentan que modelos de pocos miles de
+millones de parámetros igualan a modelos mucho mayores en tareas específicas;
+los reportes técnicos de Qwen2.5 \cite{qwen2024report}, SmolLM2
+\cite{allal2024smollm2} y OLMo 2 \cite{olmo2report} describen tres de las
+familias evaluadas. La decodificación restringida por gramática garantiza
+validez sintáctica \cite{beurerkellner2024guiding,dong2024xgrammar}; en este
+trabajo no se la empleó, tanto para medir el seguimiento de instrucciones en
+un despliegue simple como porque garantiza la validez del formato sin impedir
+que el modelo produzca un valor incorrecto dentro de un JSON válido.
 
 Zheng et al. \cite{zheng2023judging} muestran que un LLM suficientemente
 capaz aproxima el juicio humano con acuerdo alto, y proponen usarlo como juez
-donde la coincidencia exacta subestima el desempeño real — el caso de este
-trabajo, donde un sinónimo válido de un dispositivo no coincide con el ground
-truth. Su limitación conocida es el sesgo de auto-favorecimiento; como aquí
-el juez es uno de los modelos evaluados, aplica directamente (Sección 6).
+donde la coincidencia exacta subestima el desempeño real, como ocurre en este
+trabajo, donde un sinónimo válido de un dispositivo no coincide con la
+anotación de referencia. Su limitación conocida es el sesgo de
+auto-favorecimiento; como aquí el juez es uno de los modelos evaluados, ese
+sesgo es directamente aplicable (Sección 6).

@@ -7,26 +7,27 @@
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.92\textwidth]{figuras/fig1_exactitud_latencia_2026.png}
-\caption{Coincidencia exacta estricta y laxa (izquierda) y latencia promedio de
+\caption{Exactitud estricta y laxa (izquierda) y latencia promedio de
 inferencia en CPU (derecha), por modelo, agrupados por tamaño.}
 \label{fig:globales}
 \end{figure}
 
-El barrido se completó sin fallas irrecuperables: las 384 filas (12 modelos
-$\times$ 32 comandos) de la Tabla \ref{tab:globales} están completas. Bajo el
-prompt fijo a ambos lados de la comparación, \texttt{granite-4.0-1b}
-alcanza \textbf{90,6\%} de exactitud estricta —la cifra más alta del roster—
-frente al \textbf{65,6\%} de \texttt{Qwen2.5-1.5B-Instruct}, el mejor modelo
-del brazo de generación anterior medido idénticamente: \textbf{+25,0 puntos
-porcentuales}. En el otro extremo, \texttt{LFM2.5-350M} no acierta ninguno de
-los 32 comandos (0,0\%) pese a emitir JSON válido en el 100\% de sus
-respuestas. La ventaja del tier 1--2B no es universal: \texttt{Qwen3.5-0.8B}
-supera a cuatro de los seis modelos del tier superior.
+El barrido se completó sin fallas irrecuperables: las 384 respuestas (12
+modelos $\times$ 32 comandos) que resume la Tabla \ref{tab:globales} están
+completas. Bajo ese prompt único, \texttt{granite-4.0-1b}
+alcanza \textbf{90,6\%} de exactitud estricta —la cifra más alta del
+conjunto— frente al \textbf{65,6\%} de \texttt{Qwen2.5-1.5B-Instruct}, el
+representante de la generación anterior medido bajo el mismo protocolo:
+\textbf{+25,0 puntos porcentuales}. En el otro extremo, \texttt{LFM2.5-350M}
+no acierta ninguno de los 32 comandos (0,0\%) pese a emitir JSON válido en el
+100\% de sus respuestas. La ventaja de la franja 1--2B no es universal:
+\texttt{Qwen3.5-0.8B} supera a cuatro de los seis modelos de la franja
+superior.
 
-La brecha entre exactitud estricta y laxa es grande y desigual (Figura
-\ref{fig:globales}): en varios modelos la laxa más que duplica a la estricta.
+La brecha entre exactitud estricta y laxa es amplia y heterogénea (Figura
+\ref{fig:globales}): en varios modelos la laxa más que duplica la estricta.
 Por campo del esquema, \texttt{intent} y \texttt{unidad} concentran la mayor
-tasa de error y \texttt{valor} y \texttt{ubicacion} la menor.
+tasa de error, y \texttt{valor} y \texttt{ubicacion}, la menor.
 
 \subsection{Exactitud por categoría lingüística}
 
@@ -36,8 +37,8 @@ De las seis categorías cerradas del dataset, el juez usó sólo tres (Tabla
 \ref{tab:categorias}): \emph{encendido/apagado simple} (15 comandos),
 \emph{ajuste con valor numérico} (14) y \emph{ajuste relativo o cualitativo}
 (3). Las consultas de estado, las negaciones y los comandos sobre varios
-dispositivos quedaron plegados en las dos primeras. El colapso no afecta a la
-exactitud, que se calcula por comando, pero limita esta tabla como
+dispositivos quedaron absorbidos por las dos primeras. Ese colapso no afecta
+a la exactitud, que se calcula por comando, pero limita esta tabla como
 desagregación lingüística fina.
 
 \subsection{Análisis automático de errores}
@@ -51,27 +52,27 @@ etapa 1. Clasificó las 225 respuestas con \texttt{match\_exact = False} en
 las siete etiquetas cerradas, y ninguna de ellas —ni ninguna de las 32
 asignaciones de categoría— quedó con \texttt{juez\_parse\_ok = False}: no
 hubo reintentos ni etiquetas de respaldo. De esas siete, \emph{alucinación de
-valor/unidad} no se instanció nunca, así que no lleva columna en la Tabla
-\ref{tab:taxonomia}: los modelos de este roster no inventan valores ni
-unidades. \emph{Valor numérico incorrecto} se instanció una única vez, en
+valor/unidad} no se instanció nunca y no aparece como columna en la Tabla
+\ref{tab:taxonomia}: ningún modelo produjo valores ni unidades inexistentes.
+\emph{Valor numérico incorrecto} se instanció una única vez, en
 \texttt{OLMo-2-0425-1B-Instruct}. Los errores se concentran, entonces, en
-confusión de dispositivo y uso de sinónimos, y la métrica laxa rescató
+confusión de dispositivo y uso de sinónimos, y la métrica laxa acredita
 \textbf{123} de las 225 respuestas incorrectas.
 
 Una exactitud estricta cercana a cero admite dos lecturas opuestas, y
-distinguirlas exige mirar \texttt{json\_valido}: alto, es un fallo semántico
-genuino —el modelo emite bien el formato y se equivoca en el contenido—;
-bajo, es un artefacto de parseo. \texttt{LFM2.5-350M} tiene 0,0\% de
+distinguirlas exige examinar \texttt{json\_valido}: si es alto, se trata de
+un fallo semántico genuino —el formato es correcto y el contenido no—; si es
+bajo, de un artefacto de parseo. \texttt{LFM2.5-350M} tiene 0,0\% de
 exactitud estricta con \textbf{100\%} de JSON válido y
 \texttt{OLMo-2-0425-1B-Instruct} 3,1\% con también \textbf{100\%}: ambos son
 fallos semánticos. \texttt{SmolLM2-360M-Instruct}, en cambio, tiene 9,4\% con
-apenas \textbf{25\%}; sólo nueve modelos llegan a 100\% y
-\texttt{LFM2.5-230M} a 87,5\%.
+apenas \textbf{25\%}; sólo nueve modelos llegan al 100\% y
+\texttt{LFM2.5-230M} al 87,5\%.
 
-Esa fragilidad de formato se propaga a la métrica laxa. El campo
-\texttt{laxo\_json\_invalido\_n} —respuestas acreditadas a la exactitud laxa
-pese a tener JSON inválido— vale \textbf{24} para
-\texttt{SmolLM2-360M-Instruct} sobre apenas \textbf{27} rescatadas: su
+El campo \texttt{laxo\_json\_invalido\_n} —respuestas acreditadas a la
+exactitud laxa pese a tener JSON inválido— mide cómo se propaga esa
+fragilidad de formato a la métrica laxa. Asciende a \textbf{24} para
+\texttt{SmolLM2-360M-Instruct} sobre apenas \textbf{27} recuperadas: su
 exactitud laxa de 93,8\% es un artefacto, no evidencia de competencia
-semántica. Vale \textbf{4} para \texttt{LFM2.5-230M} y \textbf{0} para los
-diez modelos restantes.
+semántica. Es \textbf{4} para \texttt{LFM2.5-230M} y \textbf{0} para los diez
+modelos restantes.

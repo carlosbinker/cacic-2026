@@ -36,7 +36,8 @@
 \renewcommand{\textfraction}{0.08}
 \renewcommand{\floatpagefraction}{0.8}
 % Las referencias van sin aire extra entre entradas: es espacio en blanco, no
-% contenido, y cuenta contra el limite de paginas.
+% contenido, y cuenta contra el limite de paginas. (llncs.cls ya fija \small
+% en \thebibliography por su cuenta; no hace falta repetirlo aqui.)
 \let\viejathebibliography\thebibliography
 \renewcommand{\thebibliography}[1]{%
   \viejathebibliography{#1}%

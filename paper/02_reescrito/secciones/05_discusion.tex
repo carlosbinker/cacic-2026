@@ -1,26 +1,26 @@
 \section{Discusión}
 
-\textbf{La brecha entre exactitud estricta y laxa} mide cuánto penaliza la
-coincidencia textual exacta a respuestas que un juez semántico considera
-equivalentes, y la taxonomía la descompone en dos causas: ausencia de error
-semántico, y sustitución de un valor del vocabulario cerrado por un sinónimo.
+\textbf{La brecha entre exactitud estricta y laxa} mide en qué medida la
+coincidencia textual exacta penaliza respuestas que un juez semántico
+considera equivalentes, y la taxonomía la descompone en dos causas: ausencia
+de error semántico y sustitución de un valor del vocabulario cerrado por un
+sinónimo.
 
-\textbf{Endurecer el prompt no elimina el problema.} Aunque el prompt declara
-que un sinónimo de un valor categórico cerrado es una violación de formato
-(Sección \ref{sec:prompting}), \texttt{uso\_de\_sinonimos} aparece en
-prácticamente todos los modelos: copiar textualmente un token de una lista
-cerrada exige un tipo de obediencia distinto del que exige acertar el
-contenido, y varios modelos con buena exactitud de campo prefieren la forma
-natural (``tele'') sobre la literal exigida (``tv''). El caso extremo es
-\texttt{SmolLM2-360M-Instruct}, cuyas respuestas incorrectas se explican casi
-por completo por esta única causa (Tabla \ref{tab:taxonomia}).
+\textbf{Endurecer el prompt no elimina el problema.} Pese a la cláusula
+taxativa del prompt (Sección \ref{sec:prompting}), \texttt{uso\_de\_sinonimos}
+aparece en prácticamente todos los modelos: copiar textualmente un token de
+una lista cerrada exige un seguimiento de instrucciones distinto del que
+exige acertar el contenido, y varios modelos con buena exactitud por campo
+emiten la forma natural (``tele'') y no la literal exigida (``tv''). El caso
+extremo es \texttt{SmolLM2-360M-Instruct}, cuyas respuestas incorrectas se
+explican casi por completo por esta única causa (Tabla \ref{tab:taxonomia}).
 
-\textbf{Tamaño, arquitectura y generación.} Que \texttt{Qwen3.5-0.8B} supere
-a cuatro de los seis modelos del tier superior con menos de mil millones de
-parámetros muestra que el desempeño no depende sólo del conteo de parámetros,
-y los +25,0 puntos de \texttt{granite-4.0-1b} sobre el mejor modelo de la
-generación anterior cuantifican el desplazamiento de lo factible en el rango
-sub-2B.
+\textbf{Tamaño, arquitectura y generación.} Que \texttt{Qwen3.5-0.8B}, con
+menos de mil millones de parámetros, supere a cuatro de los seis modelos de
+la franja superior indica que el desempeño no depende sólo de la cantidad de
+parámetros, y los +25,0 puntos de \texttt{granite-4.0-1b} sobre el
+representante de la generación anterior cuantifican la distancia entre ambas
+generaciones en el rango sub-2B.
 
 \textbf{Penalización de latencia de la atención híbrida.}
 \label{sec:discusion-latencia-hibrida}
@@ -28,19 +28,19 @@ sub-2B.
 a los \textbf{13,77} de la variante densa \texttt{granite-4.0-350m}
 (\textbf{$\times$4,10}), y \texttt{granite-4.0-h-1b} \textbf{123,15} frente a
 los \textbf{42,78} de \texttt{granite-4.0-1b} (\textbf{$\times$2,88}). Que se
-reproduzca en \textbf{ambos} pares de tamaño, con la misma familia y el mismo
+reproduzca en ambos pares de tamaño, con la misma familia y el mismo
 protocolo, indica un efecto arquitectónico y no un artefacto puntual. Las
-variantes híbridas se promocionan por su complejidad sub-cuadrática en la
+variantes híbridas se proponen por su complejidad sub-cuadrática en la
 longitud de secuencia, beneficio que se materializa en secuencias largas;
-aquí los prompts son \textbf{cortos} y la ejecución es sobre \textbf{CPU}, de
-modo que ese beneficio asintótico no llega a manifestarse mientras que la
-sobrecarga \textbf{constante} de gestionar dos tipos de caché —atención
-estándar y estado lineal/recurrente— se paga en cada comando y domina el
-tiempo total. \textbf{A igual cantidad de parámetros, la variante densa es
-preferible en CPU para prompts cortos.}
+aquí los prompts son cortos y la ejecución es sobre CPU, de modo que ese
+beneficio asintótico no llega a manifestarse, mientras que la sobrecarga
+constante de gestionar dos tipos de caché —atención estándar y estado
+lineal/recurrente— se paga en cada comando y domina el tiempo total. A igual
+cantidad de parámetros, la variante densa resulta preferible en CPU para
+prompts cortos.
 
 \textbf{Viabilidad práctica.} Los 42,78 segundos por comando del modelo más
 exacto son incompatibles con una interacción de voz en tiempo real, aunque
-aceptables para automatización diferida; entre los sub-1B,
+resultan aceptables para automatización diferida; entre los sub-1B,
 \texttt{Qwen3.5-0.8B} combina 75,0\% de exactitud estricta con 18,17
-segundos, el compromiso más equilibrado del roster.
+segundos, el compromiso más equilibrado del conjunto.

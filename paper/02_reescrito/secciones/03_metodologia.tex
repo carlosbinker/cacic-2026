@@ -4,49 +4,51 @@
 
 \input{tablas/tabla1_modelos}
 
-Se evaluaron doce modelos abiertos en dos tiers de seis: sub-1000 millones de
-parámetros y entre 1000 y 2000 millones (Tabla \ref{tab:modelos}). Los doce
-son públicos en HuggingFace, sin restricción de licencia ni de token.
-\texttt{Qwen2.5-1.5B-Instruct} (1,54\,B) se incorporó \textbf{deliberadamente}
-como representante de la generación anterior de SLMs, bajo el mismo protocolo
-que el resto: esa comparación sostiene el resultado generacional de la
-Sección 4.1.
+Se evaluaron doce modelos abiertos en dos franjas de seis: sub-1000 millones
+de parámetros y entre 1000 y 2000 millones (Tabla \ref{tab:modelos}). Los
+doce están disponibles públicamente en HuggingFace, sin restricción de
+licencia ni de token. \texttt{Qwen2.5-1.5B-Instruct} (1,54\,B) se incorporó
+deliberadamente como representante de la generación anterior de SLMs, bajo el
+mismo protocolo que el resto: esa comparación sostiene el resultado
+generacional de la Sección 4.1.
 
 \subsection{Dataset de comandos}
 
-El dataset son 32 comandos de domótica en español rioplatense (voseo), con un
-ground truth de cinco campos: intent, dispositivo, ubicación, valor y unidad.
+El dataset consta de 32 comandos de domótica en español rioplatense (voseo),
+con una anotación de referencia de cinco campos: \texttt{intent},
+\texttt{dispositivo}, \texttt{ubicacion}, \texttt{valor} y \texttt{unidad}.
 Cada comando pertenece además a una de seis categorías lingüísticas cerradas
 —encendido/apagado simple, ajuste con valor numérico explícito, ajuste
-relativo o cualitativo, múltiples dispositivos, consulta de estado, y
-negación o contexto conversacional—, que asigna el juez automático (Sección
+relativo o cualitativo, múltiples dispositivos, consulta de estado y negación
+o contexto conversacional—, que asigna el juez automático (Sección
 \ref{sec:dos-etapas}) y no un anotador humano.
 
 \subsection{Protocolo de prompting y esquema de salida}
 \label{sec:prompting}
 
-El prompt de sistema es único y fijo para los doce modelos, y llega a cada
-uno por la plantilla de conversación de su propio \emph{tokenizer}. Se
-transcribe íntegro a continuación junto con el prompt de usuario; ambos se
-emiten desde las constantes que ejecuta el barrido, nunca a mano.
+El prompt de sistema es único y fijo para los doce modelos, y se aplica a
+cada uno mediante la plantilla de conversación de su propio \emph{tokenizer}.
+Se transcribe íntegro a continuación junto con el prompt de usuario; ambos
+provienen de constantes del código, no de una transcripción manual.
 
 \input{tablas/prompt_sistema}
 
-Pide un único objeto JSON con los cinco campos, da dos ejemplos few-shot y
-agrega una cláusula \textbf{taxativa} sobre los campos categóricos cerrados:
-los valores listados entre paréntesis son, textualmente, los únicos outputs
-aceptados, y un sinónimo válido en español —``tele'' por ``tv''— cuenta como
-violación de formato. Toda la Sección 4 se calcula bajo este prompt, así que
-la comparación entre arquitecturas nunca mezcla prompts.
+El prompt solicita un único objeto JSON con los cinco campos, incluye dos
+ejemplos \emph{few-shot} y agrega una cláusula taxativa sobre los campos
+categóricos cerrados: los valores listados entre paréntesis son,
+textualmente, las únicas salidas aceptadas, y un sinónimo válido en español
+—``tele'' por ``tv''— constituye una violación de formato. Los resultados de
+la Sección 4 se calculan bajo este prompt, por lo que la comparación entre
+arquitecturas nunca mezcla prompts.
 
 \subsection{Métricas}
 
 La \textbf{exactitud estricta} exige que los cinco campos coincidan
-textualmente con el ground truth bajo ese protocolo taxativo; la
-\textbf{exactitud laxa (semántica)} le suma los casos que el juez etiquetó
-\texttt{sin\_error\_semantico} o \texttt{uso\_de\_sinonimos}. La estricta es
-la métrica \textbf{primaria}; la laxa es una cota superior que separa errores
-de forma de errores de contenido, y la \textbf{brecha} entre ambas es un
+textualmente con la referencia bajo ese protocolo taxativo; la
+\textbf{exactitud laxa (semántica)} incorpora además los casos que el juez
+etiquetó como \texttt{sin\_error\_semantico} o \texttt{uso\_de\_sinonimos}. La
+estricta es la métrica primaria; la laxa es una cota superior que separa
+errores de forma de errores de contenido, y la brecha entre ambas es un
 resultado del estudio, no una corrección que deba promediarse. Se reportan
 además la tasa de JSON válido, la exactitud por campo y por categoría, y la
 latencia promedio.
@@ -55,51 +57,51 @@ latencia promedio.
 \label{sec:dos-etapas}
 
 En la \textbf{etapa 1} cada respuesta se compara campo a campo, de forma
-determinista, contra el ground truth; de ahí sale la exactitud estricta, sin
-ningún modelo adicional. El juez de la \textbf{etapa 2} se determina por una
-regla fijada de antemano: el modelo con mayor exactitud estricta en la etapa
-1, con los empates resueltos por mayor cantidad de parámetros y luego por el
-orden del roster. Ambas etapas corren con \textbf{decodificación greedy}
-(\texttt{do\_sample=False}, temperatura 0), y de eso —no de fijar el
-identificador del juez de antemano— depende la reproducibilidad.
+determinista, contra la referencia; de allí se obtiene la exactitud estricta,
+sin ningún modelo adicional. El juez de la \textbf{etapa 2} se determina por
+una regla fijada de antemano: el modelo con mayor exactitud estricta en la
+etapa 1, con los empates resueltos por mayor cantidad de parámetros y luego
+por el orden del listado. Ambas etapas se ejecutan con decodificación
+\emph{greedy} (\texttt{do\_sample=False}, temperatura 0), y de ello —no de
+fijar el identificador del juez de antemano— depende la reproducibilidad.
 
 El juez clasifica cada respuesta con \texttt{match\_exact = False} en un
-subconjunto \textbf{no vacío} de siete etiquetas cerradas —confusión de
-intención, de dispositivo y de ubicación; alucinación de valor o unidad;
-valor numérico incorrecto; más \texttt{sin\_error\_semantico} y
-\texttt{uso\_de\_sinonimos}, que definen la exactitud laxa— y asigna a cada
-comando \textbf{exactamente una} categoría lingüística. Una salida que no
-parsee contra ese vocabulario se reintenta una vez y, si vuelve a fallar, cae
-a una etiqueta de respaldo determinista; la frecuencia se reporta. Al ser uno
-de los modelos evaluados, el juez adjudica también sobre sus propias
-respuestas (Sección 6).
+subconjunto no vacío de siete etiquetas cerradas —confusión de intención, de
+dispositivo y de ubicación; alucinación de valor o unidad; valor numérico
+incorrecto; más \texttt{sin\_error\_semantico} y \texttt{uso\_de\_sinonimos},
+que definen la exactitud laxa— y asigna a cada comando exactamente una
+categoría lingüística. Una salida que no valide contra ese vocabulario se
+reintenta una vez y, si vuelve a fallar, recibe una etiqueta de respaldo
+determinista; su frecuencia se reporta. Al ser uno de los modelos evaluados,
+el juez adjudica también sobre sus propias respuestas (Sección 6).
 
 \subsection{Entorno de ejecución y reproducibilidad}
 \label{sec:entorno-repro}
 
 El host es un Intel Core i5-11400H (6 núcleos físicos / 12 hilos), sin GPU:
-los doce modelos y el juez corren en CPU, cada uno en su propia imagen de
-contenedor y de a uno por vez.
+los doce modelos y el juez se ejecutan en CPU, cada uno en su propia imagen
+de contenedor y de forma secuencial.
 
 \input{tablas/tabla5_versiones}
 
-Sobre el roster existen \textbf{dos grupos de versión} de
+El conjunto evaluado necesita \textbf{dos grupos de versión} de
 \texttt{transformers}, mutuamente excluyentes (Tabla \ref{tab:versiones}):
 4.57.6 para nueve modelos y 5.14.1 para los otros tres.
 \texttt{granite-4.0-350m} falla bajo 5.14.1, y \texttt{LFM2.5-230M},
 \texttt{LFM2.5-350M} y \texttt{Qwen3.5-0.8B} fallan bajo 4.57.6: el segundo
-grupo resuelve exactamente a la versión que rompe al modelo que fuerza el
-primero, así que ninguna versión mayor única cubre el roster (Sección 6).
+grupo se resuelve precisamente a la versión que hace fallar al modelo que
+impone el primero, de modo que ninguna versión mayor única cubre el conjunto
+(Sección 6).
 
 La configuración de Docker de esta máquina expone únicamente \textbf{2
-procesadores lógicos} y un techo de \textbf{8\,GB}, y las trece corridas
+procesadores lógicos} y un límite de \textbf{8\,GB}, y las trece ejecuciones
 —doce del barrido más la del juez— fijan \texttt{-{}-memory=8g -{}-cpus=2
--{}-cpuset-cpus=0-1}, el mismo par de identificadores lógicos en todas. Si
-esos dos son hermanos de un mismo núcleo del i5-11400H por
-\emph{hyperthreading} (SMT) o dos núcleos distintos lo decide el hipervisor, y
-\textbf{no es observable} desde adentro del contenedor. La ejecución es
-secuencial porque la inferencia en CPU está limitada por el ancho de banda de
-memoria, que no se particiona por contenedor. Nada de esto afecta a la
-exactitud, calculada sobre decodificación determinista, pero sí implica que
-las latencias son \textbf{comparables entre los doce modelos} sin que sus
-valores absolutos sean la mejor latencia alcanzable en CPU (Sección 6).
+-{}-cpuset-cpus=0-1}, el mismo par de identificadores lógicos en todas. Que
+ese par corresponda a un mismo núcleo físico por \emph{hyperthreading} (SMT)
+o a dos núcleos distintos lo decide el hipervisor y no es observable desde el
+contenedor. La ejecución es secuencial porque la inferencia en CPU está
+limitada por el ancho de banda de memoria, que no se particiona por
+contenedor. Nada de esto afecta a la exactitud, calculada con decodificación
+determinista, pero sí a las latencias: comparables entre los doce modelos,
+aunque sus valores absolutos no sean los mejores alcanzables en CPU (Sección
+6).

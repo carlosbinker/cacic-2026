@@ -64,7 +64,7 @@ _PREFIJO_A_FAMILIA = {
 _MOTIVO_EXPLICACION_PAPER: dict[str, str] = {
     "LFM2.5-230M": "tokenizer no soportado en 4.57.6",
     "LFM2.5-350M": "íd. (mismo tokenizer)",
-    "granite-4.0-350m": "regresión de caché en 5.14.1",
+    "granite-4.0-350m": "regresión de caché en la versión 5.14.1",
     "Qwen3.5-0.8B": "arquitectura no reconocida en 4.57.6",
 }
 
@@ -170,8 +170,8 @@ def tabla1_modelos() -> str:
         i for i in range(len(tiers) - 1) if tiers[i] != tiers[i + 1]
     )
     return _tabla(
-        caption="Roster de modelos evaluados. La línea horizontal separa el "
-                "tier sub-1B (arriba) del tier 1--2B (abajo)",
+        caption="Conjunto de modelos evaluados. La línea horizontal separa la "
+                "franja sub-1B (arriba) de la franja 1--2B (abajo)",
         label="tab:modelos",
         spec="lrl",
         encabezado=["Modelo", "Parámetros", "Familia"],
@@ -324,7 +324,7 @@ def tabla5_versiones() -> str:
         f"{_VERSION_RESUELTA[BASELINE_TRANSFORMERS]}) y grupo B "
         f"(\\texttt{{{_escapar(TRANSFORMERS_5X)}}}, resuelve "
         f"{_VERSION_RESUELTA[TRANSFORMERS_5X]}) son necesarios y mutuamente "
-        "excluyentes sobre el roster: no existe una única versión mayor que "
+        "excluyentes sobre el conjunto evaluado: no existe una única versión mayor que "
         "sirva para las 12 filas activas. Un motivo en blanco (—) indica que "
         "el modelo no impuso ningún requisito propio y quedó en el grupo por "
         "omisión."
