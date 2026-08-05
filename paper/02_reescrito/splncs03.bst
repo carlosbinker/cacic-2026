@@ -1472,7 +1472,13 @@ FUNCTION {presort}
   'sort.key$ :=
 }
 ITERATE {presort}
-SORT
+% NOTA (revision del lider del equipo, ver 08-delta-04-revisiones-pdf.md D4.34):
+% el SORT alfabetico de splncs03/splncs04 originales hace que la primera cita
+% del texto no sea [1] (numeracion no consecutiva en orden de aparicion). Se
+% quita el paso SORT para que las entradas queden en el orden en que BibTeX
+% las lee del .aux (orden de primera cita en el documento), sin tocar
+% call.type$ ni ninguna otra funcion de formato: el formato de cada entrada
+% (autores, titulo, acta, anio) sigue siendo el de la familia LNCS.
 STRINGS { longest.label }
 INTEGERS { number.label longest.label.width }
 FUNCTION {initialize.longest.label}
