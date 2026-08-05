@@ -16,6 +16,10 @@
 % "runningheads" la clase cae en \ps@empty en las 10 paginas, incluida
 % la primera (que ya usaba \thispagestyle{empty} de por si).
 \documentclass{llncs}
+% \usepackage{cmap} debe ir antes de fontenc: sin esto, el PDF no incluye la
+% tabla ToUnicode y copiar texto del PDF (títulos, cuerpo) pega símbolos en
+% vez de letras. Mismo fix ya validado en el paper original (paper_cacic.tex).
+\usepackage{cmap}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[spanish,es-tabla,es-noquoting]{babel}
