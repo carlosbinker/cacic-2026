@@ -1,4 +1,5 @@
 \section{Discusión}
+\label{sec:discusion}
 
 \textbf{La brecha entre exactitud estricta y laxa} mide cuánto penaliza la
 coincidencia textual exacta a respuestas que un juez semántico considera
@@ -16,7 +17,7 @@ incorrectas se explican casi por completo por esta única causa (Tabla
 
 \textbf{Tamaño, arquitectura y generación.} Que \texttt{Qwen3.5-0.8B} (menos
 de mil millones de parámetros) supere a cuatro de los seis modelos de la
-franja superior indica que el desempeño no depende sólo del tamaño; los
+franja superior indica que el desempeño no depende solo del tamaño; los
 +25,0 puntos de \texttt{granite-4.0-1b} sobre la generación anterior
 cuantifican esa distancia en el rango sub-2B.
 
@@ -28,11 +29,11 @@ a los \textbf{13,77} de la variante densa \texttt{granite-4.0-350m}
 los \textbf{42,78} de \texttt{granite-4.0-1b} (\textbf{$\times$2,88}). Que se
 reproduzca en ambos pares, misma familia y protocolo, indica un efecto
 arquitectónico, no un artefacto puntual. Las híbridas se proponen por su
-complejidad sub-cuadrática, que sólo rinde en secuencias largas; aquí los
+complejidad sub-cuadrática, que solo rinde en secuencias largas; aquí los
 prompts son cortos y la ejecución es en CPU, así que no se manifiesta,
 mientras que la sobrecarga constante
-de gestionar dos tipos de caché —atención estándar y estado
-lineal/recurrente— domina el tiempo total. A igual tamaño, la variante densa
+de gestionar dos tipos de caché — atención estándar y estado
+lineal/recurrente — domina el tiempo total. A igual tamaño, la variante densa
 es preferible en CPU para prompts cortos.
 
 \textbf{Viabilidad práctica.} Los 42,78 segundos por comando del modelo más

@@ -1,8 +1,9 @@
 \section{Amenazas a la validez}
+\label{sec:amenazas}
 
 \textbf{Constructo.} La exactitud laxa y la taxonomía separan qué parte de la
 exactitud estricta perdida es de vocabulario y qué parte es de contenido,
-pero sólo resuelven la amenaza parcialmente: la brecha es poco confiable donde
+pero solo resuelven la amenaza parcialmente: la brecha es poco confiable donde
 el formato es débil (Sección \ref{sec:analisis-errores}).
 
 \textbf{Interna.} \emph{Sesgo de auto-favorecimiento del juez.} El juez,
@@ -11,8 +12,8 @@ sus propias respuestas: un juez LLM puede favorecer las suyas
 \cite{zheng2023judging}, sin juez externo ni segundo evaluador que lo
 controle. Como atenuante, es el modelo con menos respuestas incorrectas
 involucradas (3 de 32, Tabla \ref{tab:resultados}); no obstante, es un modelo
-sub-2B que adjudica equivalencia semántica —más exigente que clasificar
-campos estructurados— sin validación contra anotación humana: los 0 casos de
+sub-2B que adjudica equivalencia semántica — más exigente que clasificar
+campos estructurados — sin validación contra anotación humana: los 0 casos de
 \texttt{juez\_parse\_ok = False} indican salidas parseables, no calidad del
 criterio, y la métrica laxa es una cota superior de un instrumento no
 validado.
@@ -23,7 +24,7 @@ modelos se ejecutan repartidos 9/3 entre los dos grupos de versión de
 diferencia de latencia entre grupos puede deberse a la librería y no al
 modelo.
 
-\emph{Topología de procesadores no controlada.} Los 2 procesadores lógicos
+\emph{Topología de procesadores no controlada.} Los dos procesadores lógicos
 que expone Docker pueden corresponder a un mismo núcleo por
 \emph{hyperthreading} o a dos distintos, sin que sea observable desde el
 contenedor (Sección \ref{sec:entorno-repro}). Afecta por igual a los doce

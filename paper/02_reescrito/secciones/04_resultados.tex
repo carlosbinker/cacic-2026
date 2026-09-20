@@ -1,6 +1,8 @@
 \section{Experimentación y resultados}
+\label{sec:resultados}
 
 \subsection{Resultados globales}
+\label{sec:resultados-globales}
 
 \input{tablas/tabla2_resultados_globales}
 
@@ -9,7 +11,7 @@
 \includegraphics[width=0.92\textwidth]{figuras/fig1_exactitud_latencia_2026.png}
 \caption{Exactitud (eje inferior) y latencia (eje superior) por modelo, cada
 una contra su propio eje. La barra de exactitud acumula estricta, laxa con
-JSON válido y, rayado, laxa con JSON inválido. Orden: exactitud estricta
+JSON válido y, en trama rayada, laxa con JSON inválido. Orden: exactitud estricta
 decreciente.}
 \label{fig:globales}
 \end{figure}
@@ -17,8 +19,8 @@ decreciente.}
 El barrido se completó sin fallas irrecuperables: la Tabla
 \ref{tab:resultados} resume las 384 respuestas completas (12 modelos
 $\times$ 32 comandos). \texttt{granite-4.0-1b}
-alcanza \textbf{90,6\%} de exactitud estricta —la cifra más alta del
-conjunto— frente al \textbf{65,6\%} de \texttt{Qwen2.5-1.5B-Instruct}, la
+alcanza \textbf{90,6\%} de exactitud estricta — la cifra más alta del
+conjunto — frente al \textbf{65,6\%} de \texttt{Qwen2.5-1.5B-Instruct}, la
 generación anterior: \textbf{+25,0 puntos
 porcentuales}. En el otro extremo, \texttt{LFM2.5-350M} no acierta ninguno
 de los 32 comandos (0,0\%) pese a emitir JSON válido en el 100\% de sus
@@ -36,7 +38,7 @@ tasa de error, y \texttt{valor} y \texttt{ubicacion}, la menor.
 
 \input{tablas/tabla3_por_categoria}
 
-De las seis categorías cerradas del dataset, el juez usó sólo tres (Tabla
+De las seis categorías cerradas del dataset, el juez usó solo tres (Tabla
 \ref{tab:categorias}): \emph{encendido/apagado simple} (15 comandos),
 \emph{ajuste con valor numérico} (14) y \emph{ajuste relativo o cualitativo}
 (3). Las consultas de estado, las negaciones y los comandos sobre varios
@@ -50,12 +52,13 @@ desagregación lingüística fina.
 El juez, por la regla de la Sección \ref{sec:dos-etapas}, es
 \texttt{granite-4.0-1b} (\textbf{90,6\%} de exactitud estricta en etapa 1).
 Clasificó las 225 respuestas con \texttt{match\_exact = False} en las siete
-etiquetas cerradas sin un solo \texttt{juez\_parse\_ok = False} —ni en las 32
-asignaciones de categoría—: no hubo reintentos ni etiquetas de respaldo. De
-esas siete, \emph{alucinación de valor/unidad} nunca se instanció —ningún
+etiquetas cerradas sin un solo \texttt{juez\_parse\_ok = False}, ni siquiera
+en las 32 asignaciones de categoría. No hubo reintentos ni etiquetas de
+respaldo. De
+esas siete, \emph{alucinación de valor/unidad} nunca se instanció — ningún
 modelo produjo valores ni unidades inexistentes, por eso no aparece como
-columna en la Tabla \ref{tab:resultados}— y \emph{valor numérico incorrecto}
-sólo una vez, en \texttt{OLMo-2-0425-1B-Instruct}. Los errores se
+columna en la Tabla \ref{tab:resultados} — y \emph{valor numérico incorrecto}
+solo una vez, en \texttt{OLMo-2-0425-1B-Instruct}. Los errores se
 concentran en confusión de dispositivo y sinónimos; la métrica laxa
 acredita \textbf{123} de las 225 incorrectas.
 
@@ -65,12 +68,12 @@ correcto, contenido no); bajo, un artefacto de parseo. \texttt{LFM2.5-350M}
 tiene 0,0\% de exactitud estricta con \textbf{100\%} de JSON válido y
 \texttt{OLMo-2-0425-1B-Instruct} 3,1\% con también \textbf{100\%}: ambos son
 fallos semánticos. \texttt{SmolLM2-360M-Instruct}, en cambio, tiene 9,4\% con
-apenas \textbf{25\%}; sólo nueve modelos llegan al 100\% y
+apenas \textbf{25\%}; solo nueve modelos llegan al 100\% y
 \texttt{LFM2.5-230M} al 87,5\%.
 
 El campo \texttt{laxo\_json\_invalido\_n} (respuestas laxamente correctas
 pese a JSON inválido) mide esa fragilidad de formato en la métrica laxa:
 \textbf{24} para \texttt{SmolLM2-360M-Instruct} sobre apenas \textbf{27}
-recuperadas —su exactitud laxa de 93,8\% es un artefacto, no evidencia de
-competencia semántica—, \textbf{4} para \texttt{LFM2.5-230M} y \textbf{0}
+recuperadas — su exactitud laxa de 93,8\% es un artefacto, no evidencia de
+competencia semántica —, \textbf{4} para \texttt{LFM2.5-230M} y \textbf{0}
 para los diez modelos restantes.
